@@ -16,7 +16,7 @@ main:
     cmp ax, b
     jnc if0
     jc else1
-    aIsGrtThnB:
+    if0:
         mov max, ax
         mov ax, b
         mov min, ax
