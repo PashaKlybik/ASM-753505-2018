@@ -1,8 +1,8 @@
 .model small
 .stack 256
 .data
-    a dw ?
-    b dw ?
+	a dw ?
+	b dw ?
 	c dw ?
 	d dw ?
 	tn dw ?
@@ -11,8 +11,8 @@
 	CR_LF db 0Dh, 0Ah, '$'
 .code
 main:
-    mov ax, @data
-    mov ds, ax
+	mov ax, @data
+	mov ds, ax
 	call IntInput
 	mov ax, tn
 	call IntInput
@@ -62,8 +62,8 @@ IntInput proc
 	mov dx, offset inpbuf
 	int 21h
 	lea dx, CR_LF
-    mov ah, 09h
-    int 21h
+	mov ah, 09h
+	int 21h
 	lea si, inpbuf+1
 	lea di, tn
 	call SStrToNum
@@ -98,29 +98,29 @@ SIntOut endp
 
 SStrToNum proc
 	push ax
-    push bx
-    push cx
-    push dx
-    push ds
-    push es
-    push ds
-    pop es 
-    mov cl, ds:[si]
-    xor ch, ch
-    inc si
-    mov bx, 10
-    xor ax, ax
-    mov bl, [si]
-    cmp bl, '-'
-    jne @cycl
-    mov checker, 1
-    inc si
-    dec cl
+	push bx
+	push cx
+	push dx
+	push ds
+	push es
+	push ds
+	pop es 
+	mov cl, ds:[si]
+	xor ch, ch
+	inc si
+	mov bx, 10
+	xor ax, ax
+	mov bl, [si]
+	cmp bl, '-'
+	jne @cycl
+	mov checker, 1
+	inc si
+	dec cl
 @cycl:
 	mov bx, 10
-	mul bx        
+	mul bx	
 	mov [di], ax  
-	cmp dx, 0     
+	cmp dx, 0	 
 	jnz error   
 	mov al, [si]   
 	cmp al, '0'
@@ -130,7 +130,7 @@ SStrToNum proc
 	sub al, '0'
 	xor ah, ah
 	add ax, [di]
-	jc  error    
+	jc  error	
 	inc si   
 	loop @cycl
 	cmp checker, 1
