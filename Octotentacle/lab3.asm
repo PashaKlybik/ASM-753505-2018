@@ -72,107 +72,6 @@ IntInput proc
 	ret
 IntInput endp
 
-StrToNum proc
-	push ax
-	push bx
-	push cx
-	push dx
-	push ds
-	push es    
-	push ds
-	pop es     
-	mov cl, ds:[si]
-	xor ch, ch   
-	inc si 
-	mov bx, 10
-	xor ax, ax
-cycle1:
-	mul bx        
-	mov [di], ax  
-	cmp dx, 0     
-	jnz errr  
-	mov al, [si]   
-	cmp al, '0'
-	jb  errr
-	cmp al, '9'
-	ja  errr
-	sub al, '0'
-	xor ah, ah
-	add ax, [di]
-	jc  errr    
-	inc si	    
-	loop cycle1    
-	mov [di], ax
-	clc 
-	pop es
-	pop ds
-	pop dx
-	pop cx
-	pop bx
-	pop ax
-	ret
-errr:
-	xor ax, ax
-	mov [di], ax
-	stc
-	pop es
-	pop ds
-	pop dx
-	pop cx
-	pop bx
-	pop ax
-	ret
-StrToNum endp
-
-SIntInput proc
-	push bx
-	push cx
-	push dx
-	push si
-	xor si, si
-	xor bx, bx
-	xor cx, cx
-	mov ah, 01h
-	int 21h
-	cmp al, '-'
-	jne unc	
-	mov si, 1
-mloop:
-	mov ah, 01h
-	int 21h
-unc:
-	cmp al, '9'
-	ja zhzh
-	sub al, '0'
-	jb zhzh
-	xor ah, ah
-	mov cx, ax
-	mov ax, bx
-	shl ax, 1
-	shl bx, 3
-	add bx, ax
-	add bx, cx
-	jmp mloop
-zhzh:
-	test si, si
-	jz fin
-	neg bx
-fin:
-	test ax, ax
-	jz ovrf
-	xor bx, bx
-ovrf:
-	lea dx, CR_LF
-    mov ah, 09h
-    int 21h
-	mov ax, bx
-	pop si
-	pop dx
-	pop cx
-	pop bx
-	ret
-SIntInput endp
-
 SIntOut proc
 	push bx
 	push cx
@@ -222,22 +121,22 @@ SStrToNum proc
 	mul bx        
 	mov [di], ax  
 	cmp dx, 0     
-	jnz @err   
+	jnz error   
 	mov al, [si]   
 	cmp al, '0'
-	jb  @err
+	jb  error
 	cmp al, '9'
-	ja  @err
+	ja  error
 	sub al, '0'
 	xor ah, ah
 	add ax, [di]
-	jc  @err    
+	jc  error    
 	inc si   
 	loop @cycl
 	cmp checker, 1
-	jne pls
+	jne notNegative
 	neg ax
-pls:
+notNegative:
 	mov [di], ax
 	mov checker, 0
 	clc
@@ -248,7 +147,7 @@ pls:
 	pop bx
 	pop ax
 	ret
-@err:
+error:
 	mov checker, 0
 	xor ax, ax
 	mov [di], ax
