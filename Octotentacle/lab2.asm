@@ -1,8 +1,8 @@
 .model small
 .stack 256
 .data
- a dw ?
- b dw ?
+	a dw ?
+	b dw ?
 	c dw ?
 	d dw ?
 	tn dw ?
@@ -11,8 +11,8 @@
 	CR_LF db 0Dh, 0Ah, '$'
 .code
 main:
- mov ax, @data
- mov ds, ax
+	mov ax, @data
+	mov ds, ax
 	call IntInput
 	mov ax, tn
 	mov a, ax
@@ -65,8 +65,8 @@ IntInput proc
 	mov dx, offset inpbuf
 	int 21h
 	lea dx, CR_LF
- mov ah, 09h
- int 21h
+	mov ah, 09h
+	int 21h
 	lea si, inpbuf+1
 	lea di, tn
 	call StrToNum
@@ -93,16 +93,16 @@ cycle1:
 	mul bx 
 	mov [di], ax 
 	cmp dx, 0 
-	jnz errr
+	jnz error
 	mov al, [si] 
 	cmp al, '0'
-	jb errr
+	jb error
 	cmp al, '9'
-	ja errr
+	ja error
 	sub al, '0'
 	xor ah, ah
 	add ax, [di]
-	jc errr 
+	jc error 
 	inc si
 	loop cycle1
 	mov [di], ax
@@ -114,7 +114,7 @@ cycle1:
 	pop bx
 	pop ax
 	ret
-errr:
+error:
 	xor ax, ax
 	mov [di], ax
 	stc 
