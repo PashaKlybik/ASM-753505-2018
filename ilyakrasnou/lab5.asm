@@ -1,7 +1,7 @@
 .model small
 .stack 256
 .data
-    matrix dw 20*20 dup (0)
+    matrix dw 10*10 dup (0)
     input db "input.txt", 0
     output db "output.txt", 0
     char db ?
@@ -15,8 +15,8 @@
     handle dw 0
     border dw 32768
     nl db 13, 10, '$'
-    mina dw 400
-    maxa dw 400
+    mina dw 0
+    maxa dw 0
     nullf db 0
 .code
 
