@@ -49,17 +49,17 @@ main:
 	JMP exit 
 
 	else1:
-	mov ax, c
-	mov bx, d
-	mul bx
-	add ax, b ; ax = с * d + b
-	JMP exit 
+		mov ax, c
+		mov bx, d
+		mul bx
+		add ax, b ; ax = с * d + b
+		JMP exit 
 	
 	else2:
-	mov ax, c ; ax = c
+		mov ax, c ; ax = c
 
 	exit:
-	mov ax, 4c00h
-	int 21h
+		mov ax, 4c00h
+		int 21h
 	
 end main
