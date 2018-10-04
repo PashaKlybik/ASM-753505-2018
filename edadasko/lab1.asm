@@ -1,8 +1,8 @@
 .model small
 .stack 256
 .data
-    a dw 6
-    b dw 3
+	a dw 6
+	b dw 3
 	c dw 2
 	d dw 4
 .code
@@ -17,10 +17,10 @@
     ;AX = с * d + b
 		
 main:
-    mov ax, @data
-    mov ds, ax
+	mov ax, @data
+	mov ds, ax
     
-    mov ax, a 
+	mov ax, a 
 	mov bx, a 
 	mul bx 
 	mul bx 
@@ -30,8 +30,8 @@ main:
 	mul bx ; ax = b ^ 2
 	cmp cx, ax ; cx > ax -> CF = 0; ZF = 0
 	
-    JBE else1 ; JBE -> CF == 1 || ZF == 1
-	
+	JBE else1 ; JBE -> CF == 1 || ZF == 1	
+
 	mov ax, c
 	mov bx, d
 	mul bx
@@ -59,7 +59,7 @@ main:
 	mov ax, c ; ax = c
 
 	exit:
-    mov ax, 4c00h
-    int 21h
+	mov ax, 4c00h
+	int 21h
 	
 end main
