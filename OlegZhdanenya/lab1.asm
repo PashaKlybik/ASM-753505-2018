@@ -16,12 +16,9 @@ start:
    MOV AX, b
    MUL b
    CMP BX, AX
-   JNZ next
+   JA next
    JMP secondresult
  next:
-   JNC next1
-   JC secondresult
- next1:
    MOV AX, c
    MUL d
    MOV BX, AX
@@ -29,8 +26,7 @@ start:
    DIV b
    CMP AX, BX
    JZ firstresult
-   JMP secondresult2
-   MOV AX, 65535
+   MOV AX, c 
    JMP all
  firstresult:
    MOV AX, a
@@ -40,10 +36,7 @@ start:
    MOV AX, c
    MUL d
    ADD AX, b
-   JMP all	
- secondresult2:
-   MOV AX, c 
-   JMP all
+   JMP all	   
  all:
    MOV AH, 4Ch
    INT 21h
