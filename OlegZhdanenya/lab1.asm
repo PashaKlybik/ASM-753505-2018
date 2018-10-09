@@ -34,7 +34,6 @@ start:
  firstresult:
    MOV AX, a
    AND AX, b
-   JMP all
  all:
    MOV AH, 4Ch
    INT 21h
