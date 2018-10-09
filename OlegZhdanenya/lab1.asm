@@ -29,7 +29,7 @@ start:
    DIV b
    CMP AX, BX
    JZ firstresult
-   JNZ secondresult2
+   JMP secondresult2
    MOV AX, 65535
    JMP all
  firstresult:
