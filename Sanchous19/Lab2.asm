@@ -1,4 +1,4 @@
-;Лабораторная работа №2
+;Г‹Г ГЎГ®Г°Г ГІГ®Г°Г­Г Гї Г°Г ГЎГ®ГІГ  В№2
 .MODEL SMALL
 .STACK 100h
 
@@ -11,9 +11,9 @@
 	endline db 13, 10, '$'
 .CODE
 
-output proc						; Процедура записи числа из регистра AX в консоль
+output proc						; ГЏГ°Г®Г¶ГҐГ¤ГіГ°Г  Г§Г ГЇГЁГ±ГЁ Г·ГЁГ±Г«Г  ГЁГ§ Г°ГҐГЈГЁГ±ГІГ°Г  AX Гў ГЄГ®Г­Г±Г®Г«Гј
 	push ax
-	push cx						; Сохранение значений из регистров в стек
+	push cx						; Г‘Г®ГµГ°Г Г­ГҐГ­ГЁГҐ Г§Г­Г Г·ГҐГ­ГЁГ© ГЁГ§ Г°ГҐГЈГЁГ±ГІГ°Г®Гў Гў Г±ГІГҐГЄ
 	push dx
 	push di
 	xor cx,cx
@@ -22,7 +22,7 @@ toString:
 	inc cx
 	xor dx,dx
 	div ten
-	add dx,'0'					; Перевод числа в строку и запись в стек
+	add dx,'0'					; ГЏГҐГ°ГҐГўГ®Г¤ Г·ГЁГ±Г«Г  Гў Г±ГІГ°Г®ГЄГі ГЁ Г§Г ГЇГЁГ±Гј Гў Г±ГІГҐГЄ
 	push dx
 	test ax,ax
 	jnz toString
@@ -31,35 +31,35 @@ toString:
 inBuffer:
 	pop dx
 	mov [di],dl
-	inc di						; Занесение числа в буфер
+	inc di						; Г‡Г Г­ГҐГ±ГҐГ­ГЁГҐ Г·ГЁГ±Г«Г  Гў ГЎГіГґГҐГ°
 	loop inBuffer
 
 	mov byte ptr[di],'$'
 
 	lea dx,buffer
-	mov ah,9					; Отображение строки в консоли
+	mov ah,9					; ГЋГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГҐ Г±ГІГ°Г®ГЄГЁ Гў ГЄГ®Г­Г±Г®Г«ГЁ
 	int 21h
 
 	pop di
 	pop dx
-	pop cx						; Возвращение значений из стека
+	pop cx						; Г‚Г®Г§ГўГ°Г Г№ГҐГ­ГЁГҐ Г§Г­Г Г·ГҐГ­ГЁГ© ГЁГ§ Г±ГІГҐГЄГ 
 	pop ax
 	ret
 output endp
 
 
-input proc						; Процедура чтения числа из консоли
+input proc						; ГЏГ°Г®Г¶ГҐГ¤ГіГ°Г  Г·ГІГҐГ­ГЁГї Г·ГЁГ±Г«Г  ГЁГ§ ГЄГ®Г­Г±Г®Г«ГЁ
 	push bx
-	push cx						; Сохранение значений из регистров в стек
+	push cx						; Г‘Г®ГµГ°Г Г­ГҐГ­ГЁГҐ Г§Г­Г Г·ГҐГ­ГЁГ© ГЁГ§ Г°ГҐГЈГЁГ±ГІГ°Г®Гў Гў Г±ГІГҐГЄ
 	push dx
 	push di
 
 	lea di,buffer
-	mov byte ptr[di],6			; Управление двумя первыми байтами в буфере
+	mov byte ptr[di],6				; Г“ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ Г¤ГўГіГ¬Гї ГЇГҐГ°ГўГ»Г¬ГЁ ГЎГ Г©ГІГ Г¬ГЁ Гў ГЎГіГґГҐГ°ГҐ
 	mov byte ptr[di+1],0
 
 	lea dx,buffer
-	mov ah,0Ah					; Чтение числа с клавиатуры
+	mov ah,0Ah					; Г—ГІГҐГ­ГЁГҐ Г·ГЁГ±Г«Г  Г± ГЄГ«Г ГўГЁГ ГІГіГ°Г»
 	int 21h
 
 	xor cx,cx
@@ -74,9 +74,9 @@ numberFromBuffer:
 	cmp bl,'0'
 	jb errorLabel
 	cmp bl,'9'
-	ja errorLabel				; Проверки на корректность ввода
+	ja errorLabel					; ГЏГ°Г®ГўГҐГ°ГЄГЁ Г­Г  ГЄГ®Г°Г°ГҐГЄГІГ­Г®Г±ГІГј ГўГўГ®Г¤Г 
 	sub bl,'0'
-	mul ten						; Перевод строки в число
+	mul ten						; ГЏГҐГ°ГҐГўГ®Г¤ Г±ГІГ°Г®ГЄГЁ Гў Г·ГЁГ±Г«Г®
 	jc errorLabel
 	add ax,bx
 	jc errorLabel
@@ -86,15 +86,15 @@ numberFromBuffer:
 errorLabel:
 	lea dx,error
 	mov ah,9
-	int 21h						; Обрабатывание ошибки в программе
+	int 21h						; ГЋГЎГ°Г ГЎГ ГІГ»ГўГ Г­ГЁГҐ Г®ГёГЁГЎГЄГЁ Гў ГЇГ°Г®ГЈГ°Г Г¬Г¬ГҐ
 	mov ax,0
 	mov ah,4ch
-    int 21h
+    	int 21h
 	
 exit:
 	pop di
 	pop dx
-	pop cx						; Возвращение значений из стека
+	pop cx						; Г‚Г®Г§ГўГ°Г Г№ГҐГ­ГЁГҐ Г§Г­Г Г·ГҐГ­ГЁГ© ГЁГ§ Г±ГІГҐГЄГ 
 	pop bx
 	ret
 input endp
@@ -137,16 +137,16 @@ printEndline endp
 
 
 START:
-    mov ax,@data
+    	mov ax,@data
 	mov ds,ax
 
 	call input
-	call output					; Ввод и вывод делимого
+	call output					; Г‚ГўГ®Г¤ ГЁ ГўГ»ГўГ®Г¤ Г¤ГҐГ«ГЁГ¬Г®ГЈГ®
 	call printEndline 
 
 	mov bx,ax
 	call input
-	call output					; Ввод и вывод делителя
+	call output					; Г‚ГўГ®Г¤ ГЁ ГўГ»ГўГ®Г¤ Г¤ГҐГ«ГЁГІГҐГ«Гї
 	call printEndline 
 
 	xchg ax,bx
@@ -154,15 +154,14 @@ START:
 	div bx
 
 	call printQuotient
-	call output					; Вывод частного
+	call output					; Г‚Г»ГўГ®Г¤ Г·Г Г±ГІГ­Г®ГЈГ®
 	call printEndline
 
 	mov ax,dx
 	call printRemainder
-	call output					; Вывод остатка
+	call output					; Г‚Г»ГўГ®Г¤ Г®Г±ГІГ ГІГЄГ 
 	call printEndline
 
-
 	mov ah,4ch
-    int 21h
+    	int 21h
 END START
