@@ -17,7 +17,10 @@ start:
    MUL b
    CMP BX, AX
    JA next
-   JMP secondresult
+   MOV AX, c
+   MUL d
+   ADD AX, b
+   JMP all	  
  next:
    MOV AX, c
    MUL d
@@ -32,11 +35,6 @@ start:
    MOV AX, a
    AND AX, b
    JMP all
- secondresult:
-   MOV AX, c
-   MUL d
-   ADD AX, b
-   JMP all	   
  all:
    MOV AH, 4Ch
    INT 21h
