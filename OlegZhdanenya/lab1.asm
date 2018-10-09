@@ -16,7 +16,7 @@ start:
    MOV AX, b
    MUL b
    CMP BX, AX
-   JA next
+   JB next
    MOV AX, c
    MUL d
    ADD AX, b
