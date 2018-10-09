@@ -1,30 +1,31 @@
+
 .model small
 .stack 256
 .data
     matrix dw 10*10 dup (0)
     input db "input.txt", 0
     output db "output.txt", 0
-    char db ?
-    rows dw 4
-    cols dw 4
+    char db ?                     ;buffer char
+    rows dw 0
+    cols dw 0
     ten dw 10
     sign db 0
     errmes db "Error", '$'
     colsmes db "Enter number of columns:",10,13,'$'
     rowsmes db "Enter number of rows:",10,13,'$'
-    handle dw 0
+    handle dw 0                   ; descriptor of file
     border dw 32768
-    nl db 13, 10, '$'
-    mina dw 0
-    maxa dw 0
-    nullf db 0
+    nl db 13, 10, '$'              ; new line
+    mina dw 0                      ; adress of min element
+    maxa dw 0                      ; adress of max element
+    nullf db 0                     ; if it isn't number
 .code
 
 setsignf:
     inc sign
     jmp Inputf
 
-FInput proc         ;BX - descriptor
+FInput proc         ;BX - descriptor, si - length of file
     push cx
     push dx
     push di
@@ -37,7 +38,10 @@ FirstInputf:
     lea dx, char
     mov cx, 1
     int 21h
-    jc nullnum
+    jc emergexitf
+    dec si
+    cmp si, 0
+    je emergexitf 
     mov al, char
     xor cx, cx
     cmp al, '-'
@@ -61,7 +65,10 @@ Inputf:
     lea dx, char
     mov cx, 1
     int 21h
-    jc exitf
+    jc emergexitf
+    dec si
+    cmp si, 0
+    je emergexitf 
     pop cx
     mov al, char
     cmp al, ' '
@@ -83,6 +90,10 @@ nextstep2f:
     mov cx, ax
     jmp Inputf
 
+emergexitf:
+    mov ah,3Eh
+    int 21h
+    jmp caseerr
 reversef:
     neg cx
     jmp nextinf
@@ -325,29 +336,44 @@ FileInput proc
     push ax
     push cx
     push dx
-    push si
+    push di
+    mov al, 2     ;считаем и записываем длину в si
+    xor cx, cx
+    xor dx, dx
+    mov ah, 42h
+    int 21h
+    jc caseerr0
+    cmp dx, 0
+    jne caseerr0
+    mov si, ax
+    mov al, 0     ; возвращаем указатель в начало файла
+    xor cx, cx
+    mov ah, 42h
+    int 21h
+    jc caseerr0
     mov ax, rows
     mul cols
     shl ax, 1
     mov cx, ax
-    mov si, 0
+    mov di, 0
 elofmatrix:
     call FInput
     cmp nullf, 0
     jne elofmatrix
-    mov matrix[si], ax
-    mov ax, matrix[si]
-    inc si
-    inc si
+    mov matrix[di], ax
+    inc di
+    inc di
    
-    cmp si, cx
+    cmp di, cx
     jc elofmatrix
 
-    pop si
+    pop di
     pop dx
     pop cx
     pop ax
     ret
+caseerr0:
+    jmp caseerr
 FileInput endp
 
 ChangeMaxMin proc
@@ -365,7 +391,6 @@ maxexternal:
         mov dx, cols
         sub dx, cx
         dec dx
-        ;add dx, cols
         cmp dx, 0
         jl maxend
         shl dx, 1
@@ -401,7 +426,6 @@ maxend:
     minexternal:
         mov di, cols
         sub di, cx ;
-        ;add di, cols
         cmp di, 0
         jnl mingreqz
         xor di, di
@@ -494,9 +518,10 @@ admission:
     call CslOutput
     
     mov al, 1
-    mov ah, 3dh
-    lea dx, output
+    mov ah, 6ch
+    lea si, output
     xor cx, cx
+    mov dx, 12h
     int 21h
     jc caseerr
     mov handle, ax
