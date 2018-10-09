@@ -1,4 +1,4 @@
-; Лабораторная №1(Вариант 8)
+; Г‹Г ГЎГ®Г°Г ГІГ®Г°Г­Г Гї В№1(Г‚Г Г°ГЁГ Г­ГІ 8)
 .MODEL SMALL
 .STACK 100h
 
@@ -9,13 +9,13 @@
 	d dw 7
 .CODE
 START:
-    mov ax,@data
+    	mov ax,@data
 	mov ds,ax
 
 
 	mov ax,a
 	mov bx,b
-    cmp ax,bx
+  	cmp ax,bx
 	jae label1
 	mov ax,b		; if a < b
 	mov bx,a
@@ -45,5 +45,5 @@ label5:
 
 
 	mov ah,4ch
-    int 21h
+    	int 21h
 END START
