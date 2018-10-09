@@ -11,8 +11,34 @@
     minl dw -1
     maxl dw 0
 .code
-;Вариант 16
-;Поменять местами наибольшее и наименьшее по длине слово.
+
+change proc
+    push cx
+    mov cx, bx                ; до первого слова
+    sub cx, si
+    cld
+    rep movsb                ; до первого слова
+    pop cx
+    push cx
+    mov si, ax
+    rep movsb                ; вставляем второе слово
+    mov cx, ax
+    sub cx, bx
+    sub cx, dx
+    mov si, bx
+    add si, dx
+    rep movsb                ; от первого до второго
+    mov cx, dx
+    mov si, bx
+    rep movsb                ; вставляем первое слово
+    mov si, ax
+    mov al, '$'
+    pop cx
+    add si, cx
+    mov cx, len
+    repne movsb                ; от второго до конца
+    ret
+change endp
 
 parse proc
     push ax
@@ -43,22 +69,17 @@ found:
     cmp dx, 0
     je nextf2
     cmp dx, minl
-    jc setmin
+    jnc nextf1
+    mov minl, dx
+    mov mina, bx
 nextf1:
     cmp maxl, dx
-    jc setmax
+    jnc nextf2
+    mov maxl, dx
+    mov maxa, bx
 nextf2:
     mov bx, di
     jmp nextw
-
-setmin:
-    mov minl, dx
-    mov mina, bx
-    jmp nextf1
-setmax:
-    mov maxl, dx
-    mov maxa, bx
-    jmp nextf2
 parse endp
 
 start:
@@ -80,64 +101,25 @@ start:
     int 21h
     call parse    
     
-    mov ax, mina
-    sub ax, di
-    mov bx, maxa
-    sub bx, di
-    cmp ax, bx
-    jnc groreq
-    mov cx, ax                ; min < max
-    cld
     lea si, string
     lea di, rezstr
-    rep movsb                ; до мин слова
+    mov ax, maxa ;ax - второе слово
+    mov bx, mina ;bx - первое слово
+                 ;сх - длина второго слова
+                 ; dx - длина первого слова
+                 ;si - указатель на строку источник
+                 ; di - указатель на результирующую строку
     mov cx, maxl
-    mov si, maxa
-    rep movsb                ; вставляем макс слово
-    mov cx, bx
-    sub cx, ax
-    sub cx, minl
-    mov si, mina
-    add si, minl
-    rep movsb                ; от мин до макс
-    mov cx, minl
-    mov si, mina
-    rep movsb                ; вставляем мин слово
-    mov cx, len
-    mov al, '$'
-    mov si, maxa
-    add si, maxl
-    repne movsb                ; от макс до конца
-    jmp output
-groreq:
-    cmp ax, bx
+    mov dx, minl
+    cmp bx, ax
+    jc next
     je ifeq
-    mov cx, bx
-    cld
-    lea si, string
-    lea di, rezstr
-    rep movsb                ; до макс слова
-    mov cx, minl
-    mov si, mina
-    rep movsb                ; вставляем мин слово
-    mov cx, ax
-    sub cx, bx
-    sub cx, maxl
-    mov si, maxa
-    add si, maxl
-    rep movsb                ; от макс до мин
-    mov cx, maxl
-    mov si, maxa
-    rep movsb                ; вставляем макс слово
-    mov cx, len
-    mov al, '$'
-    mov si, mina
-    add si, minl
-    repne movsb                ; от мин до конца
+    xchg ax, bx
+    xchg cx, dx
+next:
+    call change
     jmp output
 ifeq:
-    lea si, string
-    lea di, rezstr
     mov al, '$'
     mov cx, len
     repne movsb
