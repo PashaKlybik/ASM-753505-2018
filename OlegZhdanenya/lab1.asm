@@ -17,7 +17,7 @@ start:
    MUL b
    CMP BX, AX
    JNZ next
-   JMP all
+   JMP secondresult
  next:
    JNC next1
    JC secondresult
