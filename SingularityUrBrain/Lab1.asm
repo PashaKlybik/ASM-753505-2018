@@ -3,8 +3,8 @@
 .data
     a dw 5
     b dw 5
-	c dw 0
-	d dw 7
+    c dw 0
+    d dw 7
 .code
 main:
 	mov ax, @data
