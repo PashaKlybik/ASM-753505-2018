@@ -28,25 +28,25 @@ output PROC
  	mov BX,10
  	
  	;пока число больше 10 -> деление на 10 + остаток в стек
- 	cycle1:
+ 	cycleRestToStack:
  		CMP AX, 10 
  		JC exit
  		MOV DX, 0 
  		div BX
  		push DX
  		inc CX
- 	JMP cycle1
+ 	JMP cycleRestToStack
  	exit:		
  		push AX
  		inc CX
  	
  	;вывод чисел из стека 	
- 	cycle2:		
+ 	cycleOutputStack:		
  		pop DX	
  		add DX, 48
  		mov AH, 02h
  		int 21h
- 	LOOP cycle2
+ 	LOOP cycleOutputStack
  	
  	pop DX
  	pop CX
@@ -69,7 +69,7 @@ input PROC
  		mov AH, 01h
  		INT 21h		
  		CMP AL, 13 ;enter
- 		JZ exit1
+ 		JZ exitInput
  		CMP AL, 8 ;backspace
  		JZ backspace
 
@@ -127,7 +127,7 @@ input PROC
  		pop AX
      	jmp  enterSymbol
  				
- 	exit1:
+ 	exitInput:
  		MOV AX, BX
  		pop DX
  		pop CX
