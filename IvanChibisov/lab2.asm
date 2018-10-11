@@ -10,6 +10,7 @@
     errorMessage1 db "Invalid input, uncorrect symbol,enter again$"
     errorMessage2 db "Invalid input, Number>65536, enter again$"
     errorMessage3 db "Division by zero, the result is not obtained$"
+    remainder db "remainder$"
 .code
 PUTCHAR PROC
   PUSH BX
