@@ -111,7 +111,7 @@ ReadAX proc
 		cmp CX, 0
 		jz readSymbol
 		pop AX
-		sub CX, 1
+		dec CX
 		call DeleteSymbolFromDisplay
 		jmp readSymbol
 
@@ -122,7 +122,6 @@ ReadAX proc
 		cycle1:
 		pop AX
 		LOOP cycle1
-		
 		call DeleteNumFromDisplay
 		jmp readSymbol
 
@@ -149,7 +148,6 @@ ReadAX proc
 
 	addDigitsToNum:
 
-
 		mov SI, CX			;SI - length of the num
 		mov DI, 0
 
@@ -162,11 +160,10 @@ ReadAX proc
 		call tenInDegreeAX
 
 		cmp DX, 0
-			JNZ forError
+		JNZ forError
 
 		mul BX
 		add DI, AX
-
 		JC forError
 
 		cmp DX, 0
@@ -175,7 +172,7 @@ ReadAX proc
 		jmp continue
 
 		forError:
-			dec CX
+		dec CX
 		jmp error
 		continue:
 	LOOP cycle2
@@ -250,6 +247,9 @@ main:
 	lea DX, newLine
 	call PrintStr
 
+	cmp AX, 0
+	jz main
+	
 	mov DI, AX
 
 	call printAX
