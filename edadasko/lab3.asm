@@ -49,18 +49,17 @@ output PROC
  		push DX
  		inc CX
  	JMP cycle1
-	
+
  	exit:		
  		push AX
- 		inc CX
- 		
+ 		inc CX	
  	cycle2:		
  		pop DX	
  		add DX, 48
  		mov AH, 02h
  		int 21h
  	LOOP cycle2
- 	
+
  	pop DX
  	pop CX
  	pop BX
@@ -175,19 +174,19 @@ RET
 input ENDP
 
 checkRange PROC
-		JC error
- 		CMP SI, 0
- 		JZ checkPozitive
- 		CMP AX, 32769
- 		JNC error
- 		CMP BX, 32769
- 		JNC error
- 		JMP e
- 		checkPozitive:
- 		CMP AX, 32768
- 		JNC error
- 		CMP BX, 32768
- 		JNC error
+	JC error
+ 	CMP SI, 0
+ 	JZ checkPozitive
+ 	CMP AX, 32769
+ 	JNC error
+ 	CMP BX, 32769
+ 	JNC error
+ 	JMP e
+ 	checkPozitive:
+ 	CMP AX, 32768
+ 	JNC error
+ 	CMP BX, 32768
+ 	JNC error
 e:		
 RET
 checkRange ENDP
