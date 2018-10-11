@@ -4,9 +4,9 @@
 .model small
 .stack 256
 .data
-    a dw 0
-    b dw -3
-    c dw 1
+	a dw 0
+	b dw -3
+	c dw 1
 	d dw 2
 .code
 
