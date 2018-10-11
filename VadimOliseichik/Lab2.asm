@@ -68,7 +68,7 @@ int 21h
 mov dl, 13 
 mov ah, 02h 
 int 21h 
-lea bx, Message1 
+lea dx, Message1 
 mov ah, 09h 
 int 21h 
 mov dl, 10 
@@ -182,7 +182,7 @@ int 21h
 mov dl, 13 
 mov ah, 02h 
 int 21h 
-lea bx, Message3 
+lea dx, Message3 
 mov ah, 09h 
 int 21h 
 exit: 
