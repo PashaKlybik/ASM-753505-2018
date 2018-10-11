@@ -245,6 +245,11 @@ answer_output:
 	mov ax, bx
 	cmp ax, maxpositiveplusone
 	jc it_is_remainder
+	cmp cx, maxpositiveplusone
+	jc add_divider
+	sub ax, cx
+	jmp it_is_remainder
+add_divider:
 	add ax, cx
 it_is_remainder:
 	call OUTPUT
