@@ -28,7 +28,7 @@ main:
 	mov BX,b
 
 	mov DI, AX
-	add DI, 1
+	inc DI
 	or AX, DI
 	cmp AX, BX
 
@@ -36,7 +36,7 @@ main:
 
 	mov AX, a
 	mul BX
-	mul BX
+	add CX, D
 	mov CX, d
 	div CX
 	mov AX, DX
@@ -45,15 +45,15 @@ main:
 	flag1:
 	
 	mov AX, a
-	and AX, b
+	and AX, BX
 	mov CX, c
 	or CX, d
 	cmp AX,CX
 
 	JNZ flag2
 
-	mov DI, b
-	sub DI, 1
+	mov DI, BX
+	dec DI
 	and BX, DI
 	mov AX, BX
 	jmp exit
