@@ -52,7 +52,7 @@ output PROC
  	pop CX
  	pop BX
  	pop AX
- 	RET
+RET
 output ENDP
 
 input PROC
