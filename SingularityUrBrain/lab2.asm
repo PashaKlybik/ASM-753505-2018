@@ -14,7 +14,7 @@
 .code
 main:
 	mov ax, @data
-    mov ds, ax
+	mov ds, ax
 	
 	mov ah, 09h
 	mov dx, offset input_divnd_mess
