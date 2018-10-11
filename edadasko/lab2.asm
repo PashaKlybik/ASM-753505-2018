@@ -52,7 +52,7 @@ output PROC
  	pop CX
  	pop BX
  	pop AX
-RET
+ 	RET
 output ENDP
 
 input PROC
@@ -74,12 +74,10 @@ input PROC
  		JZ backspace
 
 		;проверка на ввод цифры
- 		CMP AL, 48
- 		JC error
- 		CMP AL, 58 
+		SUB AL, 48
+ 		CMP AL, 10
  		JNC error
 		
- 		SUB AL, 48
  		MOV CL, AL
  		MOV AX, 10
  		MUL BX
