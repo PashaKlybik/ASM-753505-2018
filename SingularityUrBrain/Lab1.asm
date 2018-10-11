@@ -1,7 +1,7 @@
 .model small
 .stack 256
 .data
-        a dw 5
+	a dw 5
 	b dw 5
 	c dw 0
 	d dw 7
