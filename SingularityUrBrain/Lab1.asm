@@ -1,9 +1,9 @@
 .model small
 .stack 256
 .data
-    a dw 5
-    b dw 5
-    c dw 0
+    a dw -5
+    b dw 1
+    c dw 3
     d dw 7
 .code
 main:
@@ -11,28 +11,28 @@ main:
     mov ds, ax
     	
 	mov ax, [a]
-	mul [c]		
+	imul [c]		
 	mov bx, ax 	
 	mov ax, [b]
-	mul [d]		
+	imul [d]		
 	add bx, ax 
 	
 	mov ax, [a]	
-	mul [d]		
+	imul [d]		
 	mov cx, ax	
 	mov ax, [b]
-	mul [c]		
+	imul [c]		
 	add cx, ax	
 	
 	cmp bx, cx
 	jnz unequal
 	mov ax, [a]
-	mul ax
+	imul ax
 	jmp end_if
 unequal:
 	mov bx, [a]
 	cmp bx, [c]
-	jna less_or_eq
+	jng less_or_eq
 	mov ax, [c]
 	and ax, [b]
 	jmp end_if
