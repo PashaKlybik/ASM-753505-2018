@@ -1,42 +1,27 @@
-Division of signed numbers
+;Division of signed numbers
 
 .model small
 .stack 256
 .data
 ten dw 10
 newLine db 10,13,'$'
-error db 10, 13,"Input error", 10, 13, '$'
+errorMsg db 10, 13,"Input error", 10, 13, '$'
+repeatInput db 10, 13,"Repeat input!", 10, 13, '$'
 enter2 db "Enter the divisor", 10, 13, '$'
 enter1 db "Enter a dividend", 10, 13, '$'
 result db "Result", 10, 13, '$'
 remainder db "Remainder", 10, 13, '$'
 .code
-printNewLine proc
+PrintStr proc
 	push AX
-	push DX
-	lea DX, newLine
 	mov AH,09h
 	int 21h
-	pop DX
 	pop AX
 	ret
-printNewLine endp
+PrintStr endp
 
-printError proc
+DeleteSymbolFromDisplay proc
 	push AX
-	push DX
-	lea DX, error
-	mov AH,09h
-	int 21h
-	pop DX
-	pop AX
-	ret
-printError endp
-
-deleteSymbol proc
-	push AX
-	push BX
-	push CX
 	push DX
 
 	mov AH, 03h
@@ -46,21 +31,17 @@ deleteSymbol proc
 	mov AH, 02h
 	int 10h
 
-	mov CX, 1
 	mov AL, 20H
 	mov AH, 0AH
 	int 10h
 
 	pop DX
-	pop CX
-	pop BX
 	pop AX
 	ret
-deleteSymbol endp
+DeleteSymbolFromDisplay endp
 
-deleteNum proc
+DeleteNumFromDisplay proc
 	push AX
-	push BX
 	push CX
 	push DX
 
@@ -74,61 +55,60 @@ deleteNum proc
 	mov AH, 02h
 	int 10h
 
-	mov CL, DL
+	xor DH, DH
+	mov CL, BL
 	mov AL, 20H
 	mov AH, 0AH
 	int 10h
 
 	pop DX
 	pop CX
-	pop BX
 	pop AX
 	ret
-deleteNum endp
+DeleteNumFromDisplay endp
 
-printAX proc
+PrintAX proc
 	push AX
-	push BX
 	push CX
 	push DX
 	push SI
 	mov SI, 0
 	mov CX, 0
-	test AX,AX
-	jns flag13
+	test AX, AX
+	jns isZero
 	neg AX
 	mov SI, 1
-	flag13:
-	flag1:				;adding a character to a number on the stack 
+	isZero:
+	pushDigit:				;adding a character to a number on the stack 
 		mov DX,0
 		div ten
 		add DX, '0'
 		push DX
 		inc CX
 		cmp AX, 0
-	JNZ flag1
+	JNZ pushDigit
 	
 	cmp SI,1
-	jnz flag19
+	jnz isNegNum1
 	inc CX
 	push 2Dh
-	flag19:
+	isNegNum1:
 
-	cycle1:				;character printing
+	printDigit:				;character printing
 		pop DX
 		mov AH, 02h
 		int 21h
-	LOOP cycle1
+	LOOP printDigit
 
 	pop SI
 	pop DX
 	pop CX
-	pop BX
 	pop AX
 	ret
-printAX endp
+PrintAX endp
 
-readAX proc
+ReadAX proc
+	push DI
 	push CX
 	push BX
 	push DX
@@ -143,62 +123,58 @@ readAX proc
 		int 21h
 
 		cmp AL, 8h			;check for a backspace
-		jnz flag10
+		jnz deleteSymbol
 
 		cmp CX, 0			;check for a digit
 		jz readSymbol
 		cmp CX, 1			;delete sign
-		jnz flag21
+		jnz isNegNum2
 		mov SI, 0
-		flag21:
+		isNegNum2:
 		pop AX
 		dec CX
-		call deleteSymbol
+		call DeleteSymbolFromDisplay
 		jmp readSymbol
-
-		flag10:
+		deleteSymbol:
 
 		cmp AL, 1Bh			;check for a ESC
-		jnz flag11
-
-		cycle4:
+		jnz deleteNum
+		cycle1:
 		pop AX
-		LOOP cycle4
+		LOOP cycle1
 		call deleteNum
 		jmp readSymbol
-
-		flag11:
+		deleteNum:
 		
 		cmp AL, 13			;if the entered character is skipped processing of the entered character
-		jz 	characterOnStack
+		jz 	addDigitsToNum
 
 		cmp AL, 2Dh
-		jnz flag14
+		jnz isMinus1
 
 		cmp SI, 1
-		jnz flag17
+		jnz isSecondMinus
+		xor SI, SI
+		jmp error
 
-		call printError
-		jmp start
+		isSecondMinus:
 
-		flag17:
 		mov SI, 1
 		push 2Dh
 		inc CX
-
 		mov DL, AL			;printing sign
 		mov AH,02h
 		int 21h
 
 		jmp readSymbol
 
-		flag14:
+		isMinus1:
 
 		mov SI, 1
 		cmp AL, '0'			;check for a digit
-		jb flag6
+		jb error
 		cmp AL, '9'
-		ja flag6
+		ja error
 
 		mov DL, AL			;output of the entered character
 		mov AH,02h
@@ -211,130 +187,133 @@ readAX proc
 		inc CX			;count of the number of digits in the number
 	jmp readSymbol
 
-	characterOnStack:
+	jmp flag3
+	flag4:
+	jmp readSymbol
+	flag3:
 
-		mov SI, CX
-		mov AX, 0
+	addDigitsToNum:
+
+		mov SI, CX			;SI - length of the num
+		mov DI, 0
 
 	cycle2:					;Adding number to the AX
 		pop BX				;extract a digit from the stack
 
 		cmp BX, 2Dh
-		jnz flag16
+		jnz isMinus2
 
-		neg AX
-		jmp exit
+		neg DI
+		jmp stopAdding
 
-		flag16:
-
-		push AX				
+		isMinus2:
 
 		mov AX, SI			
 		sub AX, CX	
-		mov DX, 0
+		xor DX, DX
 		call tenInDegreeAX
 		
-		push DX
+		cmp DX, 0
+			JNZ forError
 
 		mul BX
+		add DI, AX
+		JC forError
+
 		cmp DX, 0
+		JNZ forError
 
-		JZ flag9
-		call printError
-		jmp start
-		flag9:
+		jmp continue
 
-		pop DX
-		cmp AX, AX
-		mov BX, AX
-		pop AX
-		add AX, BX
-
-		JNC flag8
-		call printError
-		jmp start
-		flag8:
-
-		test AX, AX
-		jns flag15
-		call printError
-		jmp start
-		flag15:
-
+		forError:
+		dec CX
+		jmp error
+		continue:
 	LOOP cycle2
-	exit:
+
+	stopAdding:
+
+	mov AX, DI
+
 	pop SI
 	pop DX
 	pop BX
 	pop CX
-	ret
-	flag6:
-	call printError
-	jmp start
-	ret
-readAX endp
+	pop DI
 
-tenInDegreeAX proc
-	push CX
+	jmp exit
+	error:
+		lea DX, errorMsg
+		call PrintStr
+		lea DX, repeatInput
+		call PrintStr
+		cmp CX, 0
+		JZ flag4
+		popDigit:
+			pop AX
+		LOOP popDigit
+		jmp flag4
+	exit:
 
+	ret
+ReadAX endp
+
+TenInDegreeAX proc
 	cmp AX, 0
-	JNZ flag4
-
-	mov AX, 1
-	pop CX
-	ret
-
-	flag4:
-
+	JZ flag1
+	push CX
 	mov CX, AX
 	mov AX, 1
-
 	cycle3:
 		mul ten
 	LOOP cycle3
-
 	pop CX
+
+	jmp flag2
+	flag1:
+	mov AX, 1
+	flag2:
 	ret
-tenInDegreeAX endp
+TenInDegreeAX endp
 main:
     mov AX, @data
     mov DS, ax
 
-	start:
-	lea DX, enter1
+lea DX, enter1
 	mov AH,09h
 	int 21h
 
-	call readAX
+	call ReadAX
 
-	call printNewLine
+	lea DX, newLine
+	call PrintStr
 
 	mov SI, AX
 
-	call printAX
+	call PrintAX
 
-	call printNewLine
-
+	push AX
+	lea DX, newLine
+	call PrintStr
 	lea DX, enter2
 	mov AH,09h
 	int 21h
+	pop AX
 
-	call readAX
+	call ReadAX
 
-	call printNewLine
+	lea DX, newLine
+	call PrintStr
 
 	cmp AX, 0
-
-	jnz flag23
-	call printError
-	jmp start
-
-	flag23:
+	jz main
 
 	mov DI, AX
+
 	call printAX
 
-	call printNewLine
+	lea DX, newLine
+	call PrintStr
 
 	lea DX, result
 	mov AH,09h
@@ -342,13 +321,16 @@ main:
 
 	mov DX, 0
 	mov AX, SI
-
+	
 	CWD
 	idiv DI
 	
-	call printAX
+	call PrintAX
 	
-	call printNewLine
+	push DX
+	lea DX, newLine
+	call PrintStr
+	pop DX
 	
 	push DX
 	lea DX, remainder
@@ -358,9 +340,10 @@ main:
 
 	mov AX, DX
 
-	call printAX
+	call PrintAX
 
-	call printNewLine
+	lea DX, newLine
+	call PrintStr
 
     mov ax, 4c00h
     int 21h
