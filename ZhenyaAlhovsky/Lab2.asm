@@ -10,6 +10,7 @@
 	number dw ?
 	ten dw 10
 .code
+
 	OUTPUT proc
 		push cx
 		push dx
@@ -95,7 +96,7 @@
 					
 		deletesymbol:
 			push ax
-			mov ax, 02h
+			mov ah, 02h
 			mov dl, 8
 			int 21h
 			mov dl, ' '
@@ -149,8 +150,7 @@
 		pop ax
 		ret
 	WRITE_STRING endp
-	
-	
+		
 main:
     mov ax, @data
     mov ds, ax	
