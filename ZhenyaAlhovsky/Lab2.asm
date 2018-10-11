@@ -3,6 +3,7 @@
 .data
 	message_divident db "Enter a dividend: ", 10, '$'
 	message_divider db "Enter a divider: ", 10, '$'
+	message_remainder db "Remaider: ", 10, '$'
 	message_output db "You have entered: ", 10, '$'
 	message_divbyzero db "Error. Division by zero", 10, '$'
 	message_answer db "Answer: ", 10, '$'
@@ -10,11 +11,10 @@
 	ten dw 10
 .code
 	OUTPUT proc
-		push bx
 		push cx
 		push dx
+		push ax
 		xor cx, cx
-		mov bx, ax
 		
 		NumberInStack:
 			xor dx, dx
@@ -34,10 +34,9 @@
 		mov dl, 10
 		call WRITE
 		
+		pop ax
 		pop dx
 		pop cx
-		mov ax, bx
-		pop bx
 		ret
 	OUTPUT endp
 	
@@ -85,20 +84,25 @@
 			div ten
 			mov number, ax
 			dec cx
+			push ax
+			mov ah, 02h
 			mov dl, ' '
-			call WRITE
+			int 21h
 			mov dl, 8
-			call WRITE
+			int 21h
+			pop ax
 			jmp inp
 					
 		deletesymbol:
+			push ax
+			mov ax, 02h
 			mov dl, 8
-			call WRITE
+			int 21h
 			mov dl, ' '
-			call WRITE
+			int 21h
 			mov dl, 8
-			call WRITE
-			
+			int 21h
+			pop ax
 			jmp inp		
 			
 		escape:
@@ -119,9 +123,7 @@
 			call WRITE
 			mov dl, 13
 			call WRITE
-			jmp inp
-				
-			
+			jmp inp	
 		
 		finish:
 		mov ax, number
@@ -129,7 +131,6 @@
 		pop cx
 		pop bx
 		mov number, 0
-		
 		ret
 	INPUT endp
 	
@@ -176,14 +177,19 @@ main:
 	mov ax, cx
 	xor dx, dx
 	div bx
+	mov bx, dx
 	lea dx, message_answer
 	call WRITE_STRING
+	call OUTPUT
+	lea dx, message_remainder
+	call WRITE_STRING
+	mov ax, bx
 	call OUTPUT
 	jmp exit
 	
 	divbyzero:
-		lea dx, message_divbyzero
-		call WRITE_STRING
+        lea dx, message_divbyzero
+        call WRITE_STRING
 	
 	exit:
     mov ax, 4c00h
