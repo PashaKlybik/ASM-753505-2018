@@ -3,6 +3,7 @@
 .data
  	n db 10
  	errorMessage db "ERROR!$"
+	exceptionTest db "32768(0)$"
 .code
 
 ;переход на новую строку
@@ -29,7 +30,7 @@ output PROC
  	
  	;проверка знака
  	TEST AX, 1000000000000000b
- 	JZ cycle1 ;если положительное - переход на цикл вывода числа
+ 	JZ cycleRestToStack ;если положительное
  	
  	;если отрицательное - вывод минуса и смена знака
  	push AX
@@ -41,25 +42,26 @@ output PROC
  	pop AX
  	NEG AX
  	
- 	cycle1:
+ 	cycleRestToStack:
  		CMP AX, 10
  		JC exit
  		MOV DX, 0
  		div BX
  		push DX
  		inc CX
- 	JMP cycle1
-
+ 	JMP cycleRestToStack
+	
  	exit:		
  		push AX
- 		inc CX	
- 	cycle2:		
+ 		inc CX
+ 		
+ 	cycleOutputStack:		
  		pop DX	
  		add DX, 48
  		mov AH, 02h
  		int 21h
- 	LOOP cycle2
-
+ 	LOOP cycleOutputStack
+ 	
  	pop DX
  	pop CX
  	pop BX
@@ -82,7 +84,7 @@ input PROC
  		mov AH, 01h
  		INT 21h		
  		CMP AL, 13 ;enter
- 		JZ exit1
+ 		JZ enterExit
  		CMP AL, 8 ;backspace
  		JZ backspace
  		
@@ -126,23 +128,23 @@ input PROC
  		
  		;если стирается -, то обнуление SI
  		CMP BX, 0
- 		JNZ continue
+ 		JNZ notMinus
  		MOV SI, 0
  		pop DX
  		pop AX
  		jmp enterSymbol
  		
- 		continue:
+ 		notMinus:
  			MOV AX, BX
  			CMP AX, 10
- 			JNC continue1
+ 			JNC deleteLastDigit
  		
  		MOV BX, 0
  		pop DX
  		pop AX
  		jmp enterSymbol
 
- 		continue1:	
+ 		deleteLastDigit:	
  			MOV DX, 0
  			MOV BX, 10
  			DIV BX
@@ -159,13 +161,13 @@ input PROC
  		mov ax, 4c00h
  		int 21h
  	
- 	exit1:
+ 	enterExit:
  		MOV AX, BX
  		CMP SI, 0; если отрицательное - NEG
- 		JZ exit2
+ 		JZ exitInput
  		NEG AX
 		
- 	exit2:
+ 	exitInput:
  		pop SI
  		pop DX
  		pop CX
@@ -174,19 +176,19 @@ RET
 input ENDP
 
 checkRange PROC
-	JC error
- 	CMP SI, 0
- 	JZ checkPozitive
- 	CMP AX, 32769
- 	JNC error
- 	CMP BX, 32769
- 	JNC error
- 	JMP e
- 	checkPozitive:
- 	CMP AX, 32768
- 	JNC error
- 	CMP BX, 32768
- 	JNC error
+		JC error
+ 		CMP SI, 0
+ 		JZ checkPozitive
+ 		CMP AX, 32769
+ 		JNC error
+ 		CMP BX, 32769
+ 		JNC error
+ 		JMP e
+ 		checkPozitive:
+ 		CMP AX, 32768
+ 		JNC error
+ 		CMP BX, 32768
+ 		JNC error
 e:		
 RET
 checkRange ENDP
@@ -199,9 +201,9 @@ division PROC
  	
 	;проверка на -32768/(-1)
  	CMP AX, 32768
- 	JZ check1
+ 	JZ checkExceptionTest
  	
- 	continue2:
+ 	continueDivision:
  	CMP BX, 0 ;если деление на 0
  	JZ error
  	 		
@@ -224,23 +226,27 @@ division PROC
  		
 	jmp endDivision
 	
- 	check1:
+ 	checkExceptionTest:
  	CMP BX, 65535
- 	JNZ continue2
- 	JMP error
+ 	JNZ continueDivision
+ 	LEA DX, exceptionTest
+ 	MOV AH, 09h
+ 	int 21h
 	
 	endDivision:
  	pop DX
  	pop CX
  	pop BX
  	pop AX
+	
+	
 RET
 division ENDP
 
 main:
  	mov ax, @data
  	mov ds, ax
-
+	
  	CALL input
  	MOV CX, AX
  	CALL output
