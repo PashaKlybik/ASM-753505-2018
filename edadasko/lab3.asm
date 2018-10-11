@@ -50,7 +50,7 @@ output PROC
  		push DX
  		inc CX
  	JMP cycleRestToStack
-	
+
  	exit:		
  		push AX
  		inc CX
@@ -151,7 +151,7 @@ input PROC
  			MOV BX, AX
  			pop DX
  			pop AX
- 		jmp  enterSymbol
+			jmp  enterSymbol
  		
  	error:
  		CALL newline
@@ -176,20 +176,20 @@ RET
 input ENDP
 
 checkRange PROC
-		JC error
- 		CMP SI, 0
- 		JZ checkPozitive
- 		CMP AX, 32769
- 		JNC error
- 		CMP BX, 32769
- 		JNC error
- 		JMP e
- 		checkPozitive:
+	JC error
+ 	CMP SI, 0
+ 	JZ checkPozitive
+ 	CMP AX, 32769
+ 	JNC error
+ 	CMP BX, 32769
+ 	JNC error
+ 	JMP endCheck
+ 	checkPozitive:
  		CMP AX, 32768
  		JNC error
  		CMP BX, 32768
  		JNC error
-e:		
+endCheck:		
 RET
 checkRange ENDP
 
