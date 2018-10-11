@@ -1,9 +1,9 @@
 .model small
 .stack 256
 .data
-    a dw 3
-    b dw 2
-    c dw 4 
+    a dw 4
+    b dw 65
+    c dw 2 
     d dw 1
 .code
 main:
@@ -31,15 +31,13 @@ mov dx, ax
 cmp bx, dx
 jz label2
     
-mov bx, [c]
-mov ax,bx 
+mov ax, [c]
 jmp labelfinish
 
 label2: 
-mov bx, [a] 
+mov ax, [a] 
 mov cx, [b] 
-and bx, cx 
-mov ax,bx 
+and ax, cx 
 jmp labelfinish
 
 label1:
@@ -47,8 +45,6 @@ mov ax, [c]
 mov dx,[d] 
 mul dx 
 add ax,[b] 
-mov bx,ax
-mov ax,bx 
 jmp labelfinish
 
 labelfinish:
