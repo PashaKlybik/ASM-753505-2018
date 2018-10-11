@@ -4,7 +4,7 @@
     a dw 1
     b dw 5
     c dw 3
-   d dw 7 ; three spaces
+    d dw 7 ; four spaces
 .code
 main:
     mov ax, @data
