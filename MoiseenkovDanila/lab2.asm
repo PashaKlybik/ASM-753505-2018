@@ -18,9 +18,6 @@
 ;      на экран, затем пользователь вводит делитель, далее осуществляется вывод делителя на экран,
 ;      затем осуществляется деление и вывод результата деления на экран.
 
-
-
-
 .model small
 .stack 256
 .data
@@ -95,7 +92,7 @@ readInt proc
 	push cx
 	push dx
 
-	mov cx, 0 ; в cx будет записываться число
+	mov cx, 0 ; формирование числа в cx
 	mov bx, 10
 again:
 	mov ah, 01h
@@ -104,20 +101,21 @@ again:
 	cmp al, 0Dh ;обработка enter
 	jz exit
 	
-	cmp al, 08h ;обработка backspace
+	cmp al, 08h ;проверка на backspace
 	jnz check_char
 		mov ah, 02h
 		mov dl, ' '
 		int 21h
+		
 		mov dl, 8
 		int 21h
+		
 		xor dx, dx
 		mov ax, cx
 		div bx
 		mov cx, ax
 		jmp again
 check_char:
-
 	sub al, '0'
 	mov ah, 10;
 	
@@ -175,12 +173,12 @@ main:
 	pop ax
 	
 	test bx, bx
-	jnz notzero
+	jnz bxNotZero
 		mov ah, 9h
 		mov dx, offset divzero
 		int 21h
 		jmp exitmain
-notzero:	
+bxNotZero:	
 	mov dx, 0
 	div bx
 	call writeInt
