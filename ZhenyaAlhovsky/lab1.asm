@@ -4,7 +4,7 @@
     a dw 1
     b dw 5
     c dw 3
-	d dw 7 ;new tap
+   d dw 7 ; three spaces
 .code
 main:
     mov ax, @data
