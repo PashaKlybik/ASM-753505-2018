@@ -7,9 +7,9 @@
     d dw 7
 .code
 main:
-	mov ax, @data
-    mov ds, ax
-    	
+    mov ax, @data
+    mov ds, ax    
+	
 	mov ax, [a]
 	imul [c]		
 	mov bx, ax 	
