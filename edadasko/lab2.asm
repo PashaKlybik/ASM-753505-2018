@@ -1,7 +1,6 @@
 .model small
 .stack 256
 .data
-	n db 10
 	errorMessage db "ERROR!$"
 .code
 
@@ -10,9 +9,11 @@ newline PROC
 	push AX
 	push DX
 
-	MOV DL, n
- 	mov AH, 02h
- 	int 21h
+	MOV AH, 02h
+	MOV DL, 13
+	int 21h
+	MOV DL, 10
+	int 21h
 
  	pop DX
 	pop AX
