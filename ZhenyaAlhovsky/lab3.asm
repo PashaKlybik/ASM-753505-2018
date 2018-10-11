@@ -236,6 +236,16 @@ main:
 not_negative:
 	idiv cx ;cx = divider
 	mov bx, dx
+	cmp bx, maxpositiveplusone ;finding remainder
+	jc answer_output
+	cmp cx, maxpositiveplusone
+	jc add_divider
+	sub bx, cx
+	inc ax
+	jmp answer_output
+add_divider:
+	add bx, cx
+	dec ax
 answer_output:
 	lea dx, message_answer
 	call WRITE_STRING
@@ -243,15 +253,7 @@ answer_output:
 	lea dx, message_remainder
 	call WRITE_STRING
 	mov ax, bx
-	cmp ax, maxpositiveplusone
-	jc it_is_remainder
-	cmp cx, maxpositiveplusone
-	jc add_divider
-	sub ax, cx
-	jmp it_is_remainder
-add_divider:
-	add ax, cx
-it_is_remainder:
+
 	call OUTPUT
 	jmp exit
 	
