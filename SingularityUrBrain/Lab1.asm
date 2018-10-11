@@ -1,29 +1,29 @@
 .model small
 .stack 256
 .data
-    a dw 5
-    b dw 5
-    c dw 0
-    d dw 7
+        a dw 5
+	b dw 5
+	c dw 0
+	d dw 7
 .code
 main:
 	mov ax, @data
-    mov ds, ax
-    	
+	mov ds, ax
+
 	mov ax, [a]
 	mul [c]		
 	mov bx, ax 	
 	mov ax, [b]
 	mul [d]		
 	add bx, ax 
-	
+
 	mov ax, [a]	
 	mul [d]		
 	mov cx, ax	
 	mov ax, [b]
 	mul [c]		
 	add cx, ax	
-	
+
 	cmp bx, cx
 	jnz unequal
 	mov ax, [a]
