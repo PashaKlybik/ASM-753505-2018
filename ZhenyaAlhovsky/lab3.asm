@@ -3,6 +3,7 @@
 .data
 	message_divident db "Enter a dividend: ", 10, '$'
 	message_divider db "Enter a divider: ", 10, '$'
+	message_remainder db "Remainder: ", 10, '$'
 	message_output db "You have entered: ", 10, '$'
 	message_divbyzero db "Error. Division by zero", 10, '$'
 	message_answer db "Answer: ", 10, '$'
@@ -41,8 +42,7 @@
 			inc cx
 			jnp inp
 			
-			positive_number:
-			
+		positive_number:
 			cmp al, '0'
 			jc deletesymbol
 			cmp al, 58 ;58='9' + 1
@@ -54,12 +54,8 @@
 			mov ax, number
 			mul ten
 			jc deletesymbol
-			cmp ax, maxnegativeplusone ;or maxpositive, it must be > 32760 and < 32770 
-			jnc deletesymbol
-			
 			add ax, bx
-			mov bx, minus
-			
+			mov bx, minus			
 			;labels
 			jmp BNTU_rubbish
 			finish_label:
@@ -75,12 +71,10 @@
 			cmp minus, '-'
 			jnz positive
 				cmp ax, maxnegativeplusone
-				jnc deletesymbol
-				mov number, ax
-				inc cx
-				jmp inp
+				jmp next_step
 			positive:
 				cmp ax, maxpositiveplusone
+			next_step:
 				jnc deletesymbol
 				mov number, ax
 				inc cx
@@ -106,10 +100,10 @@
 			jmp deleting
 			
 			not_minus:
-			xor dx, dx
-			mov ax, number
-			div ten
-			mov number, ax
+				xor dx, dx
+				mov ax, number
+				div ten
+				mov number, ax
 			
 			deleting:
 				mov dl, ' '
@@ -162,13 +156,12 @@
 		mov minus, 0
 		
 		cmp ax, maxpositiveplusone
-		jc positive_out
+		jc NumberInStack
 		mov minus, '-'
 		not ax ; == sub bx, ax (bx = 0) mov ax, bx
 		inc ax
 		mov dl, '-'
 		call WRITE
-		positive_out:
 		
 		NumberInStack:
 			xor dx, dx
@@ -178,16 +171,15 @@
 			cmp ax,0
 			jnz NumberInStack
 			
+		mov ah, 02h
 		Print:
 			pop dx
 			add dx, '0'
-			mov ah, 02h
 			int 21h
 			loop Print
 		
 		mov dl, 10
 		call WRITE
-		
 		pop dx
 		pop cx
 		pop bx
@@ -242,10 +234,19 @@ main:
 	jz answer_output
 	cwd	
 not_negative:
-	idiv cx
+	idiv cx ;cx = divider
+	mov bx, dx
 answer_output:
 	lea dx, message_answer
 	call WRITE_STRING
+	call OUTPUT
+	lea dx, message_remainder
+	call WRITE_STRING
+	mov ax, bx
+	cmp ax, maxpositiveplusone
+	jc it_is_remainder
+	add ax, cx
+it_is_remainder:
 	call OUTPUT
 	jmp exit
 	
