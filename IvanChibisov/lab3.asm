@@ -14,6 +14,7 @@
     errorMessage1 db "Invalid input, uncorrect symbol,enter again$"
     errorMessage2 db "Invalid input, Number<-32768 AND Number>32767, enter again$"
     errorMessage3 db "Division by zero, the result is not obtained$"
+    remainder db "remainder$"
 .code
 PUTCHARSIGNUM PROC
  PUSH BX
@@ -274,6 +275,20 @@ CMP BX, 0
 JZ NULLdef
 CWD
 IDIV BX
+MOV b, AX
+CALL PUTCHARSIGNUM
+PUSH DX
+LEA DX, remainder
+MOV AH, 09h
+INT 21h
+MOV DL, 10
+MOV AH, 02h
+INT 21h
+MOV DL, 13
+MOV AH, 02h
+INT 21h
+POP DX
+MOV AX, DX
 MOV b, AX
 CALL PUTCHARSIGNUM
 JMP exit
