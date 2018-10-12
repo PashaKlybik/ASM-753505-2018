@@ -4,7 +4,7 @@
     a dw 9
     b dw -5
     c dw 4
-    d dw 7
+    d dw 3
 .code
 main:
 	mov ax, @data
