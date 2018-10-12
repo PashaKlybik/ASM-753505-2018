@@ -35,24 +35,25 @@ jmp fin
   No: 
    mov cx, [c]
    add cx, [b]
-   mov ax, [a]
-   mov dx, [a]
-   mul dx
-   mul dx 
-   mov bx, ax 
+   mov ax, [a] 
+   mov si, ax
+   mul si 
+   mul si 
+   mov si, ax
+
    mov ax, [b]
-   mov dx, [b]
-   mul dx
-   mul dx 
-   mov dx, ax 
-   add dx, bx 
-   cmp cx, dx 
+   mov bx, [b] 
+   mul bx 
+   mul bx 
+   add si, ax
+   cmp cx, si 
    je Yes2
    jmp No2
   Yes2:
    mov ax, [c]
    and ax, [b] 
-   xor ax, [a] 
+   xor ax, [a]
+   jmp fin
   No2: 
    mov ax, [b]
    shr ax, 3
