@@ -208,7 +208,6 @@ division PROC
  	CMP BX, 0 ;если деление на 0
  	JZ error
  	 		
- 	MOV DX, 0
  	CWD
  	IDIV BX
 	
@@ -252,9 +251,7 @@ division PROC
  	pop DX
  	pop CX
  	pop BX
- 	pop AX
-	
-	
+ 	pop AX	
 RET
 division ENDP
 
@@ -273,7 +270,6 @@ main:
  	CALL newline
  	
  	MOV AX, CX
- 	
  	CALL division
  	
  	mov ax, 4c00h
