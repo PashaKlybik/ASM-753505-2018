@@ -29,7 +29,6 @@ FInput proc         ;BX - descriptor, si - length of file
     push cx
     push dx
     push di
-    xor dx, dx
     mov ax, 0
     mov nullf, al
     mov sign, al
@@ -84,7 +83,6 @@ nextstep2f:
     xor ah, ah
     mov di, ax
     mov ax, cx
-    xor dx, dx
     mul ten
     add ax, di
     mov cx, ax
@@ -133,11 +131,10 @@ MyInput proc
     xor ch, ch
     mov cl, al
     mov ax, bx
-    xor dx, dx
     mul ten
     add ax, cx
-    cmp ax, 11
-    jnc ErrChar
+    cmp ax, 10   ;max dimensionality
+    ja ErrChar
     mov bx, ax
     jmp Inputc
 
@@ -146,7 +143,6 @@ backspace:
     mov ah, 02h
     int 21h
     mov dl, 8
-    mov ah, 02h
     int 21h
     mov ax, bx
     xor dx, dx
@@ -159,10 +155,8 @@ ErrChar:
     mov ah, 02h
     int 21h
     mov dl, ' '
-    mov ah, 02h
     int 21h
     mov dl, 8
-    mov ah, 02h
     int 21h
     jmp Inputc
     
@@ -175,21 +169,18 @@ ErrChar:
 MyInput endp
 
 MyOutput proc
-    push bx
     push cx
     push dx
-    xor bx, bx
+    xor cx, cx
     cmp ax, border
     jnc showsign
 DivCycle:
     xor dx, dx
     div ten
     push dx
-    inc bx
-    mov cx, ax
     inc cx
-    loop DivCycle
-    mov cx, bx
+    cmp ax, 0
+    jne DivCycle
 Outputc:
     pop dx
     add dx, '0'
@@ -198,7 +189,6 @@ Outputc:
     loop Outputc
     pop dx
     pop cx
-    pop bx
     ret
 showsign:
     push ax
@@ -425,26 +415,26 @@ maxend:
     mov cx, 1
     minexternal:
         mov di, cols
-        sub di, cx ;
+        sub di, cx
         cmp di, 0
         jnl mingreqz
         xor di, di
     mingreqz:
         shl di, 1
-        mov si, cols     ;;
+        mov si, cols  
         dec si
-        shl si, 1 ;;
+        shl si, 1
     mininternal:
-            cmp si, di ;;
+            cmp si, di
             jl minexnext
-            cmp ax, matrix[bx][si] ;;
+            cmp ax, matrix[bx][si]
             jng minnext
-            mov ax, matrix[bx][si] ;;
+            mov ax, matrix[bx][si]
             mov mina, bx
-            add mina, si ;;
+            add mina, si
         minnext:
-            dec si        ;;
-            dec si        ;;
+            dec si
+            dec si
             jmp mininternal
     minexnext:
         add bx, cols
