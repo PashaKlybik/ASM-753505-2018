@@ -1,15 +1,15 @@
 .model small
 .stack 256
 .data
-    a dw -5
-    b dw 1
-    c dw 3
+    a dw 5
+    b dw 5
+    c dw 0
     d dw 7
 .code
 main:
-    mov ax, @data
-    mov ds, ax    
-	
+	mov ax, @data
+	mov ds, ax
+    	
 	mov ax, [a]
 	imul [c]		
 	mov bx, ax 	
@@ -46,4 +46,4 @@ end_if:
 	mov ax, 4c00h
 	int 21h
 	
-end main
+end main 
