@@ -9,6 +9,7 @@
 	quotient db 'quotient: ', '$'
 	remainder db 'remainder: ', '$'
 	error db 'Input error, please enter the number again', 13, 10, '$'
+	dividedByZero db 'Error, divided by zero'
 	buffer db 20 dup(?)
 	endline db 13, 10, '$'
 .CODE
@@ -201,6 +202,19 @@ printEndline proc					; Процедура переноса каретки на 
 printEndline endp
 
 
+printDividedByZero proc					; Процедура переноса каретки на другую строку
+	push ax
+	push dx
+	lea dx,dividedByZero		
+	mov ah,9
+	int 21h
+	call printEndline
+	pop dx
+	pop ax
+	ret
+printDividedByZero endp
+
+
 START:
     	mov ax,@data
 	mov ds,ax
@@ -216,6 +230,12 @@ START:
 	call output					; Ввод и вывод делителя
 	call printEndline 
 
+	cmp ax,0
+	jne divisorIsNotZero
+	call printDividedByZero
+	jmp theEnd
+
+divisorIsNotZero:
 	xchg ax,bx
 	xor dx,dx
 	div bx
@@ -229,6 +249,7 @@ START:
 	call output					; Вывод остатка
 	call printEndline
 
+theEnd:
 	mov ah,4ch
     	int 21h
 END START
