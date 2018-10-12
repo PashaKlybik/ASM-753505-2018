@@ -13,30 +13,30 @@
 
 change proc
     push cx
-    mov cx, bx                ; до первого слова
+    mov cx, bx
     sub cx, si
     cld
-    rep movsb                ; до первого слова
+    rep movsb                ; until closer word
     pop cx
     push cx
     mov si, ax
-    rep movsb                ; вставляем второе слово
+    rep movsb                ; insert further word
     mov cx, ax
     sub cx, bx
     sub cx, dx
     mov si, bx
     add si, dx
-    rep movsb                ; от первого до второго
+    rep movsb                ; from closer to further word
     mov cx, dx
     mov si, bx
-    rep movsb                ; вставляем первое слово
+    rep movsb                ; insert closer word
     mov si, ax
     mov al, '$'
     pop cx
     add si, cx
     xor ch, ch
     mov cl, lenstr
-    repne movsb                ; от второго до конца
+    repne movsb                ; from further to end
     ret
 change endp
 
@@ -103,14 +103,16 @@ start:
     
     lea si, string
     lea di, rezstr
-    mov ax, maxa ;ax - второе слово
-    mov bx, mina ;bx - первое слово
-                 ;сх - длина второго слова
-                 ; dx - длина первого слова
-                 ;si - указатель на строку источник
-                 ; di - указатель на результирующую строку
+    mov ax, maxa 
+    mov bx, mina 
     mov cx, maxl
     mov dx, minl
+    ;ax - further from beginning word
+    ;bx - closer to beginning word
+    ;cx - length of further from beginning word
+    ;dx - length of closer to beginning word
+    ;si - source string
+    ;di - result string
     cmp bx, ax
     jc next
     je ifeq
