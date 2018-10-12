@@ -30,8 +30,8 @@ output PROC
  	mov BX, 10
  	
  	;проверка знака
- 	TEST AX, 1000000000000000b
- 	JZ cycleRestToStack ;если положительное
+ 	CMP AX, 0
+ 	JNS cycleRestToStack ;если положительное
  	
  	;если отрицательное - вывод минуса и смена знака
  	push AX
@@ -211,6 +211,20 @@ division PROC
  	MOV DX, 0
  	CWD
  	IDIV BX
+	
+	;исправление отрицательного остатка
+	CMP DX, 0
+	JNS answerOutput
+	MOV CX, -1
+	CMP BX, 0
+	JNS correctRest
+	NEG BX ;если делитель отрицательный
+	NEG CX ;то смена знака BX и CX
+	correctRest: 
+	ADD DX, BX 
+	ADD AX, CX 
+
+	answerOutput:
  	CALL output
  	MOV CX, DX
  	
