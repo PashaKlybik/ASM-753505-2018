@@ -22,33 +22,36 @@ main:
     mov ax, a
     mul b
     cmp ax, cx
-    jc cmp1
+    jc ax_less_bc
     
-    ret1:
+    to_2nd_compare:
     mov cx, ax
     mov ax, c
     mul d
     cmp ax, cx
-    jc cmp2
+    jc ax_less_cd
     
-    ret2:
+    to_3rd_compare:
     mov cx, ax
     mov ax, a
     mul d
     cmp ax, cx
-    jc cmp3
+    jc ax_less_ad
 
-    cmp1:
-    mov ax, cx
-    jmp ret1
-
-    cmp2:
-    mov ax, cx
-    jmp ret2
-    
-    cmp3:
-    mov ax, cx
+    to_end:
     
     mov ax, 4c00h
     int 21h
+    
+    ax_less_bc:
+    mov ax, cx
+    jmp to_2nd_compare
+
+    ax_less_cd:
+    mov ax, cx
+    jmp to_3rd_compare
+    
+    ax_less_ad:
+    mov ax, cx
+    jmp to_end
 end main
