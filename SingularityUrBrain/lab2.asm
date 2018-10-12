@@ -5,88 +5,13 @@
 	
 	input_divnd_mess db 'Input the dividend: $'
 	input_divr_mess db 'Input the divider: $'
-	output_divnd_mess db 'dividend=$'
-	output_divr_mess db 'divider=$'
+	OutputNumber_divnd_mess db 'dividend=$'
+	OutputNumber_divr_mess db 'divider=$'
 	result_mess db 'result(dividend/divider)=$'
 	residue_mess db 'residue=$'
 	div_by_z_mess db 'Division by zero!!!', 13, 10, '$'
 	out_of_range db 13,10,'Out of range exception!!!', 13, 10, '$'
-.code
-main:
-	mov ax, @data
-      mov ds, ax
-	
-	mov ah, 09h
-	mov dx, offset input_divnd_mess
-	int 21h
-	
-	call Input
-	mov bx, ax
-	
-	mov ah, 09h
-	mov dx, offset output_divnd_mess
-	int 21h
-	
-	mov ax, bx
-	call Output
-	
-	mov cx, ax	    
-	
-	mov ah, 09h
-	mov dx, offset input_divr_mess
-	int 21h
-	
-	call Input
-	
-	or ax, ax	    ;check div by 0
-	jz dbz_error
-	
-	mov bx, ax
-	
-	mov ah, 09h
-	mov dx, offset output_divr_mess
-	int 21h
-	
-	mov ax, bx
-	call Output
-	
-	mov bx, ax		
-	mov ax, cx		
-	
-	xor dx, dx
-	div bx			
-	
-	mov cx, dx
-	mov bx, ax
-	
-	mov ah, 09h
-	mov dx, offset result_mess
-	int 21h
-	
-	mov ax, bx
-	call Output
-	
-	mov ah, 09h
-	mov dx, offset residue_mess
-	int 21h 
-	
-	mov ax, cx
-	call Output
-	
-	jmp _Exit
-	
-	dbz_error:
-		stc
-		mov ah, 09h
-		mov dx, offset div_by_z_mess
-		int 21h
-	
-	_Exit:
-		mov ax, 4c00h
-		int 21h
-		
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
+.code																				
 	Input PROC
 		push bx
 		push cx
@@ -94,34 +19,32 @@ main:
 		
 		xor bx, bx
 		xor cx, cx
+	input_cycle:
+		mov ah, 01h
+		int 21h
+		cmp al, 0dh    ;enter
+		jz exit
+		cmp al, 08h
+		jz backspace
+		cmp al, 1Bh
+		jz escape
+		cmp al, '0'
+		jb dels
+		cmp al, '9'
+		ja dels
+		sub al, '0'
+		xor ah, ah
+		xchg ax, bx
 		xor dx, dx
+		mul [coeff]
+		jc _error
+		xchg ax, bx
+		add bx, ax
+		jc _error
+		inc cx         ;need for backspace
+	jmp input_cycle
 		
-		cycle:
-			mov ah, 01h
-			int 21h
-			cmp al, 0dh    ;enter
-			jz exit
-			cmp al, 08h
-			jz backspace
-			cmp al, 1Bh
-			jz escape
-			cmp al, '0'
-			jb dels
-			cmp al, '9'
-			ja dels
-			sub al, '0'
-			xchg ax, bx
-			xor dx, dx
-			mul [coeff]
-			jc _error
-			xchg ax, bx
-			xor ah, ah
-			add bx, ax
-			jc _error
-			inc cx         ;need for backspace
-		jmp cycle
-		
-
+	
 	dels:			   ;delete a symbol in cmd
 		mov ah, 02h
 		mov dl, 08h
@@ -130,16 +53,14 @@ main:
 		int 21h
 		mov dl, 08h
 		int 21h
-		jmp cycle
+		jmp input_cycle
 				
 	backspace:				
 		mov ah, 02h		
 		mov dl, 0h
 		int 21h
-		
-		or cx, cx
-		jz cycle
-		
+		or cx, cx		;check presence symbols
+		jz input_cycle
 		mov dl, 08h
 		int 21h
 		
@@ -149,13 +70,13 @@ main:
 		mov bx, ax
 		
 		dec cx
-		jmp cycle
+		jmp input_cycle
 		
 	escape:
 		xor bx, bx		    ;in progr
 		inc cx
+		mov ah, 02h
 		del_lopp:			;in cmd
-			mov ah, 02h
 			mov dl, 08h
 			int 21h
 			mov dl, 0h
@@ -163,14 +84,13 @@ main:
 			mov dl, 08h
 			int 21h
 		loop del_lopp 
-		jmp cycle
+		jmp input_cycle
 			
 	_error:
-		mov ah, 09h
 		mov dx, offset out_of_range
-		int 21h
+		call WriteMess
 		stc
-		jmp _Exit
+		jmp main_exit
 	exit:
 		mov ax, bx
 		pop dx
@@ -180,7 +100,7 @@ main:
 	Input endp	
 	
 	
-	Output PROC
+	OutputNumber PROC
 		push ax	         
 		push cx
 		push dx
@@ -193,8 +113,8 @@ main:
 		push dx
 		inc cx
 		or ax, ax    
-	    jnz division
-		
+	jnz division
+	
 		mov ah, 02h
 	outc:
 		pop dx
@@ -208,7 +128,59 @@ main:
 		pop cx
 		pop ax
 		ret
-	Output endp
+	OutputNumber endp
 	
+	WriteMess PROC
+		push ax
+		mov ah, 09h
+		int 21h
+		pop ax
+		ret
+	WriteMess endp
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+main:
+	mov ax, @data
+    mov ds, ax
+	
+	mov dx, offset input_divnd_mess
+	call WriteMess
+	call Input
+	mov bx, ax
+	mov dx, offset OutputNumber_divnd_mess
+	call WriteMess
+	call OutputNumber
+	
+	mov dx, offset input_divr_mess
+	call WriteMess	
+	call Input
+	or ax, ax	    ;check div by 0
+	jz dbz_error
+	mov dx, offset OutputNumber_divr_mess
+	call WriteMess
+	call OutputNumber
 
-end main 
+	xor dx, dx
+	xchg ax, bx
+	div bx
+	mov bx, dx
+	
+	mov dx, offset result_mess
+	call WriteMess
+	call OutputNumber
+	mov dx, offset residue_mess
+	call WriteMess
+	mov ax, bx
+	call OutputNumber
+	
+	jmp main_exit
+	
+	dbz_error:
+		mov dx, offset div_by_z_mess
+		call WriteMess
+		stc
+	main_exit:
+		mov ax, 4c00h
+		int 21h
+
+end main      
