@@ -4,13 +4,14 @@
 
 .DATA
 	ten dw 10
-	dividend db 'dividend: ', '$'
-	divisor db 'divisor: ', '$'
-	quotient db 'quotient: ', '$'
-	remainder db 'remainder: ', '$'
-	error db 'Input error, please enter the number again', 13, 10, '$'
-	dividedByZero db 'Error, divided by zero'
-	buffer db 20 dup(?)
+	string db 15 dup(?)
+	len dw ?
+	dividendMessage db 'dividend: ', '$'
+	divisorMessage db 'divisor: ', '$'
+	quotientMessage db 'quotient: ', '$'
+	remainderMessage db 'remainder: ', '$'
+	inputErrorMessage db 'Input error, please enter the number again', 13, 10, '$'
+	divideByZeroErrorMessage db 'Error, divide by zero', 13, 10, '$'
 	endline db 13, 10, '$'
 .CODE
 
@@ -21,35 +22,32 @@ output proc						; Процедура записи числа из регист�
 	push di
 	xor cx,cx
 
-	cmp ax,32767
-	jbe convertPositiveNumberToString	; Проверка на отрицательность
-	push ax
+	cmp ax,0					; Проверка на отрицательность
+	jge convertToChar			
 	mov dl,'-'					; Выводим в консоль минус, если число отрицательное
-	mov ah,02h
-	int 21h
-	pop ax
+	call printSymbol
 	neg ax
 
-convertPositiveNumberToString:
+convertToChar:						; Конвертирование цифр в символы и запись в стек
 	inc cx
 	xor dx,dx
 	div ten
-	add dx,'0'					; Перевод числа в строку и запись в стек
+	add dx,'0'					
 	push dx
 	test ax,ax
-	jnz convertPositiveNumberToString
+	jnz convertToChar
 	
-	lea di,buffer
-putInBuffer:
+	lea di,string
+putCharactersInString:					; Занесение символов в строку
 	pop dx
 	mov [di],dl
-	inc di						; Занесение числа в буфер
-	loop putInBuffer
-
+	inc di						
+	loop putCharactersInString
 	mov byte ptr[di],'$'
-	lea dx,buffer
-	mov ah,9					; Отображение строки в консоли
-	int 21h
+	
+	lea dx,string
+	call printString				; Отображение строки в консоли
+	call printEndline
 
 	pop di
 	pop dx
@@ -62,87 +60,91 @@ output endp
 input proc						; Процедура чтения числа из консоли
 	push bx
 	push cx						; Сохранение значений из регистров в стек
+	push dx
 	push di
 
 startToInput:
-	lea di,buffer
+	lea di,string
 	xor cx,cx
+	mov len,0
+	mov ah,01h
 
-inputAgain:
-	mov ah,01h					; Чтение цифр с клавиатуры
-	int 21h
+inputCharacter:						
 	inc cx
+	int 21h
 	cmp al,27
 	je pressedEscape
 	cmp al,8
 	je pressedBackspace
 	cmp al,13
 	je convertInIntegerNumber
-	mov [di],al
+	inc len
+	cmp len,15
+	ja inputCharacter
+	mov [di],al					; Чтение цифр с клавиатуры
 	inc di
-	jmp inputAgain
+	jmp inputCharacter
 
 convertInIntegerNumber:
-	lea di,buffer
 	dec cx
 	xor ax,ax
 	xor bx,bx
+	lea di,string
 	cmp byte ptr[di],'-'
-	jne positiveNumber			; Проверка на отрицательность
+	jne addNewNumeral				; Проверка на отрицательность
 	inc di
 	dec cx
 
-positiveNumber:
-	mov bl,byte ptr[di]
+addNewNumeral:						; Перевод строки в число
+	mov bl,[di]
 	inc di
 	cmp bl,'0'
-	jb errorLabel
+	jb inputErrorLabel				; Проверки на корректность ввода
 	cmp bl,'9'
-	ja errorLabel				; Проверки на корректность ввода
-	sub bl,'0'
-	mul ten						; Перевод строки в число
-	jc errorLabel
+	ja inputErrorLabel					
+	sub bl,'0'							
+	mul ten						
+	jc inputErrorLabel
 	add ax,bx
-	jc errorLabel
-	loop positiveNumber
+	jc inputErrorLabel
+	loop addNewNumeral
 
-	lea di,buffer
+	lea di,string
 	cmp byte ptr[di],'-'
 	jne cmpmax					; Проверка на отрицательность
 	cmp ax,32768
-	ja errorLabel
+	ja inputErrorLabel
 	neg ax
-	jmp exit
+	jmp theEndOfInput
 cmpmax:
 	cmp ax,32767
-	ja errorLabel
-	jmp exit
+	ja inputErrorLabel
+	jmp theEndOfInput
 	
-pressedEscape:
+pressedEscape:						; обработка нажатия на клавишу Escape
 	call deleteLastSymbol
 	loop pressedEscape
 	jmp startToInput
 
-pressedBackspace:
-	mov ah,02h
+pressedBackspace:					; обработка нажатия на клавишу Backspace
 	mov dl,' '
-	int 21h
+	call printSymbol
+	call deleteLastSymbol
 	dec cx
 	cmp cx,0
-	je inputAgain
-	call deleteLastSymbol
+	je inputCharacter
 	dec di
+	dec len
 	dec cx
-	jmp inputAgain
+	jmp inputCharacter
 
-errorLabel:
-	lea dx,error
-	mov ah,9
-	int 21h						; Обрабатывание ошибки в программе
+inputErrorLabel:
+	call printInputErrorMessage			; Обрабатывание ошибки ввода в программе
 	jmp startToInput
-	
-exit:
+
+theEndOfInput:
 	pop di
+	pop dx
 	pop cx						; Возвращение значений из стека
 	pop bx
 	ret
@@ -150,94 +152,97 @@ input endp
 
 
 deleteLastSymbol proc					; Процедура удаления последнего символа в консоли
-	push ax
 	push dx
-
-	mov ah,02h
 	mov dl,8
-	int 21h
+	call printSymbol
 	mov dl,32
-	int 21h
+	call printSymbol
 	mov dl,8
-	int 21h
-
+	call printSymbol
 	pop dx
-	pop ax
 	ret
 deleteLastSymbol endp
 
 
-printDividend proc					; Процедура выводящая на консоли слово "dividend"
+printString proc
 	push ax
-	push dx
-	lea dx,dividend
-	mov ah,9
+	mov ah,09h
 	int 21h	
-	pop dx
 	pop ax
 	ret
-printDividend endp
+printString endp
 
 
-printDivisor proc					; Процедура выводящая на консоли слово "divisor"
+printSymbol proc					
 	push ax
-	push dx
-	lea dx,divisor
-	mov ah,9
+	mov ah,02h
 	int 21h	
-	pop dx
 	pop ax
 	ret
-printDivisor endp
+printSymbol endp
 
 
-printQuotient proc					; Процедура выводящая на консоли слово "quotient"
-	push ax
+printDividendMessage proc				; Процедура выводящая на консоли слово "dividend"
 	push dx
-	lea dx,quotient
-	mov ah,9
-	int 21h	
+	lea dx,dividendMessage
+	call printString
 	pop dx
-	pop ax
 	ret
-printQuotient endp
+printDividendMessage endp
 
 
-printRemainder proc					; Процедура выводящая на консоли слово "remainder"
-	push ax
+printDivisorMessage proc				; Процедура выводящая на консоли слово "divisor"
 	push dx
-	lea dx,remainder
-	mov ah,9
-	int 21h	
+	lea dx,divisorMessage
+	call printString
 	pop dx
-	pop ax
 	ret
-printRemainder endp
+printDivisorMessage endp
+
+
+printQuotientMessage proc				; Процедура выводящая на консоли слово "quotient"
+	push dx
+	lea dx,quotientMessage
+	call printString
+	pop dx
+	ret
+printQuotientMessage endp
+
+
+printRemainderMessage proc				; Процедура выводящая на консоли слово "remainder"
+	push dx
+	lea dx,remainderMessage
+	call printString
+	pop dx
+	ret
+printRemainderMessage endp
+
+
+printInputErrorMessage proc				; Процедура выводящая ошибку при делении на 0
+	push dx
+	lea dx,inputErrorMessage
+	call printString
+	pop dx
+	ret
+printInputErrorMessage endp
+
+
+printDividedByZeroErrorMessage proc			; Процедура выводящая ошибку при делении на 0
+	push dx
+	lea dx,divideByZeroErrorMessage
+	call printString
+	pop dx
+	ret
+printDividedByZeroErrorMessage endp
 
 
 printEndline proc					; Процедура переноса каретки на другую строку
-	push ax
 	push dx
-	lea dx,endline		
-	mov ah,9
-	int 21h
+	lea dx,endline
+	call printString
 	pop dx
-	pop ax
 	ret
 printEndline endp
-
-
-printDividedByZero proc					; Процедура переноса каретки на другую строку
-	push ax
-	push dx
-	lea dx,dividedByZero		
-	mov ah,9
-	int 21h
-	call printEndline
-	pop dx
-	pop ax
-	ret
-printDividedByZero endp
 
 
 START:
@@ -245,20 +250,18 @@ START:
 	mov ds,ax
 
 	call input			
-	call printDividend
+	call printDividendMessage
 	call output					; Ввод и вывод делимого
-	call printEndline 
 
 	mov bx,ax
 	call input				
-	call printDivisor
+	call printDivisorMessage
 	call output					; Ввод и вывод делителя
-	call printEndline 
 
 	cmp ax,0
 	jne divisorIsNotZero
-	call printDividedByZero
-	jmp theEnd
+	call printDividedByZeroErrorMessage
+	jmp exit
 
 divisorIsNotZero:
 	xchg ax,bx
@@ -267,28 +270,26 @@ divisorIsNotZero:
 
 	cmp dx,0
 	jge remainderIsPositive
-	cmp ax,0
-	jge quotientIsPositive
-	dec ax
-	add dx,bx
-	jmp remainderIsPositive
-quotientIsPositive:
-	inc ax
+
+	cmp bx,0
+	jg divisorIsPositive
 	neg bx
 	add dx,bx
-
+	inc ax
+	jmp remainderIsPositive
+divisorIsPositive:
+	add dx,bx
+	dec ax
 
 remainderIsPositive:
-	call printQuotient
+	call printQuotientMessage
 	call output					; Вывод частного
-	call printEndline
 
 	mov ax,dx
-	call printRemainder
+	call printRemainderMessage
 	call output					; Вывод остатка
-	call printEndline
 
-theEnd:
+exit:
 	mov ah,4ch
     	int 21h
 END START
