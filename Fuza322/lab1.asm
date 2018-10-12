@@ -51,7 +51,7 @@ jmp fin
    jmp No2
   Yes2:
    mov ax, [c]
-   and ax, [b] 
+   add ax, [b] 
    xor ax, [a]
    jmp fin
   No2: 
