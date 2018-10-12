@@ -2,10 +2,9 @@
 .stack 256
 .data
     max db 255
-    lenstr db 0 
+    lenstr db 255 
     string db 256 dup ('$')
     rezstr db 256 dup ('$')
-    len dw 256
     mina dw 0
     maxa dw 0
     minl dw -1
@@ -35,7 +34,8 @@ change proc
     mov al, '$'
     pop cx
     add si, cx
-    mov cx, len
+    xor ch, ch
+    mov cl, lenstr
     repne movsb                ; от второго до конца
     ret
 change endp
@@ -51,7 +51,8 @@ parse proc
     mov maxa, bx
     cld
     lea di, string
-    mov cx, len
+    xor ch, ch
+    mov cl, lenstr
 nextw:
     repne scasb
     je found
@@ -67,7 +68,7 @@ found:
     sub dx, bx
     dec dx
     cmp dx, 0
-    je nextf2
+    jng nextf2
     cmp dx, minl
     jnc nextf1
     mov minl, dx
@@ -94,8 +95,7 @@ start:
     xor bh, bh
     mov bl, lenstr
     mov string[bx], ' '
-    inc bx
-    mov len, bx
+    inc lenstr
     mov ah, 02h
     mov dl, 10
     int 21h
@@ -121,7 +121,8 @@ next:
     jmp output
 ifeq:
     mov al, '$'
-    mov cx, len
+    xor ch, ch
+    mov cl, lenstr
     repne movsb
 output:
     lea dx, rezstr
