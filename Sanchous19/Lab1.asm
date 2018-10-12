@@ -2,7 +2,7 @@
 ; ax = a
 ; bx = b
 ; if (ax < bx)
-;	(a, b) = (b, a)
+;	(ax, bx) = (bx, ax)
 ; if (c > ax)
 ; 	ax = c
 ; else if (c < bx)
