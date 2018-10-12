@@ -1,86 +1,96 @@
-;Ëàáîðàòîðíàÿ ðàáîòà ¹3
+;Лабораторная работа №3
 .MODEL SMALL
 .STACK 100h
 
 .DATA
 	ten dw 10
+	dividend db 'dividend: ', '$'
+	divisor db 'divisor: ', '$'
 	quotient db 'quotient: ', '$'
 	remainder db 'remainder: ', '$'
-	error db 'Error', 13, 10, '$'
-	buffer db 9 dup(?)
+	error db 'Input error, please enter the number again', 13, 10, '$'
+	dividedByZero db 'Error, divided by zero'
+	buffer db 20 dup(?)
 	endline db 13, 10, '$'
 .CODE
 
-output proc						; Ïðîöåäóðà çàïèñè ÷èñëà èç ðåãèñòðà AX â êîíñîëü
+output proc						; Процедура записи числа из регистра AX в консоль
 	push ax
-	push cx						; Ñîõðàíåíèå çíà÷åíèé èç ðåãèñòðîâ â ñòåê
+	push cx						; Сохранение значений из регистров в стек
 	push dx
 	push di
 	xor cx,cx
 
 	cmp ax,32767
-	jbe positiveNumberToString			; Ïðîâåðêà íà îòðèöàòåëüíîñòü
+	jbe convertPositiveNumberToString	; Проверка на отрицательность
 	push ax
-	mov dl,'-'					; Âûâîäèì â êîíñîëü ìèíóñ, åñëè ÷èñëî îòðèöàòåëüíîå
+	mov dl,'-'					; Выводим в консоль минус, если число отрицательное
 	mov ah,02h
 	int 21h
 	pop ax
 	neg ax
 
-positiveNumberToString:
+convertPositiveNumberToString:
 	inc cx
 	xor dx,dx
 	div ten
-	add dx,'0'					; Ïåðåâîä ÷èñëà â ñòðîêó è çàïèñü â ñòåê
+	add dx,'0'					; Перевод числа в строку и запись в стек
 	push dx
 	test ax,ax
-	jnz positiveNumberToString
+	jnz convertPositiveNumberToString
 	
 	lea di,buffer
-inBuffer:
+putInBuffer:
 	pop dx
 	mov [di],dl
-	inc di						; Çàíåñåíèå ÷èñëà â áóôåð
-	loop inBuffer
+	inc di						; Занесение числа в буфер
+	loop putInBuffer
 
 	mov byte ptr[di],'$'
-
 	lea dx,buffer
-	mov ah,9					; Îòîáðàæåíèå ñòðîêè â êîíñîëè
+	mov ah,9					; Отображение строки в консоли
 	int 21h
 
 	pop di
 	pop dx
-	pop cx						; Âîçâðàùåíèå çíà÷åíèé èç ñòåêà
+	pop cx						; Возвращение значений из стека
 	pop ax
 	ret
 output endp
 
 
-input proc						; Ïðîöåäóðà ÷òåíèÿ ÷èñëà èç êîíñîëè
+input proc						; Процедура чтения числа из консоли
 	push bx
-	push cx						; Ñîõðàíåíèå çíà÷åíèé èç ðåãèñòðîâ â ñòåê
-	push dx
+	push cx						; Сохранение значений из регистров в стек
 	push di
 
+startToInput:
 	lea di,buffer
-	mov byte ptr[di],7	 			; Óïðàâëåíèå äâóìÿ ïåðâûìè áàéòàìè â áóôåðå
-	mov byte ptr[di+1],0
-
-	lea dx,buffer
-	mov ah,0Ah					; ×òåíèå ÷èñëà ñ êëàâèàòóðû
-	int 21h
-
 	xor cx,cx
-	mov cl,[di+1]
-	add di,2
+
+inputAgain:
+	mov ah,01h					; Чтение цифр с клавиатуры
+	int 21h
+	inc cx
+	cmp al,27
+	je pressedEscape
+	cmp al,8
+	je pressedBackspace
+	cmp al,13
+	je convertInIntegerNumber
+	mov [di],al
+	inc di
+	jmp inputAgain
+
+convertInIntegerNumber:
+	lea di,buffer
+	dec cx
 	xor ax,ax
 	xor bx,bx
-
-	cmp byte ptr[di], '-'
-	jne positiveNumber				; Ïðîâåðêà íà îòðèöàòåëüíîñòü
+	cmp byte ptr[di],'-'
+	jne positiveNumber			; Проверка на отрицательность
 	inc di
-	dec cl
+	dec cx
 
 positiveNumber:
 	mov bl,byte ptr[di]
@@ -88,17 +98,17 @@ positiveNumber:
 	cmp bl,'0'
 	jb errorLabel
 	cmp bl,'9'
-	ja errorLabel					; Ïðîâåðêè íà êîððåêòíîñòü ââîäà
+	ja errorLabel				; Проверки на корректность ввода
 	sub bl,'0'
-	mul ten						; Ïåðåâîä ñòðîêè â ÷èñëî
+	mul ten						; Перевод строки в число
 	jc errorLabel
 	add ax,bx
 	jc errorLabel
 	loop positiveNumber
 
-	lea di,buffer+2
+	lea di,buffer
 	cmp byte ptr[di],'-'
-	jne cmpmax					; Ïðîâåðêà íà îòðèöàòåëüíîñòü
+	jne cmpmax					; Проверка на отрицательность
 	cmp ax,32768
 	ja errorLabel
 	neg ax
@@ -107,25 +117,81 @@ cmpmax:
 	cmp ax,32767
 	ja errorLabel
 	jmp exit
+	
+pressedEscape:
+	call deleteLastSymbol
+	loop pressedEscape
+	jmp startToInput
+
+pressedBackspace:
+	mov ah,02h
+	mov dl,' '
+	int 21h
+	dec cx
+	cmp cx,0
+	je inputAgain
+	call deleteLastSymbol
+	dec di
+	dec cx
+	jmp inputAgain
 
 errorLabel:
 	lea dx,error
 	mov ah,9
-	int 21h						; Îáðàáàòûâàíèå îøèáêè â ïðîãðàììå
-	mov ax,0
-	mov ah,4ch
-    int 21h
+	int 21h						; Обрабатывание ошибки в программе
+	jmp startToInput
 	
 exit:
 	pop di
-	pop dx
-	pop cx						; Âîçâðàùåíèå çíà÷åíèé èç ñòåêà
+	pop cx						; Возвращение значений из стека
 	pop bx
 	ret
 input endp
 
 
-printQuotient proc
+deleteLastSymbol proc					; Процедура удаления последнего символа в консоли
+	push ax
+	push dx
+
+	mov ah,02h
+	mov dl,8
+	int 21h
+	mov dl,32
+	int 21h
+	mov dl,8
+	int 21h
+
+	pop dx
+	pop ax
+	ret
+deleteLastSymbol endp
+
+
+printDividend proc					; Процедура выводящая на консоли слово "dividend"
+	push ax
+	push dx
+	lea dx,dividend
+	mov ah,9
+	int 21h	
+	pop dx
+	pop ax
+	ret
+printDividend endp
+
+
+printDivisor proc					; Процедура выводящая на консоли слово "divisor"
+	push ax
+	push dx
+	lea dx,divisor
+	mov ah,9
+	int 21h	
+	pop dx
+	pop ax
+	ret
+printDivisor endp
+
+
+printQuotient proc					; Процедура выводящая на консоли слово "quotient"
 	push ax
 	push dx
 	lea dx,quotient
@@ -137,7 +203,7 @@ printQuotient proc
 printQuotient endp
 
 
-printRemainder proc
+printRemainder proc					; Процедура выводящая на консоли слово "remainder"
 	push ax
 	push dx
 	lea dx,remainder
@@ -149,10 +215,10 @@ printRemainder proc
 printRemainder endp
 
 
-printEndline proc
+printEndline proc					; Процедура переноса каретки на другую строку
 	push ax
 	push dx
-	mov dx,offset endline		
+	lea dx,endline		
 	mov ah,9
 	int 21h
 	pop dx
@@ -161,38 +227,68 @@ printEndline proc
 printEndline endp
 
 
+printDividedByZero proc					; Процедура переноса каретки на другую строку
+	push ax
+	push dx
+	lea dx,dividedByZero		
+	mov ah,9
+	int 21h
+	call printEndline
+	pop dx
+	pop ax
+	ret
+printDividedByZero endp
+
+
 START:
     	mov ax,@data
 	mov ds,ax
 
-	call input
-	call output					; Ââîä è âûâîä äåëèìîãî
+	call input			
+	call printDividend
+	call output					; Ввод и вывод делимого
 	call printEndline 
 
 	mov bx,ax
-	call input
-	call output					; Ââîä è âûâîä äåëèòåëÿ
+	call input				
+	call printDivisor
+	call output					; Ввод и вывод делителя
 	call printEndline 
 
+	cmp ax,0
+	jne divisorIsNotZero
+	call printDividedByZero
+	jmp theEnd
+
+divisorIsNotZero:
 	xchg ax,bx
 	cwd
 	idiv bx
 
 	cmp dx,0
 	jge remainderIsPositive
+	cmp ax,0
+	jge quotientIsPositive
 	dec ax
 	add dx,bx
+	jmp remainderIsPositive
+quotientIsPositive:
+	inc ax
+	neg bx
+	add dx,bx
+
 
 remainderIsPositive:
 	call printQuotient
-	call output					; Âûâîä ÷àñòíîãî
+	call output					; Вывод частного
 	call printEndline
 
 	mov ax,dx
 	call printRemainder
-	call output					; Âûâîä îñòàòêà
+	call output					; Вывод остатка
 	call printEndline
 
+theEnd:
 	mov ah,4ch
     	int 21h
 END START
