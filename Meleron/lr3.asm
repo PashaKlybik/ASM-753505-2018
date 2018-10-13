@@ -3,7 +3,7 @@
 .data
     buffer db 256 dup(?)
     endline db 13,10,'$'
-	;errMessaage db 'Error!', 13, 10, '$'
+	;exceptionMessaage db 'Error!', 13, 10, '$'
 .code
 main:
     mov ax, @data
@@ -27,23 +27,26 @@ divideNumbers proc
     push cx
     xor cx, cx
 	cmp bx,0
-	je dnerr
+	je dnexception
     mov cx, 0
     cmp bx, 32767
     jo bxNeg
-    cn1:
+	
+  compareBound:
     cmp ax, 32767
     jo axNeg
-    cn2:
+	
+  checkNegative:
     test cx, 1
     jnz odd ;Если результат отрицательный (1 минус, нечетное)
-    cn3:
+	
+  division:
     div bx
     pop cx
     push ax
     push cx
     ret
-odd:
+  odd:
     push ax
     push dx
     mov dl, 45
@@ -51,16 +54,16 @@ odd:
     int 21h
     pop dx
     pop ax
-    jmp cn3
-bxNeg:
+    jmp division
+  bxNeg:
     inc cx
     neg bx
-    jmp cn1
-axNeg:
+    jmp compareBound
+  axNeg:
     inc cx
     neg ax
-    jmp cn2
-dnerr:
+    jmp checkNegative
+  dnexception:
     call exitProg
 divideNumbers endp
     
@@ -68,89 +71,84 @@ enterString proc ; Выход: cx - строка
     mov ah, 01h
     int 21h  
     cmp al, '-'
-    je esln
+    je ifNegative
 	cmp al, '0'
-	jl err
+	jl exception
 	cmp al, '9'
-	jg err
+	jg exception
     sub al, 30h
     xor ah, ah
     mov bx, 10
     mov cx, ax
     
-eslp:
+  ifPositive:
     mov ah, 01h
     int 21h
     cmp al, 0dh
     je stop
-    ;cmp al, 08h
-    ;jne neq
-    ;call backSpace
-    ;jmp neq
     
-    neq:
+  notEquals:
 	cmp al, '0'
-	jl err
+	jl exception
 	cmp al, '9'
-	jg err
+	jg exception
     sub al, 30h
     xor ah, ah
     xchg ax, cx
     mul bx
 	cmp ax, 32767
-    ja err
+    ja exception
     add cx, ax
 	cmp cx, 32767
-    ja err
-    jmp eslp
+    ja exception
+    jmp ifPositive
     
-    
-esln:
+  ifNegative:
     mov ah, 01h
     int 21h  
 	cmp al, '0'
-	jl err
+	jl exception
 	cmp al, '9'
-	jg err
+	jg exception
     sub al, 30h
     xor ah, ah
     mov bx, 10
     mov cx, ax
     
-lp:
+  lp:
     mov ah, 01h
     int 21h
     cmp al, 0dh
-    jne eslnneq
+    jne ifNegAndNotEquals
     neg cx
     jmp stop
     
-eslnneq:
+  ifNegAndNotEquals:
 	cmp al, '0'
-	jl err
+	jl exception
 	cmp al, '9'
-	jg err
+	jg exception
     sub al, 30h
     xor ah, ah
     xchg ax, cx
     mul bx
 	cmp ax, 32768
-    ja err
+    ja exception
     add cx, ax
 	cmp cx, 32768
-    ja err
+    ja exception
     jmp lp
     
-err:
+  exception:
 	call exitProg
     
-stop:
+  stop:
     pop ax
     push cx
     push ax
 	jmp ex
     
-ex:
+  ex:
     ret
 enterString endp
 
@@ -195,7 +193,7 @@ convertNumber proc
     xor cx, cx
     mov bx, 10
     
-lp1:
+  lp1:
     xor dx, dx
     div bx
     add dl, '0'
@@ -204,7 +202,7 @@ lp1:
     test ax, ax
     jnz lp1
     
-lp2:
+  lp2:
     pop dx
     mov [di], dl
     inc di
