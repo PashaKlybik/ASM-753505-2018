@@ -75,10 +75,10 @@ PrintAX proc
 	mov SI, 0
 	mov CX, 0
 	test AX, AX
-	jns isZero
+	jns isNegNum
 	neg AX
 	mov SI, 1
-	isZero:
+	isNegNum:
 	pushDigit:				;adding a character to a number on the stack 
 		mov DX,0
 		div ten
