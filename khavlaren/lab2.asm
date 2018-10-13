@@ -19,7 +19,6 @@ Output PROC
 	PUSH CX
 	PUSH DX
 	
-	XOR DX, DX
 	XOR CX, CX
 	MOV BX, 10
 	
@@ -87,17 +86,6 @@ Backspace:
 	MOV BX, AX
 	JMP In_Cycle
 	
-;Escape:
-;	MOV CX, 6		; 6 раз стереть символ. Больше не понадобится, так как ввод не позволит этого сделать (max 5 знаков в числе).
-;	XOR BX, BX
-;Back_Loop:
-;	MOV DL, 8		; "Нарисовать" Backspace - передвинуться влево на 1 позицию (если это ещё возможно).
-;	MOV AH, 02h
-;	INT 21h
-;	CALL Delete
-;	LOOP Back_Loop
-;	JMP In_Cycle
-	
 Escape:
 	MOV CX, SI
 	XOR SI, SI
@@ -134,8 +122,6 @@ Input ENDP
 
 Delete PROC 		; Выводит ' ' и перемещается назад на 1 позицию (позицию только что выведенного пробела).  
 	PUSH AX 		; Реализовано так, потому что вызывается по нажатию Backspace (если обработка без него, это учтено).
-	PUSH BX 
-	PUSH CX 
 	PUSH DX 
 	
 	MOV DL, ' '
@@ -145,9 +131,7 @@ Delete PROC 		; Выводит ' ' и перемещается назад на 1
 	MOV AH, 02h
 	INT 21h
 
-	POP DX 
-	POP CX 
-	POP BX 
+	POP DX
 	POP AX 
 	RET 
 Delete ENDP
