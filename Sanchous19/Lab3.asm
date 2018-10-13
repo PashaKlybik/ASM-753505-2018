@@ -5,7 +5,7 @@
 .DATA
 	ten dw 10
 	string db 15 dup(?)
-	len dw ?
+	minus db ?
 	dividendMessage db 'dividend: ', '$'
 	divisorMessage db 'divisor: ', '$'
 	quotientMessage db 'quotient: ', '$'
@@ -22,9 +22,9 @@ output proc						; Процедура записи числа из регист�
 	push di
 	xor cx,cx
 
-	cmp ax,0					; Проверка на отрицательность
+	cmp ax,0						; Проверка на отрицательность
 	jge convertToChar			
-	mov dl,'-'					; Выводим в консоль минус, если число отрицательное
+	mov dl,'-'								; Выводим в консоль минус, если число отрицательное
 	call printSymbol
 	neg ax
 
@@ -46,7 +46,7 @@ putCharactersInString:					; Занесение символов в строку
 	mov byte ptr[di],'$'
 	
 	lea dx,string
-	call printString				; Отображение строки в консоли
+	call printString					; Отображение строки в консоли
 	call printEndline
 
 	pop di
@@ -61,15 +61,12 @@ input proc						; Процедура чтения числа из консоли
 	push bx
 	push cx						; Сохранение значений из регистров в стек
 	push dx
-	push di
-
-startToInput:
-	lea di,string
 	xor cx,cx
-	mov len,0
-	mov ah,01h
+	xor bx,bx
+	mov minus,0
 
-inputCharacter:						
+inputCharacter:	
+	mov ah,01h					
 	inc cx
 	int 21h
 	cmp al,27
@@ -77,29 +74,22 @@ inputCharacter:
 	cmp al,8
 	je pressedBackspace
 	cmp al,13
-	je convertInIntegerNumber
-	inc len
-	cmp len,15
-	ja inputCharacter
-	mov [di],al					; Чтение цифр с клавиатуры
-	inc di
+	je CheckNumber
+	cmp al,'-'
+	je checkMinus
+	jmp addNewNumeral					; Чтение цифр с клавиатуры
+
+checkMinus:
+	cmp cx,1
+	ja inputErrorLabel
+	mov minus,1 
 	jmp inputCharacter
 
-convertInIntegerNumber:
-	dec cx
-	xor ax,ax
-	xor bx,bx
-	lea di,string
-	cmp byte ptr[di],'-'
-	jne addNewNumeral				; Проверка на отрицательность
-	inc di
-	dec cx
-
-addNewNumeral:						; Перевод строки в число
-	mov bl,[di]
-	inc di
+addNewNumeral:							; Перевод строки в число
+	xor ah,ah
+	xchg ax,bx
 	cmp bl,'0'
-	jb inputErrorLabel				; Проверки на корректность ввода
+	jb inputErrorLabel					; Проверки на корректность ввода
 	cmp bl,'9'
 	ja inputErrorLabel					
 	sub bl,'0'							
@@ -107,45 +97,60 @@ addNewNumeral:						; Перевод строки в число
 	jc inputErrorLabel
 	add ax,bx
 	jc inputErrorLabel
-	loop addNewNumeral
+	xchg ax,bx
+	jmp inputCharacter
 
-	lea di,string
-	cmp byte ptr[di],'-'
-	jne cmpmax					; Проверка на отрицательность
-	cmp ax,32768
-	ja inputErrorLabel
-	neg ax
-	jmp theEndOfInput
-cmpmax:
-	cmp ax,32767
-	ja inputErrorLabel
-	jmp theEndOfInput
-	
-pressedEscape:						; обработка нажатия на клавишу Escape
+pressedEscape:								; обработка нажатия на клавишу Escape
 	call deleteLastSymbol
 	loop pressedEscape
-	jmp startToInput
+	xor bx,bx
+	mov minus,0
+	jmp inputCharacter
 
-pressedBackspace:					; обработка нажатия на клавишу Backspace
+pressedBackspace:							; обработка нажатия на клавишу Backspace
 	mov dl,' '
 	call printSymbol
 	call deleteLastSymbol
 	dec cx
 	cmp cx,0
 	je inputCharacter
-	dec di
-	dec len
+	cmp cx,1
+	je deleteMinus
+	xor dx,dx
+	xchg ax,bx
+	div ten
+	xchg ax,bx
+	dec cx
+	jmp inputCharacter
+deleteMinus:
+	mov minus,0
 	dec cx
 	jmp inputCharacter
 
 inputErrorLabel:
-	call printInputErrorMessage			; Обрабатывание ошибки ввода в программе
-	jmp startToInput
+	call printEndline
+inputErrorLabelWithoutEndline:
+	call printInputErrorMessage						; Обрабатывание ошибки ввода в программе
+	xor bx,bx
+	xor cx,cx
+	mov minus,0
+	jmp inputCharacter
+
+CheckNumber:
+	mov ax,bx
+	cmp minus,1
+	jne cmpWithPositiveMax					; Проверка на отрицательность
+	cmp ax,32768
+	ja inputErrorLabelWithoutEndline
+	neg ax
+	jmp theEndOfInput
+cmpWithPositiveMax:
+	cmp ax,32767
+	ja inputErrorLabelWithoutEndline
 
 theEndOfInput:
-	pop di
 	pop dx
-	pop cx						; Возвращение значений из стека
+	pop cx							; Возвращение значений из стека
 	pop bx
 	ret
 input endp
@@ -173,7 +178,7 @@ printString proc
 printString endp
 
 
-printSymbol proc					
+printSymbol proc
 	push ax
 	mov ah,02h
 	int 21h	
@@ -182,7 +187,7 @@ printSymbol proc
 printSymbol endp
 
 
-printDividendMessage proc				; Процедура выводящая на консоли слово "dividend"
+printDividendMessage proc						; Процедура выводящая на консоли слово "dividend"
 	push dx
 	lea dx,dividendMessage
 	call printString
@@ -191,7 +196,7 @@ printDividendMessage proc				; Процедура выводящая на кон
 printDividendMessage endp
 
 
-printDivisorMessage proc				; Процедура выводящая на консоли слово "divisor"
+printDivisorMessage proc						; Процедура выводящая на консоли слово "divisor"
 	push dx
 	lea dx,divisorMessage
 	call printString
@@ -200,7 +205,7 @@ printDivisorMessage proc				; Процедура выводящая на кон�
 printDivisorMessage endp
 
 
-printQuotientMessage proc				; Процедура выводящая на консоли слово "quotient"
+printQuotientMessage proc						; Процедура выводящая на консоли слово "quotient"
 	push dx
 	lea dx,quotientMessage
 	call printString
@@ -209,7 +214,7 @@ printQuotientMessage proc				; Процедура выводящая на кон
 printQuotientMessage endp
 
 
-printRemainderMessage proc				; Процедура выводящая на консоли слово "remainder"
+printRemainderMessage proc						; Процедура выводящая на консоли слово "remainder"
 	push dx
 	lea dx,remainderMessage
 	call printString
@@ -218,7 +223,7 @@ printRemainderMessage proc				; Процедура выводящая на ко�
 printRemainderMessage endp
 
 
-printInputErrorMessage proc				; Процедура выводящая ошибку при делении на 0
+printInputErrorMessage proc					; Процедура выводящая ошибку при делении на 0
 	push dx
 	lea dx,inputErrorMessage
 	call printString
@@ -227,7 +232,7 @@ printInputErrorMessage proc				; Процедура выводящая ошиб�
 printInputErrorMessage endp
 
 
-printDividedByZeroErrorMessage proc			; Процедура выводящая ошибку при делении на 0
+printDividedByZeroErrorMessage proc					; Процедура выводящая ошибку при делении на 0
 	push dx
 	lea dx,divideByZeroErrorMessage
 	call printString
@@ -236,7 +241,7 @@ printDividedByZeroErrorMessage proc			; Процедура выводящая о
 printDividedByZeroErrorMessage endp
 
 
-printEndline proc					; Процедура переноса каретки на другую строку
+printEndline proc						; Процедура переноса каретки на другую строку
 	push dx
 	lea dx,endline
 	call printString
