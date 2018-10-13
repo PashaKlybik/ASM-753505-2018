@@ -10,8 +10,11 @@
     errorMessage1 db "Invalid input, uncorrect symbol,enter again$"
     errorMessage2 db "Invalid input, Number>65536, enter again$"
     errorMessage3 db "Division by zero, the result is not obtained$"
-    remainder db "remainder$"
+    remainder db "remainder: $"
+    quotient db "quotient: $"
+
 .code
+
 PUTCHAR PROC
   PUSH BX
   PUSH AX
@@ -21,24 +24,24 @@ PUTCHAR PROC
   MOV BX,0
   MOV CX,0
   MOV CX,10
-vivod:
+write:
   DIV CX
   PUSH AX
   PUSH DX
   INC BX
   CMP AX,0
-  JZ exitVivod
+  JZ exitWrite
   MOV DX,0
-  JMP vivod
-  exitVivod:
+  JMP Write
+ exitWrite:
   MOV CX,BX
-  cicle:
+ cicle:
   POP DX
   POP AX
   ADD DX, 48
   MOV AH, 02h
   INT 21h
-  LOOP cicle
+ LOOP cicle
   MOV DL, 10
   MOV AH, 02h
   INT 21h
@@ -61,7 +64,7 @@ GETCHAR PROC
   MOV BX,0
   MOV CX,10
   MOV b, 0
-Vvod:
+Read:
   MOV AH, 01h
   INT 21h
   MOV BL, 27
@@ -75,7 +78,7 @@ next1:
   MOV BL,13
   CMP AL,BL
   JNZ next2
-  JMP ExitVvod
+  JMP ExitRead
 next2:
   CMP AL,48
   JNC next3
@@ -101,7 +104,7 @@ next4:
   ADD AX,c
   JC Error2
   MOV b,AX
-  JMP Vvod
+  JMP Read
 ESCape:
   MOV AX, 0
   MOV b,AX
@@ -118,7 +121,7 @@ cicleFor:
   MOV AH, 02h
   INT 21h
 LOOP cicleFor
-  JMP Vvod
+  JMP Read
 Error2:
   MOV DL, 10
   MOV AH, 02h
@@ -139,7 +142,7 @@ Error2:
   MOV BX,0
   MOV CX,10
   MOV b, 0
-  JMP Vvod 
+  JMP Read 
 BackSpace:
   MOV CX,10
   MOV DX,0
@@ -153,7 +156,7 @@ BackSpace:
   MOV DL, 8
   MOV AH, 02h
   INT 21h
-  JMP Vvod
+  JMP Read
 Error:
   MOV DL, 10
   MOV AH, 02h
@@ -174,13 +177,14 @@ Error:
   MOV BX,0
   MOV CX,10
   MOV b, 0
-  JMP Vvod 
-ExitVvod:
+  JMP Read
+ExitRead:
   POP CX
   POP AX
   POP BX
 RET		
 GETCHAR ENDP
+
 main:
     mov ax, @data
     mov ds, ax
@@ -198,6 +202,19 @@ CMP BX, 0
 JZ NULLdef
 MOV DX,0
 DIV BX
+PUSH DX
+PUSH AX
+LEA DX, quotient
+MOV AH, 09h
+INT 21h
+MOV DL, 10
+MOV AH, 02h
+INT 21h
+MOV DL, 13
+MOV AH, 02h
+INT 21h
+POP AX
+POP DX
 CALL PUTCHAR
 PUSH DX
 LEA DX, remainder
@@ -232,4 +249,4 @@ INT 21h
 exit:
     mov ax, 4c00h
     int 21h
-end main
+end main 
