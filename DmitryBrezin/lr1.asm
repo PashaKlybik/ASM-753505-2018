@@ -13,17 +13,17 @@ main:
     dec bx
     and ax,bx 
     cmp ax,b
-    jbe lol
-    jmp notlol
+    jbe condition1
+    jmp notcondition1
 
-    lol:
+    condition1:
 	mov cx,c
 	mov dx,d
 	add cx,b
 	cmp dx,cx
-	jnle lol1
-	jmp notlol1
-		lol1:
+	jnle condition2
+	jmp notcondition2
+		condition2:
 			mov dx,0
 			mov ax,0
 			mov bx,0
@@ -32,14 +32,14 @@ main:
 			div bx
 			add ax,dx
 			jmp exi
-		notlol1:
+		notcondition2:
 			mov cx,c
 			mov dx,d
 			xor cx,dx
 			mov ax,cx
 			jmp exi	
 	
-    notlol:
+    notcondition1:
 		mov ax, b
 		mov bx, b
 		inc bx
