@@ -1,3 +1,4 @@
+;6 Matrix N*M. Subtract the minimum element located below the secondary diagonal from the original elements located not below the secondary diagonal.
 .model small
 .stack 100h
 .data
@@ -369,7 +370,7 @@ Task PROC
     mov max, BX
 
     mov CX, rows
-    mov count, 1
+    mov count, 0
     mov BX, min
     cycleRows3:
         push CX
@@ -378,6 +379,10 @@ Task PROC
         mul colums
         add AX, colums
         sub AX, count
+
+		cmp AX, colums
+		jz continue3
+
         mul two
         mov SI, AX
         mov CX, count
@@ -409,6 +414,7 @@ Task PROC
             continue2:
             add SI, 2
         LOOP cycleColums3
+        continue3:
         pop CX
         inc count
     LOOP cycleRows3
@@ -435,8 +441,6 @@ main:
     call ReadFile
     call PrintMatrix
     call Task
-
-
 
     mov AX,4c00h
     int 21h  
