@@ -10,75 +10,74 @@
     cols dw 0
     ten dw 10
     sign db 0
-    errmes db "Error", '$'
-    colsmes db "Enter number of columns:",10,13,'$'
-    rowsmes db "Enter number of rows:",10,13,'$'
+    errorMessage db "Error", '$'
+    colsMessage db "Enter number of columns:",10,13,'$'
+    rowsMessage db "Enter number of rows:",10,13,'$'
     handle dw 0                   ; descriptor of file
     border dw 32768
-    nl db 13, 10, '$'              ; new line
-    mina dw 0                      ; adress of min element
-    maxa dw 0                      ; adress of max element
-    nullf db 0                     ; if it isn't number
+    newLine db 13, 10, '$'              ; new line
+    addressOfMin dw 0                      ; adress of min element
+    addressOfMax dw 0                      ; adress of max element
+    nullWord db 0                     ; if it isn't number
 .code
+LOCALS
 
-setsignf:
-    inc sign
-    jmp Inputf
-
-FInput proc         ;BX - descriptor, si - length of file
+FileNumInput proc         ;BX - descriptor, si - length of file
     push cx
     push dx
     push di
     mov ax, 0
-    mov nullf, al
+    mov nullWord, al
     mov sign, al
-FirstInputf:
+    ;first input
     mov ah, 3fh
     lea dx, char
     mov cx, 1
     int 21h
-    jc emergexitf
+    jc @@emergencyExit
     dec si
     cmp si, 0
-    je emergexitf 
+    je @@emergencyExit 
     mov al, char
     xor cx, cx
     cmp al, '-'
-    je setsignf
+    je @@setsign
     cmp al, ' '
-    je nullnum
+    je @@nullNumber
     cmp al, 10
-    je nullnum
+    je @@nullNumber
     cmp al, 13
-    je nullnum
+    je @@nullNumber
     cmp al, 9
-    je nullnum
-nextstep1f:
+    je @@nullNumber
+@@nextStep1:
     sub al, '0'
     xor ah, ah
     mov cx, ax
-    jmp Inputf
-Inputf:
+    jmp @@input
+@@setsign:
+    inc sign
+@@input:
     push cx
     mov ah, 3fh
     lea dx, char
     mov cx, 1
     int 21h
-    jc emergexitf
+    jc @@emergencyExit
     dec si
     cmp si, 0
-    je emergexitf 
+    je @@emergencyExit 
     pop cx
     mov al, char
     cmp al, ' '
-    je exitf
+    je @@exit
     cmp al, 10
-    je exitf
+    je @@exit
     cmp al, 13
-    je exitf
+    je @@exit
     cmp al, 9
-    je exitf
-nextstep2f:
+    je @@exit
+@@nextStep2:
     sub al, '0'
     xor ah, ah
     mov di, ax
@@ -86,22 +85,21 @@ nextstep2f:
     mul ten
     add ax, di
     mov cx, ax
-    jmp Inputf
+    jmp @@input
 
-emergexitf:
+@@emergencyExit:
     mov ah,3Eh
     int 21h
-    jmp caseerr
-reversef:
-    neg cx
-    jmp nextinf
-nullnum:
-    inc nullf
-    jmp nextinf
-exitf:
+    jmp caseErr
+
+@@nullNumber:
+    inc nullWord
+    jmp @@exit
+@@exit:
     cmp sign, 1
-    jnc reversef
-nextinf:
+    jc @@exitNext
+    neg cx
+@@exitNext:
     mov ax, 0
     mov sign, al
     mov ax, cx
@@ -109,24 +107,24 @@ nextinf:
     pop dx
     pop cx
     ret
-FInput endp
+FileNumInput endp
 
-MyInput proc
+CslNumInput proc
     push bx
     push cx
     push dx
     xor bx, bx
-  Inputc:
+  @@input:
     mov ah, 01h
     int 21h
     cmp al, 13
-    je exit
+    je @@exit
     cmp al, 8
-    je backspace
+    je @@backspace
     cmp al, '0'
-    jc ErrChar
+    jc @@errChar
     cmp al, '9'+1
-    jnc ErrChar
+    jnc @@errChar
     sub al, '0'
     xor ch, ch
     mov cl, al
@@ -134,11 +132,11 @@ MyInput proc
     mul ten
     add ax, cx
     cmp ax, 10   ;max dimensionality
-    ja ErrChar
+    ja @@errChar
     mov bx, ax
-    jmp Inputc
+    jmp @@input
 
-backspace:
+@@backspace:
     mov dl, ' '
     mov ah, 02h
     int 21h
@@ -148,9 +146,9 @@ backspace:
     xor dx, dx
     div ten
     mov bx, ax
-    jmp Inputc
+    jmp @@input
 
-ErrChar:
+@@errChar:
     mov dl, 8
     mov ah, 02h
     int 21h
@@ -158,63 +156,63 @@ ErrChar:
     int 21h
     mov dl, 8
     int 21h
-    jmp Inputc
+    jmp @@input
     
-    exit:
+@@exit:
     mov ax, bx
     pop dx
     pop cx
     pop bx
     ret
-MyInput endp
+CslNumInput endp
 
-MyOutput proc
+CslNumOutput proc
     push cx
     push dx
     xor cx, cx
     cmp ax, border
-    jnc showsign
-DivCycle:
+    jnc @@showSign
+@@divLoop:
     xor dx, dx
     div ten
     push dx
     inc cx
     cmp ax, 0
-    jne DivCycle
-Outputc:
+    jne @@divLoop
+@@output:
     pop dx
     add dx, '0'
     mov ah, 02h
     int 21h
-    loop Outputc
+    loop @@output
     pop dx
     pop cx
     ret
-showsign:
+@@showSign:
     push ax
     mov dl, '-'
     mov ah, 02h
     int 21h
     pop ax
     neg ax
-    jmp DivCycle
-MyOutput endp
+    jmp @@divLoop
+CslNumOutput endp
 
-FOutput proc
+FileNumOutput proc
     push bx
     push cx
     push dx
     xor cx, cx
     cmp ax, border
-    jnc fshowsign
-FDivCycle:
+    jnc @@showSign
+@@divLoop:
     xor dx, dx
     div ten
     push dx
     inc cx
     cmp ax, 0
-    jne FDivCycle
-FOutputc:
+    jne @@divLoop
+@@output:
     pop dx
     push cx
     add dx, '0'
@@ -224,12 +222,12 @@ FOutputc:
     mov cx, 1
     int 21h
     pop cx
-    loop FOutputc
+    loop @@output
     pop dx
     pop cx
     pop bx
     ret
-fshowsign:
+@@showSign:
     push ax
     push cx
     mov ah, 40h
@@ -241,8 +239,8 @@ fshowsign:
     pop cx
     pop ax
     neg ax
-    jmp FDivCycle
-FOutput endp
+    jmp @@divLoop
+FileNumOutput endp
 
 FileOutput proc
     push ax
@@ -250,35 +248,30 @@ FileOutput proc
     push dx
     mov si, 0
     mov cx, rows     
-externalf:
+@@external:
+    push cx
+    mov cx, cols
+    @@internal:
+        mov ax,matrix[si]    
+        call FileNumOutput
         push cx
-
-        mov cx, cols
-    internalf:
-            mov ax,matrix[si]    
-            call FOutput
-            push cx
-            mov dl, 9
-            mov char, dl
-            lea dx, char
-            mov cx, 1
-            mov ah, 40h
-            int 21h
-            pop cx
-        nextf:
-            inc si
-            inc si
-            loop internalf
-        push cx
-        lea dx, nl
-        mov cx, 2
+        mov dl, 9
+        mov char, dl
+        lea dx, char
+        mov cx, 1
         mov ah, 40h
         int 21h
         pop cx
-
-        pop cx
-        loop externalf
-endoutputf:
+    @@next:
+        inc si
+        inc si
+        loop @@internal
+    lea dx, newLine
+    mov cx, 2
+    mov ah, 40h
+    int 21h
+    pop cx
+    loop @@external
     pop dx
     pop cx
     pop ax
@@ -292,29 +285,26 @@ CslOutput proc
     push si
     mov si, 0
     mov cx, rows     
-external:
-        push cx
-        
-        mov cx, cols
-    internal:
-            mov ax,matrix[si]    
-            call MyOutput
-            mov dl, 9
-            mov al, 2
-            int 21h
-        next:
-            inc si 
-            inc si        
-            loop internal
-        mov dl, 10
+@@external:
+    push cx        
+    mov cx, cols
+@@internal:
+        mov ax,matrix[si]    
+        call CslNumOutput
+        mov dl, 9
         mov al, 2
         int 21h
-        mov dl, 13
-        int 21h
-
-        pop cx 
-        loop external
-endoutput:
+    @@next:
+        inc si 
+        inc si        
+        loop @@internal
+    mov dl, 10
+    mov al, 2
+    int 21h
+    mov dl, 13
+    int 21h
+    pop cx 
+    loop @@external
     pop si
     pop dx
     pop cx
@@ -332,38 +322,36 @@ FileInput proc
     xor dx, dx
     mov ah, 42h
     int 21h
-    jc caseerr0
+    jc @@caseErr
     cmp dx, 0
-    jne caseerr0
+    jne @@caseErr
     mov si, ax
     mov al, 0     ; возвращаем указатель в начало файла
     xor cx, cx
     mov ah, 42h
     int 21h
-    jc caseerr0
+    jc @@caseErr
     mov ax, rows
     mul cols
     shl ax, 1
     mov cx, ax
     mov di, 0
-elofmatrix:
-    call FInput
-    cmp nullf, 0
-    jne elofmatrix
+elOfMatrix:
+    call FileNumInput
+    cmp nullWord, 0
+    jne elOfMatrix
     mov matrix[di], ax
     inc di
     inc di
-   
     cmp di, cx
-    jc elofmatrix
-
+    jc elOfMatrix
     pop di
     pop dx
     pop cx
     pop ax
     ret
-caseerr0:
-    jmp caseerr
+@@caseErr:
+    jmp caseErr
 FileInput endp
 
 ChangeMaxMin proc
@@ -375,36 +363,35 @@ ChangeMaxMin proc
     push di
     xor bx, bx
     mov ax, matrix[bx]
-    mov maxa, bx
+    mov addressOfMax, bx
     mov cx, 0     
-maxexternal:
+    @@maxExternal:
         mov dx, cols
         sub dx, cx
         dec dx
         cmp dx, 0
-        jl maxend
+        jl maxFound
         shl dx, 1
         xor di, di
-    maxinternal:
+    @@maxInternal:
             cmp dx, di
-            jc maxexnext
+            jc @@maxExtNext
             cmp ax, matrix[bx][di]
-            jnl maxnext
+            jnl @@maxIntNext
             mov ax, matrix[bx][di]
-            mov maxa, bx
-            add maxa, di
-        maxnext:
+            mov addressOfMax, bx
+            add addressOfMax, di
+        @@maxIntNext:
             inc di 
             inc di        
-            jmp maxinternal
-    maxexnext:
+            jmp @@maxInternal
+    @@maxExtNext:
         add bx, cols
         add bx, cols
-
         inc cx
         cmp cx, rows
-        jc maxexternal
-maxend:
+        jc @@maxExternal
+maxFound:
     mov si, rows
     dec si
     shl si, 2
@@ -413,44 +400,41 @@ maxend:
     mov bx, cols
     shl bx, 1
     mov cx, 1
-    minexternal:
+    @@minExternal:
         mov di, cols
         sub di, cx
         cmp di, 0
-        jnl mingreqz
+        jnl @@notNeg
         xor di, di
-    mingreqz:
+    @@notNeg:
         shl di, 1
         mov si, cols  
         dec si
         shl si, 1
-    mininternal:
+    @@minInternal:
             cmp si, di
-            jl minexnext
+            jl @@minExtNext
             cmp ax, matrix[bx][si]
-            jng minnext
+            jng @@minIntNext
             mov ax, matrix[bx][si]
-            mov mina, bx
-            add mina, si
-        minnext:
+            mov addressOfMin, bx
+            add addressOfMin, si
+        @@minIntNext:
             dec si
             dec si
-            jmp mininternal
-    minexnext:
+            jmp @@minInternal
+    @@minExtNext:
         add bx, cols
         add bx, cols
-
         inc cx
         cmp cx, rows
-        jc minexternal
-minend:
-    mov si, mina
+        jc @@minExternal
+    mov si, addressOfMin
     mov ax, matrix[si]
-    mov di, maxa
+    mov di, addressOfMax
     mov bx, matrix[di]
     mov matrix[di], ax
     mov matrix[si], bx
-minfinal:
     pop di
     pop si
     pop dx
@@ -465,28 +449,28 @@ start:
     mov ds, ax
     
     mov ah, 09h
-    lea dx, rowsmes
+    lea dx, rowsMessage
     int 21h
-    call MyInput
+    call CslNumInput
     mov rows, ax
     
     mov ah, 09h
-    lea dx, colsmes
+    lea dx, colsMessage
     int 21h
-    call MyInput
+    call CslNumInput
     mov cols, ax
     
     cmp cols, 0
-    je toend
+    je exit
     cmp rows, 0
-    je toend
+    je exit
     
     xor al, al
     mov ah, 3dh
     lea dx, input
     xor cx, cx
     int 21h
-    jc caseerr
+    jc caseErr
     mov handle, ax
     mov bx, ax
     
@@ -496,13 +480,13 @@ start:
     mov ah,3Eh
     mov bx,[handle]
     int 21h
-    jc toend
+    jc exit
     
     cmp rows, 1
     jng admission
     call ChangeMaxMin
 admission:
-    lea dx, nl
+    lea dx, newLine
     mov ah, 09h
     int 21h
     call CslOutput
@@ -513,7 +497,7 @@ admission:
     xor cx, cx
     mov dx, 12h
     int 21h
-    jc caseerr
+    jc caseErr
     mov handle, ax
     mov bx, ax
     
@@ -522,13 +506,13 @@ admission:
     mov ah,3Eh
     mov bx,[handle]
     int 21h
-    jnc toend
+    jnc exit
     
-caseerr:
-    lea dx, errmes
+caseErr:
+    lea dx, errorMessage
     mov ah, 09h
     int 21h
-toend:
+exit:
     mov ah, 01h
     int 21h
     mov ax, 4c00h
