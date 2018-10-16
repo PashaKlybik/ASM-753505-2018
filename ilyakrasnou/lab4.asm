@@ -1,17 +1,18 @@
 .model small
 .stack 256
 .data
-    max db 255
-    lenstr db 255 
+    maxLen db 255
+    lenStr db 0 
     string db 256 dup ('$')
-    rezstr db 256 dup ('$')
-    mina dw 0
-    maxa dw 0
-    minl dw -1
-    maxl dw 0
+    rezStr db 256 dup ('$')
+    addressOfMin dw 0
+    addressOfMax dw 0
+    lengthOfMin dw -1
+    lengthOfMax dw 0
 .code
+LOCALS
 
-change proc
+ChangeMaxMin proc
     push cx
     mov cx, bx
     sub cx, si
@@ -35,27 +36,27 @@ change proc
     pop cx
     add si, cx
     xor ch, ch
-    mov cl, lenstr
+    mov cl, lenStr
     repne movsb                ; from further to end
     ret
-change endp
+ChangeMaxMin endp
 
-parse proc
+FindMaxMin proc
     push ax
     push bx
     push cx
     push dx
     mov al, ' '
     lea bx, string
-    mov mina, bx
-    mov maxa, bx
+    mov addressOfMin, bx
+    mov addressOfMax, bx
     cld
     lea di, string
-    xor ch, ch
-    mov cl, lenstr
-nextw:
+    xor ch,ch
+    mov cl, lenStr
+@@nextWord:
     repne scasb
-    je found
+    je @@found
     lea di, string
     pop dx
     pop cx
@@ -63,50 +64,50 @@ nextw:
     pop ax
     ret
 
-found:
+@@found:
     mov dx, di
     sub dx, bx
     dec dx
     cmp dx, 0
-    jng nextf2
-    cmp dx, minl
-    jnc nextf1
-    mov minl, dx
-    mov mina, bx
-nextf1:
-    cmp maxl, dx
-    jnc nextf2
-    mov maxl, dx
-    mov maxa, bx
-nextf2:
+    jng @@next2
+    cmp dx, lengthOfMin
+    jnc @@next1
+    mov lengthOfMin, dx
+    mov addressOfMin, bx
+@@next1:
+    cmp lengthOfMax, dx
+    jnc @@next2
+    mov lengthOfMax, dx
+    mov addressOfMax, bx
+@@next2:
     mov bx, di
-    jmp nextw
-parse endp
+    jmp @@nextWord
+FindMaxMin endp
 
 start:
     mov ax, @data
     mov ds, ax
     mov es, ax
 
-    lea dx, max
+    lea dx, maxLen
     mov ah, 0ah
     int 21h
     
     xor bh, bh
-    mov bl, lenstr
+    mov bl, lenStr
     mov string[bx], ' '
-    inc lenstr
+    inc lenStr
     mov ah, 02h
     mov dl, 10
     int 21h
-    call parse    
+    call FindMaxMin    
     
     lea si, string
-    lea di, rezstr
-    mov ax, maxa 
-    mov bx, mina 
-    mov cx, maxl
-    mov dx, minl
+    lea di, rezStr
+    mov ax, addressOfMax 
+    mov bx, addressOfMin 
+    mov cx, lengthOfMax
+    mov dx, lengthOfMin
     ;ax - further from beginning word
     ;bx - closer to beginning word
     ;cx - length of further from beginning word
@@ -115,19 +116,19 @@ start:
     ;di - result string
     cmp bx, ax
     jc next
-    je ifeq
+    je ifEqual
     xchg ax, bx
     xchg cx, dx
 next:
-    call change
+    call ChangeMaxMin
     jmp output
-ifeq:
+ifEqual:
     mov al, '$'
-    xor ch, ch
-    mov cl, lenstr
+    xor ch,ch
+    mov cl, lenStr
     repne movsb
 output:
-    lea dx, rezstr
+    lea dx, rezStr
     mov ah, 09h
     int 21h
     mov ah, 02h
