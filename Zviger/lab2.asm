@@ -5,12 +5,12 @@
 .data
 ten dw 10
 newLine db 10,13,'$'
-errorMsg db 10, 13,"Input error", 10, 13, '$'
+errorMsg db 10, 13,"Input error!", 10, 13, '$'
 repeatInput db 10, 13,"Repeat input!", 10, 13, '$'
-enter2 db "Enter the divisor", 10, 13, '$'
-enter1 db "Enter a dividend", 10, 13, '$'
-result db "Result", 10, 13, '$'
-remainder db "Remainder", 10, 13, '$'
+enter2 db "Enter the divisor:", 10, 13, '$'
+enter1 db "Enter a dividend:", 10, 13, '$'
+result db "Result:", 10, 13, '$'
+remainder db "Remainder:", 10, 13, '$'
 .code
 PrintStr proc
     push AX
@@ -55,7 +55,7 @@ DeleteNumFromDisplay proc
     mov AH, 02h
     int 10h
 
-    xor DH, DH
+    xor CH, CH
     mov CL, BL
     mov AL, 20H
     mov AH, 0AH
@@ -222,37 +222,32 @@ main:
     mov DS, ax
 
     lea DX, enter1
-    mov AH,09h
-    int 21h
+    call PrintStr
 
     call ReadAX
 
     lea DX, newLine
     call PrintStr
 
+    call PrintAX
     mov SI, AX
 
-    call PrintAX
-
-    push AX
     lea DX, newLine
     call PrintStr
     lea DX, enter2
-    mov AH,09h
-    int 21h
-    pop AX
+    call PrintStr
 
     call ReadAX
 
     lea DX, newLine
     call PrintStr
+
+    call PrintAX
 
     cmp AX, 0
     jz main
     
     mov DI, AX
-
-    call printAX
 
     lea DX, newLine
     call PrintStr
