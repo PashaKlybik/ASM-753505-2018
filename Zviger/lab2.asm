@@ -255,8 +255,7 @@ main:
     call PrintStr
 
     lea DX, result
-    mov AH,09h
-    int 21h
+    call PrintStr
 
     mov DX, 0
     mov AX, SI
