@@ -23,6 +23,7 @@ PrintStr endp
 DeleteSymbolFromDisplay proc
     push AX
     push DX
+    push CX
 
     mov AH, 03h
     int 10h
@@ -35,6 +36,7 @@ DeleteSymbolFromDisplay proc
     mov AH, 0AH
     int 10h
 
+    pop CX
     pop DX
     pop AX
     ret
@@ -265,12 +267,9 @@ main:
     push DX
     lea DX, newLine
     call PrintStr
-    pop DX
     
-    push DX
     lea DX, remainder
-    mov AH,09h
-    int 21h
+    call PrintStr
     pop DX
 
     mov AX, DX
