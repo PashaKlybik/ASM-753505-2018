@@ -4,7 +4,7 @@
 
 .DATA
 	ten dw 10
-	string db 15 dup(?)
+	string db 10 dup(?)
 	minus db ?
 	dividendMessage db 'dividend: ', '$'
 	divisorMessage db 'divisor: ', '$'
@@ -46,7 +46,7 @@ putCharactersInString:					; Занесение символов в строку
 	mov byte ptr[di],'$'
 	
 	lea dx,string
-	call printString					; Отображение строки в консоли
+	call printString				; Отображение строки в консоли
 	call printEndline
 
 	pop di
@@ -100,14 +100,14 @@ addNewNumeral:							; Перевод строки в число
 	xchg ax,bx
 	jmp inputCharacter
 
-pressedEscape:								; обработка нажатия на клавишу Escape
+pressedEscape:							; обработка нажатия на клавишу Escape
 	call deleteLastSymbol
 	loop pressedEscape
 	xor bx,bx
 	mov minus,0
 	jmp inputCharacter
 
-pressedBackspace:							; обработка нажатия на клавишу Backspace
+pressedBackspace:						; обработка нажатия на клавишу Backspace
 	mov dl,' '
 	call printSymbol
 	call deleteLastSymbol
@@ -115,14 +115,15 @@ pressedBackspace:							; обработка нажатия на клавишу 
 	cmp cx,0
 	je inputCharacter
 	cmp cx,1
-	je deleteMinus
+	je deleteTheFirstCharacter
 	xor dx,dx
 	xchg ax,bx
 	div ten
 	xchg ax,bx
 	dec cx
 	jmp inputCharacter
-deleteMinus:
+deleteTheFirstCharacter:
+	xor bx,bx
 	mov minus,0
 	dec cx
 	jmp inputCharacter
@@ -130,7 +131,7 @@ deleteMinus:
 inputErrorLabel:
 	call printEndline
 inputErrorLabelWithoutEndline:
-	call printInputErrorMessage						; Обрабатывание ошибки ввода в программе
+	call printInputErrorMessage				; Обрабатывание ошибки ввода в программе
 	xor bx,bx
 	xor cx,cx
 	mov minus,0
@@ -169,7 +170,7 @@ deleteLastSymbol proc					; Процедура удаления последне
 deleteLastSymbol endp
 
 
-printString proc
+printString proc								; Процедура выводящая строку
 	push ax
 	mov ah,09h
 	int 21h	
@@ -178,7 +179,7 @@ printString proc
 printString endp
 
 
-printSymbol proc
+printSymbol proc								; Процедура выводящая символ
 	push ax
 	mov ah,02h
 	int 21h	
@@ -223,7 +224,7 @@ printRemainderMessage proc						; Процедура выводящая на к�
 printRemainderMessage endp
 
 
-printInputErrorMessage proc					; Процедура выводящая ошибку при делении на 0
+printInputErrorMessage proc					; Процедура выводящая ошибку при вводе
 	push dx
 	lea dx,inputErrorMessage
 	call printString
@@ -241,7 +242,7 @@ printDividedByZeroErrorMessage proc					; Процедура выводящая 
 printDividedByZeroErrorMessage endp
 
 
-printEndline proc						; Процедура переноса каретки на другую строку
+printEndline proc					; Процедура переноса каретки на другую строку
 	push dx
 	lea dx,endline
 	call printString
