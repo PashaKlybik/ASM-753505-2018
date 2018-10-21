@@ -1,4 +1,4 @@
-;Лабораторная работа №4
+;Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° в„–4
 .MODEL SMALL
 .STACK 100h
 
@@ -10,37 +10,37 @@
 	endline db 13, 10, '$'
 .CODE
 
-input proc						; Процедура чтения числа из консоли
+input proc								; РџСЂРѕС†РµРґСѓСЂР° С‡С‚РµРЅРёСЏ С‡РёСЃР»Р° РёР· РєРѕРЅСЃРѕР»Рё
 	push ax			
 	push cx
-	push dx						; Сохранение значений из регистров в стек
+	push dx								; РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЂРµРіРёСЃС‚СЂРѕРІ РІ СЃС‚РµРє
 	push di
 
 	lea di,string
-	mov byte ptr[di],254				; Управление двумя первыми байтами в строке
+	mov byte ptr[di],254				; РЈРїСЂР°РІР»РµРЅРёРµ РґРІСѓРјСЏ РїРµСЂРІС‹РјРё Р±Р°Р№С‚Р°РјРё РІ СЃС‚СЂРѕРєРµ
 	mov byte ptr[di+1],0
 
 	lea dx,string
-	mov ah,0Ah					; Чтение строки с клавиатуры
+	mov ah,0Ah							; Р§С‚РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ РєР»Р°РІРёР°С‚СѓСЂС‹
 	int 21h
 	call printEndline
 
 	xor cx,cx
 	mov cl,[di+1]
-	mov len,cx					; Определяем длину строки
+	mov len,cx							; РћРїСЂРµРґРµР»СЏРµРј РґР»РёРЅСѓ СЃС‚СЂРѕРєРё
 
 	pop di
-	pop dx						; Возвращение значений из стека
+	pop dx								; Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЃС‚РµРєР°
 	pop cx
 	pop ax
 	ret
 input endp
 
 
-solveFunction proc					; Процедура, решающая задачу
+solveFunction proc						; РџСЂРѕС†РµРґСѓСЂР°, СЂРµС€Р°СЋС‰Р°СЏ Р·Р°РґР°С‡Сѓ
 	push ax
 	push bx
-	push cx						; Сохранение значений из регистров в стек
+	push cx								; РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЂРµРіРёСЃС‚СЂРѕРІ РІ СЃС‚РµРє
 	push dx
 	push si
 	push di
@@ -62,20 +62,20 @@ findWord:
 	mov al,' '
 	repe scasb
 	jcxz finishSolveFunction
-	mov bx,di					; Определяем начало слова
+	mov bx,di							; РћРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»Рѕ СЃР»РѕРІР°
 	dec bx
 	repne scasb
 	mov cx,di
 	dec cx
-	sub cx,bx					; Определяем длину слова
+	sub cx,bx							; РћРїСЂРµРґРµР»СЏРµРј РґР»РёРЅСѓ СЃР»РѕРІР°
 	inc dx
 	push di
 
-	lea di,string+2					; Возвращаем указатель на начало строки
+	lea di,string+2						; Р’РѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ СЃС‚СЂРѕРєРё
 	mov si,bx
 	xor ax,ax
 	call countTheWordInTheLine
-	call outputResult			; Выводим сколько раз слово встретилось в частях других слов
+	call outputResult					; Р’С‹РІРѕРґРёРј СЃРєРѕР»СЊРєРѕ СЂР°Р· СЃР»РѕРІРѕ РІСЃС‚СЂРµС‚РёР»РѕСЃСЊ РІ С‡Р°СЃС‚СЏС… РґСЂСѓРіРёС… СЃР»РѕРІ
 	pop di
 	jmp findWord
 
@@ -83,7 +83,7 @@ finishSolveFunction:
 	pop di
 	pop si
 	pop dx
-	pop cx						; Возвращение значений из стека
+	pop cx								; Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЃС‚РµРєР°
 	pop bx
 	pop ax
 	ret
@@ -101,9 +101,9 @@ goOnTheLine:
 	push si
 	push di
 
-	repe cmpsb					; Сравниваем по символу
+	repe cmpsb							; РЎСЂР°РІРЅРёРІР°РµРј РїРѕ СЃРёРјРІРѕР»Сѓ
 	jne notEqual
-	inc ax						; Если нашли вхождение, то увеличиваем количество вхождений
+	inc ax								; Р•СЃР»Рё РЅР°С€Р»Рё РІС…РѕР¶РґРµРЅРёРµ, С‚Рѕ СѓРІРµР»РёС‡РёРІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РІС…РѕР¶РґРµРЅРёР№
 	
 notEqual:
 	pop di
@@ -119,29 +119,29 @@ notEqual:
 countTheWordInTheLine endp
 
 
-outputResult proc					; Процедура, выводящая сколько раз слово встретилось в других словах
+outputResult proc						; РџСЂРѕС†РµРґСѓСЂР°, РІС‹РІРѕРґСЏС‰Р°СЏ СЃРєРѕР»СЊРєРѕ СЂР°Р· СЃР»РѕРІРѕ РІСЃС‚СЂРµС‚РёР»РѕСЃСЊ РІ РґСЂСѓРіРёС… СЃР»РѕРІР°С…
 	push cx
 	push dx
 	dec ax
-	cmp ax,0						; Проверяем количество на 0
+	cmp ax,0							; РџСЂРѕРІРµСЂСЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР° 0
 	je exit
 
 	push ax
 	mov ax,dx
-	call printIntegerNumber			; Выводим на консоль номер слова
+	call printIntegerNumber				; Р’С‹РІРѕРґРёРј РЅР° РєРѕРЅСЃРѕР»СЊ РЅРѕРјРµСЂ СЃР»РѕРІР°
 	mov ah,02h
 	mov dl,')'
-	int 21h						; Выводим на консоль проверяемое слово
+	int 21h								; Р’С‹РІРѕРґРёРј РЅР° РєРѕРЅСЃРѕР»СЊ РїСЂРѕРІРµСЂСЏРµРјРѕРµ СЃР»РѕРІРѕ
 printCharacter:
 	mov dl,[si]
-	int 21h						; Выводим на консоль проверяемое слово
+	int 21h								; Р’С‹РІРѕРґРёРј РЅР° РєРѕРЅСЃРѕР»СЊ РїСЂРѕРІРµСЂСЏРµРјРѕРµ СЃР»РѕРІРѕ
 	inc si
 	loop printCharacter
 
 	mov dl,'-'
 	int 21h
 	pop ax					
-	call printIntegerNumber 			; Выводим на консоль количество
+	call printIntegerNumber 			; Р’С‹РІРѕРґРёРј РЅР° РєРѕРЅСЃРѕР»СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ
 	call printEndline
 
 exit:
@@ -151,14 +151,14 @@ exit:
 outputResult endp
 
 
-printIntegerNumber proc					; Процедура записи числа из регистра AX в консоль
+printIntegerNumber proc					; РџСЂРѕС†РµРґСѓСЂР° Р·Р°РїРёСЃРё С‡РёСЃР»Р° РёР· СЂРµРіРёСЃС‚СЂР° AX РІ РєРѕРЅСЃРѕР»СЊ
 	push ax
-	push cx						; Сохранение значений из регистров в стек
+	push cx								; РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЂРµРіРёСЃС‚СЂРѕРІ РІ СЃС‚РµРє
 	push dx
 	push di
 	xor cx,cx
 
-convertToChar:						; Конвертирование цифр в символы и запись в стек
+convertToChar:							; РљРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ С†РёС„СЂ РІ СЃРёРјРІРѕР»С‹ Рё Р·Р°РїРёСЃСЊ РІ СЃС‚РµРє
 	inc cx
 	xor dx,dx
 	div ten
@@ -168,7 +168,7 @@ convertToChar:						; Конвертирование цифр в символы и запись в стек
 	jnz convertToChar
 	
 	lea di,integerNumber
-putCharactersInString:				; Занесение символов в строку
+putCharactersInString:					; Р—Р°РЅРµСЃРµРЅРёРµ СЃРёРјРІРѕР»РѕРІ РІ СЃС‚СЂРѕРєСѓ
 	pop dx
 	mov [di],dl
 	inc di						
@@ -177,17 +177,17 @@ putCharactersInString:				; Занесение символов в строку
 	
 	mov ah,09h
 	lea dx,integerNumber
-	int 21h							; Отображение строки в консоли
+	int 21h								; РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚СЂРѕРєРё РІ РєРѕРЅСЃРѕР»Рё
 
 	pop di
 	pop dx
-	pop cx						; Возвращение значений из стека
+	pop cx								; Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЃС‚РµРєР°
 	pop ax
 	ret
 printIntegerNumber endp
 
 
-printEndline proc					; Переход на новую строку
+printEndline proc						; РџРµСЂРµС…РѕРґ РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
 	push ax
 	push dx
 	lea dx,endline		
@@ -200,7 +200,7 @@ printEndline endp
 
 
 START:
-    mov ax,@data
+   	mov ax,@data
 	mov ds,ax
 	mov es,ax
 
@@ -208,5 +208,5 @@ START:
 	call solveFunction
 
 	mov ah,4ch
-    int 21h
+    	int 21h
 END START
