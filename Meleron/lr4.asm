@@ -5,7 +5,6 @@
     endline db 13,10,'$'
     correct db 13,10,'correct$'
     incorrect db 13,10,'incorrect$'
-	;errMessaage db 'Error!', 13, 10, '$'
 .code
 main:
     mov ax, @data
@@ -17,51 +16,62 @@ main:
     int 21h
     
 enterString proc ; Выход: cx - строка
-    xor cx, cx
-lp:
+  cycle:
     mov ah, 01h
     int 21h
     cmp al, '('
-    je cxinc
+    je isRoundBracketOpened
 	cmp al, '{'
-    je cxinc
+    je isBraceOpened
 	cmp al, '['
-    je cxinc
+    je isSquareBracketOpened
 	cmp al, ')'
-	je cxdec
+	je isRoundBracketClosed
 	cmp al, '}'
-	je cxdec
+	je isBraceClosed
 	cmp al, ']'
-	je cxdec
+	je isSquareBracketClosed
     cmp al, 0dh
-    je result
-    jmp err
+    je right
+    jmp wrongInput
     
-cxinc:
-    inc cx
-    jmp lp
-cxdec:
-    dec cx
-    cmp cx, 0
-    jl mst
-    jmp lp
-result:
-    cmp cx, 0
-    jne mst
-    je rgt
-rgt:
+  isRoundBracketOpened:
+    push 1
+    jmp cycle
+  isBraceOpened: 
+    push 2
+    jmp cycle
+  isSquareBracketOpened: 
+    push 3
+    jmp cycle
+  isRoundBracketClosed:
+    pop bx
+    cmp bx, 1
+    je cycle
+    jne mistake
+  isBraceClosed:
+    pop bx
+    cmp bx, 2
+    je cycle
+    jne mistake
+  isSquareBracketClosed:
+    pop bx
+    cmp bx, 3
+    je cycle
+    jne mistake
+  right:
     push di
     lea di, correct
     call printString
     pop di
     ret
-mst:
+  mistake:
     push di
     lea di, incorrect
     call printString
     pop di
     ret
-err:
+  wrongInput:
 	call exitProg
 enterString endp
 
