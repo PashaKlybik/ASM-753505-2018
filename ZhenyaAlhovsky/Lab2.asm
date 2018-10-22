@@ -7,7 +7,6 @@
 	message_output db "You have entered: ", 10, '$'
 	message_divbyzero db "Error. Division by zero", 10, '$'
 	message_answer db "Answer: ", 10, '$'
-	number dw ?
 	ten dw 10
 .code
 
@@ -47,7 +46,6 @@
 		push dx
 		xor ax, ax
 		xor cx, cx
-		mov number, 0
 		inp:
 			mov ah, 01h
 			int 21h
@@ -60,42 +58,35 @@
 			jz escape
 			cmp al, '0'
 			jc deletesymbol
-			cmp al, 58 ;58 = '9' + 1
-			jnc deletesymbol
+			cmp al, '9'		
+			ja deletesymbol
 			xor bx, bx
 			mov bl, al
 			sub bl, '0'
-			mov ax, number
+			mov ax, cx
 			mul ten
 			jc deletesymbol
 			add ax, bx
 			jc deletesymbol
-			mov number, ax
-			inc cx
+			mov cx, ax
 			jmp inp	
 			
 		finish_label:
 			jmp finish
 			
 		backspace:
-			cmp cx, 0
-			jz inp
-			mov ax, number
+			mov ax, cx
 			xor dx, dx
 			div ten
-			mov number, ax
-			dec cx
-			push ax
+			mov cx, ax
 			mov ah, 02h
 			mov dl, ' '
 			int 21h
 			mov dl, 8
 			int 21h
-			pop ax
 			jmp inp
 					
 		deletesymbol:
-			push ax
 			mov ah, 02h
 			mov dl, 8
 			int 21h
@@ -103,35 +94,27 @@
 			int 21h
 			mov dl, 8
 			int 21h
-			pop ax
 			jmp inp		
 			
 		escape:
+			mov ah, 02h
 			mov dl, 13
-			call WRITE
-			cmp cx, 0
-			jz end_escape
-			mov ax, number
-			mov number, 0
-			deletingloop:
-				mov dl, ' '
-				call WRITE
-				xor dx, dx
-				div ten
-				loop deletingloop
-			end_escape:
+			int 21h
 			mov dl, ' '
-			call WRITE
+			mov cx, 6
+			deletingloop:
+				int 21h
+				loop deletingloop
 			mov dl, 13
-			call WRITE
+			int 21h
+			xor cx, cx
 			jmp inp	
 		
-		finish:
-		mov ax, number
+	finish:
+		mov ax, cx
 		pop dx
 		pop cx
 		pop bx
-		mov number, 0
 		ret
 	INPUT endp
 	
@@ -191,7 +174,7 @@ main:
         lea dx, message_divbyzero
         call WRITE_STRING
 	
-	exit:
+exit:
     mov ax, 4c00h
     int 21h
 end main
