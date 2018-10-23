@@ -106,17 +106,17 @@ Message6 db "The minus was already or is not in its place$"
     mov cx, 32768 
     cmp cx, ax
     pop cx
-    jz checking6 
-    jnc checking7
-    jmp Error2 
+    jz checking6 ;Переходим, если ах = 32768, и проверяем на -
+    jnc checking7;Переходим, если ах < 32768
+    jmp Error2   ;Переходим, если ах > 32768 
 
     checking6: 
     push cx
     mov cx, sl 
     cmp cx, 1 
     pop cx
-    jz checking7
-    jmp Error2 
+    jz checking7 ;Переходим, если ах = -32768 
+    jmp Error2   ;Переходим, если ах = 32768 
 
     checking7: 
     mov b,ax
