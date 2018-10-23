@@ -35,10 +35,10 @@ Message6 db "The minus was already or is not in its place$"
     int 21h 
     mov bl,13 
     cmp al,bl 
-    jnz checking2 
+    jnz Zerocodecheck 
     jmp WriteExit
 
-    checking1: 
+    EnterandMinusCheck: 
     cmp slll,1 
     jz allgood
     mov dl, 10 
@@ -67,22 +67,23 @@ Message6 db "The minus was already or is not in its place$"
     mov sl,1
     jmp write
 
-    checking2: 
+    
+    Zerocodecheck: 
     cmp al,45 
     jne label_else
-    jz checking1
+    jz EnterandMinusCheck
     label_else:
     cmp al,48 
-    jnc checking3 
+    jnc Checkcodenine 
     jmp Error1 
 
-    checking3: 
+    Checkcodenine: 
     mov bl,57 
     cmp bl,al 
-    jnc checking4 
+    jnc check65538 
     jmp Error1 
 
-    checking4: 
+    check65538: 
     mov cx,i 
     inc cx
     mov i,cx
@@ -97,28 +98,29 @@ Message6 db "The minus was already or is not in its place$"
     jc Error2 
     add ax,c 
     jc Error2
-    jnc checking5 
+    jnc check32768 
     mov b,ax
     jmp write
 
-    checking5: 
+    
+    check32768: 
     push cx
     mov cx, 32768 
     cmp cx, ax
     pop cx
-    jz checking6 ;Переходим, если ах = 32768, и проверяем на -
-    jnc checking7;Переходим, если ах < 32768
+    jz check=32768 ;Переходим, если ах = 32768, и проверяем на -
+    jnc check<32768;Переходим, если ах < 32768
     jmp Error2   ;Переходим, если ах > 32768 
 
-    checking6: 
+    check=32768: 
     push cx
     mov cx, sl 
     cmp cx, 1 
     pop cx
-    jz checking7 ;Переходим, если ах = -32768 
+    jz check<32768 ;Переходим, если ах = -32768 
     jmp Error2   ;Переходим, если ах = 32768 
 
-    checking7: 
+    check<32768: 
     mov b,ax
     jmp write
 
