@@ -44,42 +44,41 @@ input_error:
     jmp END_PROGRAM 
 
 CHECK_STRING:
-	push ax		;счетчик открытых скобок
+	push ax		;символ
 	push bx		;адрес символа
 	push cx		;счетчик символов
-	push dx		;символ
+	push dx		;счетчик открытых скобок
 	      
-	xor ax, ax
+	xor dx, dx
     xor ch, ch
     mov cl,inputString[1]    ;cl = длина введённой строки
-    lea bx, inputString      ;bx = адрес строки
-	inc BX
-    inc BX
-	
-	inc cx
+	inc cx   
+	lea si, inputString
+	inc si
+	inc si
 check_next_symbol:	    
 	dec cx
     jcxz end_of_lines			;Если были рассмотрены все символы, то строка корректна
-    mov dl,[bx]					;Загрузка в dl очередного символа строки (в dx код символа)
+    lods inputString
     inc bx      	     	   	;Инкремент адреса
-	cmp dl,'('      	    	;Если очередной символ это '('
+	cmp al,'('      	    	;Если очередной символ это '('
     jz bracket_is_open  		;переходим к следующему символу
-    cmp dl,')'   		       	;Если очередной символ это ')'
+    cmp al,')'   		       	;Если очередной символ это ')'
     jz bracket_closed   	    ;переходим к следующему символу
 	jmp string_is_not_valid		;Если символ не '(' и не ')', то строка не корректна
 	
 bracket_is_open:
-	inc ax						;увеличиваем количество открытых скобок
+	inc dx						;увеличиваем количество открытых скобок
 	jmp check_next_symbol
 
 bracket_closed:
-	cmp ax, 0					
+	cmp dx, 0					
 	jz string_is_not_valid		;если открытых скобок нет, то строка не корректна
-	dec ax						;уменьшаем количество открытых скобок
+	dec dx						;уменьшаем количество открытых скобок
 	jmp check_next_symbol		
 	
 end_of_lines:
-	cmp ax, 0					
+	cmp dx, 0					
 	jz string_is_valid			;если открытых и закрытых скобок одинаковое количество, то строка корректна
 	jmp string_is_not_valid		;если открытых и закрытых скобок разное количество, то строка н корректна
 	
