@@ -2,19 +2,18 @@
 .model small
 .stack 256
 .data
-    matrix dw 10*10 dup (0)
+    dimensionality = 10
+    matrix dw dimensionality*dimensionality dup (0)
     input db "input.txt", 0
     output db "output.txt", 0
     char db ?                     ;buffer char
     rows dw 0
     cols dw 0
     ten dw 10
-    sign db 0
     errorMessage db "Error", '$'
     colsMessage db "Enter number of columns:",10,13,'$'
     rowsMessage db "Enter number of rows:",10,13,'$'
     handle dw 0                   ; descriptor of file
-    border dw 32768
     newLine db 13, 10, '$'              ; new line
     addressOfMin dw 0                      ; adress of min element
     addressOfMax dw 0                      ; adress of max element
@@ -22,22 +21,24 @@
 .code
 LOCALS
 
-FileNumInput proc         ;BX - descriptor, si - length of file
+FileNumInput proc         ;BX - descriptor
     push cx
     push dx
     push di
+    push si
     mov ax, 0
     mov nullWord, al
-    mov sign, al
+    mov si, ax
     ;first input
+    mov ax, 4406h
+    int 21h
+    cmp al, 0
+    je @@emergencyExit
     mov ah, 3fh
     lea dx, char
     mov cx, 1
     int 21h
-    jc @@emergencyExit
-    dec si
-    cmp si, 0
-    je @@emergencyExit 
+    jc @@emergencyExit 
     mov al, char
     xor cx, cx
     cmp al, '-'
@@ -56,17 +57,18 @@ FileNumInput proc         ;BX - descriptor, si - length of file
     mov cx, ax
     jmp @@input
 @@setsign:
-    inc sign
+    inc si
 @@input:
+    mov ax, 4406h
+    int 21h
+    cmp al, 0
+    je @@exit
     push cx
     mov ah, 3fh
     lea dx, char
     mov cx, 1
     int 21h
     jc @@emergencyExit
-    dec si
-    cmp si, 0
-    je @@emergencyExit 
     pop cx
     mov al, char
     cmp al, ' '
@@ -88,21 +90,23 @@ FileNumInput proc         ;BX - descriptor, si - length of file
     jmp @@input
 
 @@emergencyExit:
-    mov ah,3Eh
-    int 21h
+    pop si
+    pop di
+    pop dx
+    pop cx
+    pop ax
     jmp caseErr
 
 @@nullNumber:
     inc nullWord
     jmp @@exit
 @@exit:
-    cmp sign, 1
+    cmp si, 1
     jc @@exitNext
     neg cx
 @@exitNext:
-    mov ax, 0
-    mov sign, al
     mov ax, cx
+    pop si
     pop di
     pop dx
     pop cx
@@ -131,7 +135,7 @@ CslNumInput proc
     mov ax, bx
     mul ten
     add ax, cx
-    cmp ax, 10   ;max dimensionality
+    cmp ax, dimensionality
     ja @@errChar
     mov bx, ax
     jmp @@input
@@ -170,8 +174,8 @@ CslNumOutput proc
     push cx
     push dx
     xor cx, cx
-    cmp ax, border
-    jnc @@showSign
+    cmp ax, 0
+    jl @@showSign
 @@divLoop:
     xor dx, dx
     div ten
@@ -203,8 +207,8 @@ FileNumOutput proc
     push cx
     push dx
     xor cx, cx
-    cmp ax, border
-    jnc @@showSign
+    cmp ax, 0
+    jl @@showSign
 @@divLoop:
     xor dx, dx
     div ten
@@ -317,20 +321,6 @@ FileInput proc
     push cx
     push dx
     push di
-    mov al, 2     ;считаем и записываем длину в si
-    xor cx, cx
-    xor dx, dx
-    mov ah, 42h
-    int 21h
-    jc @@caseErr
-    cmp dx, 0
-    jne @@caseErr
-    mov si, ax
-    mov al, 0     ; возвращаем указатель в начало файла
-    xor cx, cx
-    mov ah, 42h
-    int 21h
-    jc @@caseErr
     mov ax, rows
     mul cols
     shl ax, 1
