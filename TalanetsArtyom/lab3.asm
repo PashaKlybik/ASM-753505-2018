@@ -2,69 +2,69 @@
 .STACK 100h
 
 .DATA
-	ten dw 10
-	endl db 13, 10, '$'
-	errorInput db "Input error", 13, 10, '$'
-	errorDivByZero db "Division by zero", 13, 10, '$'
-	buffer   db 7,  256 dup(?)
+    ten dw 10
+    endl db 13, 10, '$'
+    errorInput db "Input error", 13, 10, '$'
+    errorDivByZero db "Division by zero", 13, 10, '$'
+    buffer   db 7,  256 dup(?)
 .CODE
 
 END_LINE:
-	push ax
-	mov ah, 9
-	lea dx, endl
-	int 21h
-	pop ax	
-ret
+    push ax
+    mov ah, 9
+    lea dx, endl
+    int 21h
+    pop ax	
+    ret
 
 INPUT:	
-	push bx
-	push cx
-	push dx	
-	push di 			;di = 1 <=> число отрицательное
+    push bx
+    push cx
+    push dx	
+    push di 			;di = 1 <=> С‡РёСЃР»Рѕ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРµ
 	   
     mov ah,0Ah
-    lea dx,buffer       ;DX = aдрес буфера
+    lea dx,buffer       ;DX = aРґСЂРµСЃ Р±СѓС„РµСЂР°
     int 21h     
     xor ch, ch
-    mov cl,buffer[1]    ;cl = длина введённой строки
-    lea bx, buffer     	;bx = адрес строки
-	inc BX
+    mov cl,buffer[1]    ;cl = РґР»РёРЅР° РІРІРµРґС‘РЅРЅРѕР№ СЃС‚СЂРѕРєРё
+    lea bx, buffer     	;bx = Р°РґСЂРµСЃ СЃС‚СЂРѕРєРё
     inc BX
-    jcxz input_error    ;Если длина = 0, возвращаем ошибку
+    inc BX
+    jcxz input_error    ;Р•СЃР»Рё РґР»РёРЅР° = 0, РІРѕР·РІСЂР°С‰Р°РµРј РѕС€РёР±РєСѓ
     xor ax,ax           ;AX = 0
  
-	;Проверка первого символа на знак '-'
-	mov dl,[bx]			;Загрузка в dl первого символа строки (в dx код символа)    
-	xor di, di
+    ;РџСЂРѕРІРµСЂРєР° РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° РЅР° Р·РЅР°Рє '-'
+    mov dl,[bx]			;Р—Р°РіСЂСѓР·РєР° РІ dl РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° СЃС‚СЂРѕРєРё (РІ dx РєРѕРґ СЃРёРјРІРѕР»Р°)    
+    xor di, di
     cmp dx, '-'
-    jnz input_loop		;если первый знак не '-', то переходим по метке
-	;если первый знак '-'
-    inc bx				;Инкремент адреса
-    dec cx				;Декремент счетчика
-    cmp cx, 0			;если больше знаков нет (введен только '-')
-    jz input_error 		;возвращаем ошибку
-    mov di, 1			;di = 1 <=> число отрицательное
+    jnz input_loop		;РµСЃР»Рё РїРµСЂРІС‹Р№ Р·РЅР°Рє РЅРµ '-', С‚Рѕ РїРµСЂРµС…РѕРґРёРј РїРѕ РјРµС‚РєРµ
+    ;РµСЃР»Рё РїРµСЂРІС‹Р№ Р·РЅР°Рє '-'
+    inc bx				;РРЅРєСЂРµРјРµРЅС‚ Р°РґСЂРµСЃР°
+    dec cx				;Р”РµРєСЂРµРјРµРЅС‚ СЃС‡РµС‚С‡РёРєР°
+    cmp cx, 0			;РµСЃР»Рё Р±РѕР»СЊС€Рµ Р·РЅР°РєРѕРІ РЅРµС‚ (РІРІРµРґРµРЅ С‚РѕР»СЊРєРѕ '-')
+    jz input_error 		;РІРѕР·РІСЂР°С‰Р°РµРј РѕС€РёР±РєСѓ
+    mov di, 1			;di = 1 <=> С‡РёСЃР»Рѕ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРµ
 	
  
 input_loop:
-    mov dl,[bx]			;Загрузка в dl очередного символа строки (в dx код символа)
-    inc bx              ;Инкремент адреса
-    cmp dx,'0'          ;Если код символа меньше кода '0', то 
-    jl input_error      ;возвращаем ошибку
-    cmp dx,'9'          ;Если код символа больше кода '9', то
-    jg input_error      ;возвращаем ошибку
-    sub dx,'0'			;в dx цифры
-	push dx
-	mul ten             ;AX = AX * 10
-	jc input_error      ;Если перенос - ошибка
-    jo input_error      ;Если переполнение - ошибка
-	pop dx
-	add ax, dx
-	jc input_error      ;Если перенос - ошибка
-    jo input_error      ;Если переполнение - ошибка
-    loop input_loop     ;Команда цикла
-    jmp input_exit      ;Успешное завершение (здесь всегда CF = 0)
+    mov dl,[bx]			;Р—Р°РіСЂСѓР·РєР° РІ dl РѕС‡РµСЂРµРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р° СЃС‚СЂРѕРєРё (РІ dx РєРѕРґ СЃРёРјРІРѕР»Р°)
+    inc bx              ;РРЅРєСЂРµРјРµРЅС‚ Р°РґСЂРµСЃР°
+    cmp dx,'0'          ;Р•СЃР»Рё РєРѕРґ СЃРёРјРІРѕР»Р° РјРµРЅСЊС€Рµ РєРѕРґР° '0', С‚Рѕ 
+    jl input_error      ;РІРѕР·РІСЂР°С‰Р°РµРј РѕС€РёР±РєСѓ
+    cmp dx,'9'          ;Р•СЃР»Рё РєРѕРґ СЃРёРјРІРѕР»Р° Р±РѕР»СЊС€Рµ РєРѕРґР° '9', С‚Рѕ
+    jg input_error      ;РІРѕР·РІСЂР°С‰Р°РµРј РѕС€РёР±РєСѓ
+    sub dx,'0'			;РІ dx С†РёС„СЂС‹
+    push dx
+    mul ten             ;AX = AX * 10
+    jc input_error      ;Р•СЃР»Рё РїРµСЂРµРЅРѕСЃ - РѕС€РёР±РєР°
+    jo input_error      ;Р•СЃР»Рё РїРµСЂРµРїРѕР»РЅРµРЅРёРµ - РѕС€РёР±РєР°
+    pop dx
+    add ax, dx
+    jc input_error      ;Р•СЃР»Рё РїРµСЂРµРЅРѕСЃ - РѕС€РёР±РєР°
+    jo input_error      ;Р•СЃР»Рё РїРµСЂРµРїРѕР»РЅРµРЅРёРµ - РѕС€РёР±РєР°
+    loop input_loop     ;РљРѕРјР°РЅРґР° С†РёРєР»Р°
+    jmp input_exit      ;РЈСЃРїРµС€РЅРѕРµ Р·Р°РІРµСЂС€РµРЅРёРµ (Р·РґРµСЃСЊ РІСЃРµРіРґР° CF = 0)
  
 input_error:
     xor ax,ax  
@@ -74,40 +74,40 @@ input_error:
     jmp END_PROGRAM   
  
 input_exit:
-	call END_LINE
-	cmp di, 1
-	jnz input_is_positive
-	neg ax
+    call END_LINE
+    cmp di, 1
+    jnz input_is_positive
+    neg ax
 	
 input_is_positive:
-	pop di
-	pop dx
-	pop cx
-	pop bx
-	ret
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    ret
 
 OUTPUT:
-	push ax
-	push bx
-	push cx
-	push dx		
-	push di 			;di = 1 <=> число отрицательное
+    push ax
+    push bx
+    push cx
+    push dx		
+    push di 			;di = 1 <=> С‡РёСЃР»Рѕ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРµ
 	
-	xor cx, cx
-	xor di, di
+    xor cx, cx
+    xor di, di
 	
-	or ax, ax
-	jns push_digit_to_stack
-	mov di, 1
-	neg ax
+    or ax, ax
+    jns push_digit_to_stack
+    mov di, 1
+    neg ax
 	
 push_digit_to_stack:
     xor dx,dx
     div ten
-    push dx						;добавили в стек очередную цифру числа
+    push dx						;РґРѕР±Р°РІРёР»Рё РІ СЃС‚РµРє РѕС‡РµСЂРµРґРЅСѓСЋ С†РёС„СЂСѓ С‡РёСЃР»Р°
     inc cx
-    test ax, ax					;(логическое И)
-    jnz push_digit_to_stack 	;если ax - не ноль, то добавляем следующую цифру
+    test ax, ax					;(Р»РѕРіРёС‡РµСЃРєРѕРµ Р)
+    jnz push_digit_to_stack 	;РµСЃР»Рё ax - РЅРµ РЅРѕР»СЊ, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј СЃР»РµРґСѓСЋС‰СѓСЋ С†РёС„СЂСѓ
        
     mov ah, 02h
     cmp di, 1
@@ -115,24 +115,24 @@ push_digit_to_stack:
     mov dx, '-'
     int 21h
 print:
-	pop dx			;в dx - цифра, которую необходимо вывести
-    add dl, '0'		;символ, выводимы на дисплей
+    pop dx			;РІ dx - С†РёС„СЂР°, РєРѕС‚РѕСЂСѓСЋ РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РІРµСЃС‚Рё
+    add dl, '0'		;СЃРёРјРІРѕР», РІС‹РІРѕРґРёРјС‹ РЅР° РґРёСЃРїР»РµР№
     int 21h
     loop print   
     call END_LINE
     
     pop di 	
-	pop dx
+    pop dx
     pop cx 
     pop bx 
     pop ax  
-ret
+    ret
 
 CHECK_DIV_BY_ZERO:
-	push ax
-	xor ax, ax  
-	cmp bx, ax
-	jnz no_error
+    push ax
+    xor ax, ax  
+    cmp bx, ax
+    jnz no_error
     mov ah, 9
     lea dx, errorDivByZero
     int 21h      
@@ -141,35 +141,35 @@ no_error:
     pop ax
     ret
     
-SIGNED_DIVISION:	;деление со знаком, 
-					;вход: AX - делимое, BX - делитель
-					;выход: AX - частное
-	push dx	
-	xor dx, dx		;dx = 0 <=> делимое положительное
-	or ax, ax		;проверяем знак делимого
-	jns division	;если делимое положительное, оставляем  dx = 0
-	sub dx, 1		;если делимое отрицательно, то dx=1..1 
-	division:		
-	call CHECK_DIV_BY_ZERO
-	idiv bx	
-	pop dx
-	ret
+SIGNED_DIVISION:	;РґРµР»РµРЅРёРµ СЃРѕ Р·РЅР°РєРѕРј, 
+					;РІС…РѕРґ: AX - РґРµР»РёРјРѕРµ, BX - РґРµР»РёС‚РµР»СЊ
+					;РІС‹С…РѕРґ: AX - С‡Р°СЃС‚РЅРѕРµ
+    push dx	
+    xor dx, dx		;dx = 0 <=> РґРµР»РёРјРѕРµ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРµ
+    or ax, ax		;РїСЂРѕРІРµСЂСЏРµРј Р·РЅР°Рє РґРµР»РёРјРѕРіРѕ
+    jns division	;РµСЃР»Рё РґРµР»РёРјРѕРµ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРµ, РѕСЃС‚Р°РІР»СЏРµРј  dx = 0
+    sub dx, 1		;РµСЃР»Рё РґРµР»РёРјРѕРµ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕ, С‚Рѕ dx=1..1 
+    division:		
+    call CHECK_DIV_BY_ZERO
+    idiv bx	
+    pop dx
+    ret
 
 START:
 	
     mov ax,@data
-	mov ds,ax
-		
-	call INPUT      
-   	call OUTPUT
-	mov bx, ax
-	call INPUT      
-   	call OUTPUT   	
-	xchg ax, bx
+    mov ds,ax
 	
-	call SIGNED_DIVISION
+    call INPUT      
+    call OUTPUT
+    mov bx, ax
+    call INPUT      
+    call OUTPUT   	
+    xchg ax, bx
+	
+    call SIGNED_DIVISION
 		
-	call OUTPUT
+    call OUTPUT
 	
 END_PROGRAM:
     mov ah,4ch
