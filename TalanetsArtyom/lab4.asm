@@ -3,38 +3,38 @@
 
 .DATA
     ten dw 10
-	endl db 13, 10, '$'
-	errorInput db "Input error", 13, 10, '$'
-	stringIsValid db "String is valid", 13, 10, '$'
-	stringIsNotValid db "String is not valid", 13, 10, '$'
-	inputString   db 254,  256 dup(?)
+    endl db 13, 10, '$'
+    errorInput db "Input error", 13, 10, '$'
+    stringIsValid db "String is valid", 13, 10, '$'
+    stringIsNotValid db "String is not valid", 13, 10, '$'
+    inputString   db 254,  256 dup(?)
 .CODE
 
 END_LINE:
-	push ax
-	mov ah, 9
-	lea dx, endl
-	int 21h
-	pop ax	
+    push ax
+    mov ah, 9
+    lea dx, endl
+    int 21h
+    pop ax	
 ret
 
 INPUT_STRING:	
-	push ax
-	push cx
-	push dx	
+    push ax
+    push cx
+    push dx	
 	   
     mov ah,0Ah
-    lea dx,inputString       ;DX = aдрес буфера
+    lea dx,inputString       ;DX = aРґСЂРµСЃ Р±СѓС„РµСЂР°
     int 21h     
     xor ch, ch
-    mov cl,inputString[1]    ;cl = длина введённой строки
-    jcxz input_error    	 ;Если длина = 0, возвращаем ошибку
-	call END_LINE
+    mov cl,inputString[1]    ;cl = РґР»РёРЅР° РІРІРµРґС‘РЅРЅРѕР№ СЃС‚СЂРѕРєРё
+    jcxz input_error    	 ;Р•СЃР»Рё РґР»РёРЅР° = 0, РІРѕР·РІСЂР°С‰Р°РµРј РѕС€РёР±РєСѓ
+    call END_LINE
 	
-	pop dx
-	pop cx
-	pop ax
-	ret  
+    pop dx
+    pop cx
+    pop ax
+    ret  
 	
 input_error:
     xor ax,ax  
@@ -44,73 +44,72 @@ input_error:
     jmp END_PROGRAM 
 
 CHECK_STRING:
-	push ax		;счетчик открытых скобок
-	push bx		;адрес символа
-	push cx		;счетчик символов
-	push dx		;символ
+    push ax		;СЃРёРјРІРѕР»
+    push bx		;Р°РґСЂРµСЃ СЃРёРјРІРѕР»Р°
+    push cx		;СЃС‡РµС‚С‡РёРє СЃРёРјРІРѕР»РѕРІ
+    push dx		;СЃС‡РµС‚С‡РёРє РѕС‚РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє
 	      
-	xor ax, ax
+    xor dx, dx
     xor ch, ch
-    mov cl,inputString[1]    ;cl = длина введённой строки
-    lea bx, inputString      ;bx = адрес строки
-	inc BX
-    inc BX
-	
-	inc cx
+    mov cl,inputString[1]    ;cl = РґР»РёРЅР° РІРІРµРґС‘РЅРЅРѕР№ СЃС‚СЂРѕРєРё
+    inc cx   
+    lea si, inputString
+    inc si
+    inc si
 check_next_symbol:	    
-	dec cx
-    jcxz end_of_lines			;Если были рассмотрены все символы, то строка корректна
-    mov dl,[bx]					;Загрузка в dl очередного символа строки (в dx код символа)
-    inc bx      	     	   	;Инкремент адреса
-	cmp dl,'('      	    	;Если очередной символ это '('
-    jz bracket_is_open  		;переходим к следующему символу
-    cmp dl,')'   		       	;Если очередной символ это ')'
-    jz bracket_closed   	    ;переходим к следующему символу
-	jmp string_is_not_valid		;Если символ не '(' и не ')', то строка не корректна
+    dec cx
+    jcxz end_of_lines			;Р•СЃР»Рё Р±С‹Р»Рё СЂР°СЃСЃРјРѕС‚СЂРµРЅС‹ РІСЃРµ СЃРёРјРІРѕР»С‹, С‚Рѕ СЃС‚СЂРѕРєР° РєРѕСЂСЂРµРєС‚РЅР°
+    lods inputString
+    inc bx      	     	   	;РРЅРєСЂРµРјРµРЅС‚ Р°РґСЂРµСЃР°
+    cmp al,'('      	    	;Р•СЃР»Рё РѕС‡РµСЂРµРґРЅРѕР№ СЃРёРјРІРѕР» СЌС‚Рѕ '('
+    jz bracket_is_open  		;РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
+    cmp al,')'   		       	;Р•СЃР»Рё РѕС‡РµСЂРµРґРЅРѕР№ СЃРёРјРІРѕР» СЌС‚Рѕ ')'
+    jz bracket_closed   	    ;РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
+    jmp string_is_not_valid		;Р•СЃР»Рё СЃРёРјРІРѕР» РЅРµ '(' Рё РЅРµ ')', С‚Рѕ СЃС‚СЂРѕРєР° РЅРµ РєРѕСЂСЂРµРєС‚РЅР°
 	
 bracket_is_open:
-	inc ax						;увеличиваем количество открытых скобок
-	jmp check_next_symbol
+    inc dx						;СѓРІРµР»РёС‡РёРІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє
+    jmp check_next_symbol
 
 bracket_closed:
-	cmp ax, 0					
-	jz string_is_not_valid		;если открытых скобок нет, то строка не корректна
-	dec ax						;уменьшаем количество открытых скобок
-	jmp check_next_symbol		
+    cmp dx, 0					
+    jz string_is_not_valid		;РµСЃР»Рё РѕС‚РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє РЅРµС‚, С‚Рѕ СЃС‚СЂРѕРєР° РЅРµ РєРѕСЂСЂРµРєС‚РЅР°
+    dec dx						;СѓРјРµРЅСЊС€Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє
+    jmp check_next_symbol		
 	
 end_of_lines:
-	cmp ax, 0					
-	jz string_is_valid			;если открытых и закрытых скобок одинаковое количество, то строка корректна
-	jmp string_is_not_valid		;если открытых и закрытых скобок разное количество, то строка н корректна
+    cmp dx, 0					
+    jz string_is_valid			;РµСЃР»Рё РѕС‚РєСЂС‹С‚С‹С… Рё Р·Р°РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє РѕРґРёРЅР°РєРѕРІРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ, С‚Рѕ СЃС‚СЂРѕРєР° РєРѕСЂСЂРµРєС‚РЅР°
+    jmp string_is_not_valid		;РµСЃР»Рё РѕС‚РєСЂС‹С‚С‹С… Рё Р·Р°РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє СЂР°Р·РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ, С‚Рѕ СЃС‚СЂРѕРєР° РЅ РєРѕСЂСЂРµРєС‚РЅР°
 	
 
 string_is_valid:
-	mov ah, 9
+    mov ah, 9
     lea dx, stringIsValid
     int 21h      
     jmp check_exit 
 
 string_is_not_valid:
-	mov ah, 9
+    mov ah, 9
     lea dx, stringIsNotValid
     int 21h      
     jmp check_exit  
  
 check_exit:
-	call END_LINE
-	pop dx
-	pop cx
-	pop bx
-	pop ax
-	ret
+    call END_LINE
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
 
    
 START:
-	mov ax,@data
-	mov ds,ax
+    mov ax,@data
+    mov ds,ax
 	
-	call INPUT_STRING
-	call CHECK_STRING
+    call INPUT_STRING
+    call CHECK_STRING
 	
 END_PROGRAM:
     mov ah,4ch
