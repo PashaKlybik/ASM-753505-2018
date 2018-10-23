@@ -22,7 +22,7 @@ divzero db "Error. Division by zero", 13, 10, '$'
 .code
 
 writeln proc
-    push dx
+	push dx
 	push ax
 	
 	mov ah, 02h
@@ -59,8 +59,8 @@ writeSignedInt proc
 	push cx
 	push dx
 
-    xor cx, cx
-    mov bx, 10
+	xor cx, cx
+	mov bx, 10
 	
 	cmp ax, 0
 	jns s_get_digit
@@ -72,26 +72,26 @@ writeSignedInt proc
 		not ax
 		inc ax
 s_get_digit:
-    xor dx, dx
-    div bx
-    push dx
-    inc cx
+	xor dx, dx
+	div bx
+	push dx
+	inc cx
 	
-    test ax, ax
-    jnz s_get_digit
+	test ax, ax
+	jnz s_get_digit
 	
-    mov ah, 02h
+	mov ah, 02h
 s_out_digit:
 		pop dx
 		add dl, '0'
 		int 21h
-    loop s_out_digit
+	loop s_out_digit
 	
 	pop dx
 	pop cx
 	pop bx
 	pop ax
-    ret
+	ret
 writeSignedInt endp
 
 
@@ -101,29 +101,29 @@ writeUnsignedInt proc
 	push cx
 	push dx
 
-    xor cx, cx
-    mov bx, 10
+	xor cx, cx
+	mov bx, 10
 u_get_digit:
-    xor dx, dx
-    div bx
-    push dx
-    inc cx
+	xor dx, dx
+	div bx
+	push dx
+	inc cx
 	
-    test ax, ax
-    jnz u_get_digit
+	test ax, ax
+	jnz u_get_digit
 	
-    mov ah, 02h
+	mov ah, 02h
 u_out_digit:
 		pop dx
 		add dl, '0'
 		int 21h
-    loop u_out_digit
+	loop u_out_digit
 	
 	pop dx
 	pop cx
 	pop bx
 	pop ax
-    ret
+	ret
 writeUnsignedInt endp
 
 
@@ -297,6 +297,6 @@ output:
 	call writeln
 	
 exitmain:
-    mov ax, 4c00h
-    int 21h
+	mov ax, 4c00h
+	int 21h
 end main
