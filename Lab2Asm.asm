@@ -2,8 +2,8 @@
 .stack 100h
 .data
 	errorMessage db 'ERROR!','$'
-	result      db      'Result', '$'
-	residual    db      'Residual', '$'
+	result db 'Result', '$'
+	residual db 'Residual', '$'
 .code
 
 main proc
@@ -23,7 +23,7 @@ mov  ax,dx
 
 call show_ax
 
-mov ax,     4C00h
+mov ax, 4C00h
 int 21h
 main endp
 
