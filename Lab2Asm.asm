@@ -23,8 +23,8 @@ mov  ax,dx
 
 call show_ax
 
-mov     ax,     4C00h
-int     21h
+mov ax,     4C00h
+int 21h
 main endp
 
 Show_AX proc
@@ -95,10 +95,10 @@ input proc
  		cmp al, 13
  		jz exitInput
 
-		cmp     al, '0'
-        	jb      error
-        	cmp     al, '9'
-        	ja      error
+		cmp al, '0'
+        	jb error
+        	cmp al, '9'
+        	ja error
 		sub al, '0'
 		
  		mov cl, al
