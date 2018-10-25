@@ -5,31 +5,34 @@
 	result db 'Result', '$'
 	residual db 'Residual', '$'
 .code
- main proc
+main proc
 mov ax,@data
 mov ds,ax
- call input
+
+call input
 mov  bx,ax
 call input
-cmp 	ax,0
-jne     next
-lea     dx, errorMessage
-mov     ah,09h
+cmp  ax,0
+jne  next
+lea  dx, errorMessage
+mov  ah,09h
 int 21h
 mov ax, 4C00h
 int 21h
+
 next:
 xor  dx,dx
 xchg ax,bx
- div  bx
+div  bx
 call show_ax
 call endl
 mov  ax,dx
- call show_ax
- mov ax, 4C00h
+call show_ax
+mov ax, 4C00h
 int 21h
 main endp
- Show_AX proc
+
+Show_AX proc
 	push ax
  	push bx
  	push cx
@@ -64,7 +67,8 @@ main endp
  	pop ax
 	ret
 Show_AX endp
- endl proc
+
+endl proc
 	push ax
 	push dx
  	mov ah, 02h
@@ -76,7 +80,8 @@ Show_AX endp
 	pop ax
 	ret
 endl endp
- input proc
+
+input proc
  	push bx
  	push cx
  	push dx
