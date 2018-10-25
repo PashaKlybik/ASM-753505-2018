@@ -1,7 +1,6 @@
 .model small
 .stack 100h
 .data
-	ten dw 10
 	errorMessage db 'ERROR!','$'
 	result      db      'Result', '$'
 	residual    db      'Residual', '$'
@@ -33,7 +32,7 @@ Show_AX proc
  	push bx
  	push cx
  	push dx
- 	mov cx, 0
+ 	xor  cx,cx
  	mov bx,10
  	
  	;output with the help of stack
@@ -61,7 +60,7 @@ Show_AX proc
  	pop cx
  	pop bx
  	pop ax
-ret
+	ret
 Show_AX endp
 
 endl proc
@@ -76,17 +75,17 @@ endl proc
 
  	pop dx
 	pop ax
-ret
+	ret
 endl endp
 
 input proc
  	push bx
  	push cx
  	push dx
- 	mov ax, 0
- 	mov bx, 0
- 	mov cx, 0
- 	mov dx, 0
+ 	xor  ax,ax
+ 	xor  bx,bx
+ 	xor  cx,cx
+ 	xor  dx,dx
 
  	symbolEntry:
  		mov ah, 01h
@@ -134,10 +133,15 @@ input proc
  		mov ax, bx
  		cmp ax, 10
  		jnc continue
+		
+		xor bx,bx
+ 		pop dx
+ 		pop ax
+ 		jmp symbolEntry
 	
 	;delete last digit
  	continue:	
- 		mov dx, 0
+ 		xor dx,dx
  		mov bx, 10
  		div bx
  		mov bx, ax
@@ -151,6 +155,6 @@ input proc
  		pop dx
  		pop cx
  		pop bx
-ret
+		ret
 input endp
 end main
