@@ -11,6 +11,7 @@
     messageDividingByZero db 10, 13, "Error: dividing by zero.", 10, 13, '$'
     messageResult db 10, 13, "Result: $"
     messageRemainder db 10, 13, "Remainder: $"
+	messageOverflow db 10, 13, "Error: overflow.", 10, 13, '$'
 .code
 
 Output PROC
@@ -207,7 +208,18 @@ main:
     CALL OutputSigned
     CMP AX, 0
     JZ DividingByZeroException
+    CMP AX, -1
+    JNZ Dividing
+    POP BX
+    CMP BX, 8000h
+    PUSH BX
+    JNZ Dividing
+    LEA DX, messageOverflow
+    MOV AH, 09h
+    INT 21h
+    JMP ProgramFinish
     
+Dividing:	
     MOV CX, AX
     POP AX
     CWD
