@@ -29,7 +29,7 @@ removeDuplicateCharacters proc
     mov AL, stringSize
     add SI, AX
 	mov CX, 24h
-    mov [SI],  CX
+    mov [SI], CX
 
     mov CX, 0
     lea SI, string 
