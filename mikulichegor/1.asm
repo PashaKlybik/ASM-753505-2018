@@ -11,17 +11,17 @@
   
   mov ax, a
   cmp ax, b
-  jle fi
+  jge first
    mov ax, b
- fi:
+ first:
    cmp ax,c
-   jle sec
+   jge second
    mov ax,c
-sec:
+second:
    cmp ax,d
-   jle thi
+   jge third
    mov ax,d
-thi:
+third:
  int 21h
     mov ax, 4c00h
    
