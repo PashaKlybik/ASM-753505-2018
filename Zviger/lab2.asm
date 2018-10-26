@@ -32,6 +32,7 @@ DeleteSymbolFromDisplay proc
     mov AH, 02h
     int 10h
 
+	mov CX, 1
     mov AL, 20H
     mov AH, 0AH
     int 10h
@@ -108,8 +109,8 @@ ReadAX proc
         mov AH,08h            ;character reading
         int 21h
 
-        cmp AL, 8h
-        jnz deleteSymbol
+        cmp AL, 8h				;BackSpace
+        jnz noBackSpace
         cmp CX, 0
         jz readSymbol
         pop AX
@@ -117,17 +118,17 @@ ReadAX proc
         call DeleteSymbolFromDisplay
         jmp readSymbol
 
-        deleteSymbol:
+        noBackSpace:
 
-        cmp AL, 1Bh
-        jnz deleteNum
+        cmp AL, 1Bh				;ESC
+        jnz noESC
         cycle1:
         pop AX
         LOOP cycle1
         call DeleteNumFromDisplay
         jmp readSymbol
 
-        deleteNum:
+        noESC:
         
         cmp AL, 13            ;if the entered character is skipped processing of the entered character
         jz addDigitsToNum
@@ -255,7 +256,8 @@ main:
     call PrintStr
 
     lea DX, result
-    call PrintStr
+    mov AH,09h
+    int 21h
 
     mov DX, 0
     mov AX, SI
@@ -263,15 +265,13 @@ main:
     
     call PrintAX
     
-    push DX
+    mov AX, DX
+
     lea DX, newLine
     call PrintStr
     
     lea DX, remainder
     call PrintStr
-    pop DX
-
-    mov AX, DX
 
     call PrintAX
 
