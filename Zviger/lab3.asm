@@ -5,12 +5,12 @@
 .data
 ten dw 10
 newLine db 10,13,'$'
-errorMsg db 10, 13,"Input error", 10, 13, '$'
+errorMsg db 10, 13,"Input error:", 10, 13, '$'
 repeatInput db 10, 13,"Repeat input!", 10, 13, '$'
-enter2 db "Enter the divisor", 10, 13, '$'
-enter1 db "Enter a dividend", 10, 13, '$'
-result db "Result", 10, 13, '$'
-remainder db "Remainder", 10, 13, '$'
+enter2 db "Enter the divisor:", 10, 13, '$'
+enter1 db "Enter a dividend:", 10, 13, '$'
+result db "Result:", 10, 13, '$'
+remainder db "Remainder:", 10, 13, '$'
 .code
 PrintStr proc
     push AX
@@ -77,10 +77,11 @@ PrintAX proc
     mov SI, 0
     mov CX, 0
     test AX, AX
-    jns isNegNum
+    jns isPosNum
     neg AX
     mov SI, 1
-    isNegNum:
+    isPosNum:
+
     pushDigit:                ;adding a character to a number on the stack 
         mov DX,0
         div ten
@@ -91,10 +92,10 @@ PrintAX proc
     JNZ pushDigit
     
     cmp SI,1
-    jnz isNegNum1
+    jnz isPosNum1
     inc CX
     push 2Dh
-    isNegNum1:
+    isPosNum1:
 
     printDigit:                ;character printing
         pop DX
@@ -125,41 +126,41 @@ ReadAX proc
         int 21h
 
         cmp AL, 8h            ;check for a backspace
-        jnz deleteSymbol
-
+        jnz noBackSpace
         cmp CX, 0            ;check for a digit
         jz readSymbol
         cmp CX, 1            ;delete sign
-        jnz isNegNum2
+        jnz isPosNum2
         mov SI, 0
-        isNegNum2:
+        isPosNum2:
         pop AX
         dec CX
         call DeleteSymbolFromDisplay
         jmp readSymbol
-        deleteSymbol:
+        noBackSpace:
 
         cmp AL, 1Bh            ;check for a ESC
-        jnz deleteNum
-        cycle1:
+        jnz noESC
+        popSymbol:
         pop AX
-        LOOP cycle1
-        call deleteNum
+        LOOP popSymbol
+        call DeleteNumFromDisplay
+		xor SI, SI
         jmp readSymbol
-        deleteNum:
+        noESC:
         
         cmp AL, 13            ;if the entered character is skipped processing of the entered character
         jz     addDigitsToNum
 
         cmp AL, 2Dh
-        jnz isMinus1
+        jnz isNotMinus
 
         cmp SI, 1
-        jnz isSecondMinus
+        jnz isNotSecondMinus
         xor SI, SI
         jmp error
 
-        isSecondMinus:
+        isNotSecondMinus:
 
         mov SI, 1
         push 2Dh
@@ -170,7 +171,7 @@ ReadAX proc
 
         jmp readSymbol
 
-        isMinus1:
+        isNotMinus:
 
         mov SI, 1
         cmp AL, '0'            ;check for a digit
@@ -199,16 +200,18 @@ ReadAX proc
         mov SI, CX            ;SI - length of the num
         mov DI, 0
 
-    cycle2:                    ;Adding number to the AX
+    cycle:                    ;Adding number to the AX
         pop BX                ;extract a digit from the stack
 
         cmp BX, 2Dh
-        jnz isMinus2
+        jnz isNotMinus1
 
+        cmp DI, 32769
+        jnc forError
         neg DI
         jmp stopAdding
 
-        isMinus2:
+        isNotMinus1:
 
         mov AX, SI            
         sub AX, CX    
@@ -220,18 +223,18 @@ ReadAX proc
 
         mul BX
         add DI, AX
-        JC forError
-
-        cmp DX, 0
-        JNZ forError
 
         jmp continue
 
         forError:
         dec CX
         jmp error
+
         continue:
-    LOOP cycle2
+    LOOP cycle
+
+    cmp DI, 32768
+    JNC error
 
     stopAdding:
 
@@ -312,7 +315,7 @@ main:
     call PrintStr
 
     lea DX, result
-    PrintStr
+    Call PrintStr
 
     mov DX, 0
     mov AX, SI
