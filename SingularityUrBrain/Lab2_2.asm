@@ -5,7 +5,7 @@
 .code
 main:
 	mov ax, @data
-    mov ds, ax
+        mov ds, ax
 	
 	call Input
 	
