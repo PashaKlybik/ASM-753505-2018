@@ -3,6 +3,7 @@
 .model small
 .stack 256
 .data
+
 ten dw 10
 newLine db 10,13,'$'
 errorMsg db 10, 13,"Input error:", 10, 13, '$'
@@ -11,6 +12,7 @@ enter2 db "Enter the divisor:", 10, 13, '$'
 enter1 db "Enter a dividend:", 10, 13, '$'
 result db "Result:", 10, 13, '$'
 remainder db "Remainder:", 10, 13, '$'
+
 .code
 PrintStr proc
     push AX
@@ -36,7 +38,7 @@ DeleteSymbolFromDisplay proc
     mov AH, 0AH
     int 10h
 
-	pop CX
+    pop CX
     pop DX
     pop AX
     ret
@@ -145,12 +147,12 @@ ReadAX proc
         pop AX
         LOOP popSymbol
         call DeleteNumFromDisplay
-		xor SI, SI
+        xor SI, SI
         jmp readSymbol
         noESC:
         
         cmp AL, 13            ;if the entered character is skipped processing of the entered character
-        jz     addDigitsToNum
+        jz addDigitsToNum
 
         cmp AL, 2Dh
         jnz isNotMinus
@@ -180,7 +182,7 @@ ReadAX proc
         ja error
 
         mov DL, AL            ;output of the entered character
-        mov AH,02h
+        mov AH, 02h
         int 21h
 
         mov AH, 0            ;adding a digit to the stack
