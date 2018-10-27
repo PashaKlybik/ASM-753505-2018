@@ -58,15 +58,15 @@
             
             cmp minus, '-'
             jnz positive
-                cmp ax, maxNegative
-                jmp nextStep
-            positive:
-                cmp ax, maxPositive
-            nextStep:
-                ja deleteSymbol
-                mov number, ax
-                inc cx
-                jmp inp
+            cmp ax, maxNegative
+            jmp nextStep
+        positive:
+            cmp ax, maxPositive
+        nextStep:
+            ja deleteSymbol
+            mov number, ax
+            inc cx
+            jmp inp
                 
             ;labels
             jmp labelsList
