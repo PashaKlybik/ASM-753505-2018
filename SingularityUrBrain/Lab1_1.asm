@@ -8,7 +8,7 @@
 .code
 main:
 	mov ax, @data
-    mov ds, ax
+      mov ds, ax
     	
 	mov ax, [a]
 	mul [c]		
