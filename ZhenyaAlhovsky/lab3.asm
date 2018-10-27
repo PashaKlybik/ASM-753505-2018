@@ -1,20 +1,21 @@
 .model small
 .stack 256
 .data
-	message_divident db "Enter a dividend: ", 10, '$'
-	message_divider db "Enter a divider: ", 10, '$'
-	message_remainder db "Remainder: ", 10, '$'
-	message_output db "You have entered: ", 10, '$'
-	message_divbyzero db "Error. Division by zero", 10, '$'
-	message_answer db "Answer: ", 10, '$'
+	messageDivident db "Enter a dividend: ", 10, '$'
+	messageDivider db "Enter a divider: ", 10, '$'
+	messageRemainder db "Remainder: ", 10, '$'
+	messageoutput db "You have entered: ", 10, '$'
+	messageDivideByZero db "Error. Division by zero", 10, '$'
+	messageOveflow db "Overflow", 10, '$'
+	messageAnswer db "Answer: ", 10, '$'
 	minus dw ?
 	number dw ? ; push pop slower
-	maxpositiveplusone dw 32768
-	maxnegativeplusone dw 32769
+	maxPositive dw 32767
+	maxNegative dw 32768
 	ten dw 10
 .code
 
-	INPUT proc
+	input proc
 		push bx
 		push cx
 		push dx
@@ -29,125 +30,123 @@
 			int 21h
 			
 			cmp al, 13
-			jz finish_label
+			jz goToFinishLabel
 			cmp al, 8
-			jz backspace_label
+			jz goToBackspaceLabel
 			cmp al, 27;escape
-			jz escape_label
+			jz goToEscapeLabel
 			cmp al, '-'
-			jnz positive_number
+			jnz positiveNumber
 			cmp cx, 0
-			jnz deletesymbol
+			jnz deleteSymbol
 			mov minus, '-'
 			inc cx
 			jnp inp
 			
-		positive_number:
+		positiveNumber:
 			cmp al, '0'
-			jc deletesymbol
-			cmp al, 58 ;58='9' + 1
-			jnc deletesymbol
-			
+			jc deleteSymbol
+			cmp al, '9'
+			ja deleteSymbol
 			xor bx, bx
 			mov bl, al
 			sub bl, '0'
 			mov ax, number
 			mul ten
-			jc deletesymbol
+			jc deleteSymbol
 			add ax, bx
-			mov bx, minus			
-			;labels
-			jmp BNTU_rubbish
-			finish_label:
-			jmp finish
-			backspace_label:
-			jmp backspace
-			escape_label:
-			jmp escape
-			inp_label:
-			jmp inp
-			BNTU_rubbish:
 			
 			cmp minus, '-'
 			jnz positive
-				cmp ax, maxnegativeplusone
-				jmp next_step
+				cmp ax, maxNegative
+				jmp nextStep
 			positive:
-				cmp ax, maxpositiveplusone
-			next_step:
-				jnc deletesymbol
+				cmp ax, maxPositive
+			nextStep:
+				ja deleteSymbol
 				mov number, ax
 				inc cx
 				jmp inp
 				
-		deletesymbol:
+			;labels
+			jmp labelsList
+			goToFinishLabel:
+			jmp finish
+			goToBackspaceLabel:
+			jmp backspace
+			goToEscapeLabel:
+			jmp escape
+			inputLabel:
+			jmp inp
+			labelsList:
+				
+		deleteSymbol:
+			mov ah, 02h
 			mov dl, 8
-			call WRITE
+			int 21h
 			mov dl, ' '
-			call WRITE
+			int 21h
 			mov dl, 8
-			call WRITE			
-			jmp inp_label
+			int 21h
+			jmp inputLabel
 			
 		backspace:
 			cmp cx, 0
-			jz inp_label
+			jz inputLabel
 			cmp cx, 1
-			jnz not_minus
+			jnz notMinus
 			cmp minus, '-'
-			jnz not_minus
+			jnz notMinus
 			mov minus, 0
 			jmp deleting
 			
-			not_minus:
-				xor dx, dx
-				mov ax, number
-				div ten
-				mov number, ax
-			
-			deleting:
-				mov dl, ' '
-				call WRITE
-				mov dl, 8
-				call WRITE
+		notMinus:
+			xor dx, dx
+			mov ax, number
+			div ten
+			mov number, ax
+		
+		deleting:
+			mov ah, 02h
+			mov dl, ' '
+			int 21h
+			mov dl, 8
+			int 21h
 			dec cx
-			jmp inp_label
+			jmp inputLabel
 			
 		escape:
+			mov ah, 02h
 			mov dl, 13
-			call WRITE
-			cmp  cx, 0
-			jz end_escape
-			xor ax, ax
-			mov number, ax
+			int 21h
+			cmp cx, 0
+			jz escapeEnd
 			mov minus, 0
-			deleteall:
-				mov dl,' '
-				call WRITE
-				loop deleteall
-			end_escape:
 			mov dl, ' '
-			call WRITE
+			deleteAllSymbols:
+				int 21h
+				loop deleteAllSymbols
+			escapeEnd:
+			int 21h
 			mov dl, 13
-			call WRITE
-
-			jmp inp_label
+			int 21h
+			mov number, 0
+			jmp inputLabel
 			
 		finish:
-		mov ax, number
-		cmp minus, '-'
-		jnz to_exit
-		not ax
-		inc ax
-		to_exit:
-		mov minus, 0
-		pop dx
-		pop cx
-		pop bx
-		ret		
-	INPUT endp
+			mov ax, number
+			cmp minus, '-'
+			jnz toExit
+			neg ax
+			toExit:
+			mov minus, 0
+			pop dx
+			pop cx
+			pop bx
+			ret		
+	input endp
 
-	OUTPUT proc
+	output proc
 		push bx
 		push cx
 		push dx
@@ -155,13 +154,11 @@
 		mov number, ax
 		mov minus, 0
 		
-		cmp ax, maxpositiveplusone
-		jc NumberInStack
-		mov minus, '-'
-		not ax ; == sub bx, ax (bx = 0) mov ax, bx
-		inc ax
+		cmp ax, maxPositive
+		jna NumberInStack
+		neg ax
 		mov dl, '-'
-		call WRITE
+		call write
 		
 		NumberInStack:
 			xor dx, dx
@@ -179,96 +176,100 @@
 			loop Print
 		
 		mov dl, 10
-		call WRITE
+		call write
 		pop dx
 		pop cx
 		pop bx
 		mov ax, number
 		ret
-	OUTPUT endp
+	output endp
 	
-	WRITE proc
+	write proc
 		push ax
 		mov ah, 02h
 		int 21h
 		pop ax
 		ret
-	WRITE endp
+	write endp
 	
-	WRITE_STRING proc
+	writeString proc
 		push ax
 		mov ah, 09h
 		int 21h
 		pop ax
 		ret
-	WRITE_STRING endp
+	writeString endp
 	
 main:
     mov ax, @data
     mov ds, ax	
 	
-	lea dx, message_divident
-	call WRITE_STRING
-	call INPUT
-	lea dx, message_output
-	call WRITE_STRING
-	call OUTPUT
+	lea dx, messageDivident
+	call writeString
+	call input
+	lea dx, messageoutput
+	call writeString
+	call output
 	
-	mov bx, ax
+	mov bx, ax ;dividend
 	
-	lea dx, message_divider
-	call WRITE_STRING
-	call INPUT
-	lea dx, message_output
-	call WRITE_STRING
-	call OUTPUT
+	lea dx, messageDivider
+	call writeString
+	call input
+	lea dx, messageoutput
+	call writeString
+	call output
 	
 	cmp ax, 0
-	jz divbyzero
+	jz divideByZero
 	mov cx, ax
 	mov ax, bx
-	;cmp cx, 0FFFFh
+	mov bx, 0
 	cmp cx, -1
-	jz div_minus_one
+	jz divideOnMinusOne
 	cmp cx, 1
-	jz answer_output
-	cwd	
-not_negative:
+	jz answeroutput
+	cwd
+
 	idiv cx ;cx = divider
 	mov bx, dx
-	cmp bx, maxpositiveplusone ;finding remainder
-	jc answer_output
-	cmp cx, maxpositiveplusone
-	jc add_divider
+	cmp bx, maxPositive ;finding remainder
+	jna answeroutput
+	cmp cx, maxPositive
+	jna addDivider
 	sub bx, cx
 	inc ax
-	jmp answer_output
-add_divider:
+	jmp answeroutput
+addDivider:
 	add bx, cx
 	dec ax
-answer_output:
-	lea dx, message_answer
-	call WRITE_STRING
-	call OUTPUT
-	lea dx, message_remainder
-	call WRITE_STRING
+answeroutput:
+	lea dx, messageAnswer
+	call writeString
+	call output
+	lea dx, messageRemainder
+	call writeString
 	mov ax, bx
 
-	call OUTPUT
+	call output
 	jmp exit
 	
-	div_minus_one:
+	divideOnMinusOne:
 		neg ax
-		jmp answer_output
+		cmp ax, maxPositive
+		ja overflow
+		jmp answeroutput
 		
-	divbyzero:
-		lea dx, message_divbyzero
-		call WRITE_STRING
+	divideByZero:
+		lea dx, messageDivideByZero
+		call writeString
+		jmp exit
 	
+	overflow: 
+		lea dx, messageOveflow
+		call writeString
+		
 	exit:
     mov ax, 4c00h
     int 21h
-end main	
-			
-			
-			
+end main
