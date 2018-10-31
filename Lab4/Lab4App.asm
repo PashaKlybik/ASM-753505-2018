@@ -4,7 +4,7 @@
     string db 255,0,256 dup (0)
     strCorrectAnswer db 'Correct string $'
     strNotCorrectAnswer db 'Incorrect string $'
-    smthGoingWrong db 'Somphing going wrong:( $'
+    smthGoingWrong db 'Something going wrong:( $'
     stackCheck dw 7
 .code
 
@@ -65,10 +65,10 @@ inputAndCheck proc
     int 21h 
 
     mov si,offset string+2
-    mov cl,string[1]
-    cld
+    mov cl,string[1];cl is count of symbols in the string
+    cld             ;direct order
     strLoop:
-        lodsb
+        lodsb       ;take symbol from the string
         cmp al,'('
         je roundBracketOpened
         cmp al,'{'
@@ -115,7 +115,7 @@ inputAndCheck proc
         endCycle:
     loop strLoop
     
-    pop bx;
+    pop bx    ;check count of opened and close brackets
     cmp bx,[stackCheck]
     je correctCheck
     call notCorrectProc
