@@ -1,4 +1,4 @@
-; Лабораторная №1(Вариант 8)
+; Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ в„–5(Р’Р°СЂРёР°РЅС‚ 8)
 .MODEL SMALL
 .STACK 100h
 
@@ -25,7 +25,7 @@
 	endline db 13, 10, '$'
 .CODE
 
-readMatrixFromFile proc							; Процедура чтения строки из файла
+readMatrixFromFile proc							; РџСЂРѕС†РµРґСѓСЂР° С‡С‚РµРЅРёСЏ СЃС‚СЂРѕРєРё РёР· С„Р°Р№Р»Р°
 	push ax
 	push bx
 	push cx
@@ -34,7 +34,7 @@ readMatrixFromFile proc							; Процедура чтения строки из файла
 	mov ah,3dH
 	lea dx,inputFileName
 	xor al,al
-	int 21h										; Открытие файла
+	int 21h										; РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	jnc fileIsOpen1
 	call errorWithFile
 fileIsOpen1:
@@ -43,7 +43,7 @@ fileIsOpen1:
 	mov ah,3fH
 	lea dx,matrixAsString
 	mov cx,500
-	int 21h										; Чтение файла
+	int 21h										; Р§С‚РµРЅРёРµ С„Р°Р№Р»Р°
 	jnc fileIsRead
 	call errorWithFile
 fileIsRead:
@@ -52,7 +52,7 @@ fileIsRead:
 	add bx,ax
 	mov byte ptr[bx],'$'
 
-	mov ah,3eH									; Закрытие файла
+	mov ah,3eH									; Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	mov bx,[handle]
 	int 21h
 	jnc fileIsClose1
@@ -67,7 +67,7 @@ fileIsClose1:
 readMatrixFromFile endp
 
 
-writeMatrixInFile proc							; Процедура записи строки в файл
+writeMatrixInFile proc							; РџСЂРѕС†РµРґСѓСЂР° Р·Р°РїРёСЃРё СЃС‚СЂРѕРєРё РІ С„Р°Р№Р»
 	push ax
 	push bx
 	push cx
@@ -76,7 +76,7 @@ writeMatrixInFile proc							; Процедура записи строки в файл
 	mov ah,3cH
 	xor cx,cx
 	lea dx,outputFileName
-	int 21h										; Открытие файла
+	int 21h										; РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	jnc fileIsOpen2
 	call errorWithFile
 fileIsOpen2:
@@ -85,13 +85,13 @@ fileIsOpen2:
 	mov ah,40H
 	lea dx,matrixAsString
 	mov cx,len
-	int 21h										; Запись в файл
+	int 21h										; Р—Р°РїРёСЃСЊ РІ С„Р°Р№Р»
 	jnc recordedInFile
 	call errorWithFile
 recordedInFile:
 	mov ah,3eH
 	mov bx,[handle]
-	int 21h										; Закрытие файла
+	int 21h										; Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	jnc fileIsClose2
 	call errorWithFile
 fileIsClose2:
@@ -104,7 +104,7 @@ fileIsClose2:
 writeMatrixInFile endp
 
 
-errorWithFile proc								; Процедура, обрабатывающая ошибки с файлами
+errorWithFile proc								; РџСЂРѕС†РµРґСѓСЂР°, РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰Р°СЏ РѕС€РёР±РєРё СЃ С„Р°Р№Р»Р°РјРё
 	lea dx,fileErrorMessage
 	call printString
 	mov ah,4ch
@@ -112,7 +112,7 @@ errorWithFile proc								; Процедура, обрабатывающая ошибки с файлами
 errorWithFile endp
 
 
-convertStringInMatrix proc					; Процедура преобразования строки в матрицу
+convertStringInMatrix proc					; РџСЂРѕС†РµРґСѓСЂР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃС‚СЂРѕРєРё РІ РјР°С‚СЂРёС†Сѓ
 	push ax
 	push bx
 	push cx						
@@ -121,7 +121,7 @@ convertStringInMatrix proc					; Процедура преобразования строки в матрицу
 	
 	lea di,matrixAsString
 	mov cx,len
-viewString:									; Замена всех лишних символов на символ табуляции
+viewString:									; Р—Р°РјРµРЅР° РІСЃРµС… Р»РёС€РЅРёС… СЃРёРјРІРѕР»РѕРІ РЅР° СЃРёРјРІРѕР» С‚Р°Р±СѓР»СЏС†РёРё
 	cmp byte ptr[di],10
 	jne symbolIsNot10
 	mov byte ptr[di],9
@@ -150,18 +150,18 @@ findWord:
 	mov al,9
 	repe scasb
 	jcxz finishSolveFunction
-	mov bx,di								; Определяем начало элемента матрицы
+	mov bx,di								; РћРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»Рѕ СЌР»РµРјРµРЅС‚Р° РјР°С‚СЂРёС†С‹
 	dec bx
 	repne scasb
 	mov cx,di
 	dec cx
-	sub cx,bx								; Определяем длину элемента матрицы
+	sub cx,bx								; РћРїСЂРµРґРµР»СЏРµРј РґР»РёРЅСѓ СЌР»РµРјРµРЅС‚Р° РјР°С‚СЂРёС†С‹
 	push di
 
-	mov di,bx								; Возвращаем указатель на начало элемента
+	mov di,bx								; Р’РѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ СЌР»РµРјРµРЅС‚Р°
 	call CheckIntegerNumber
 	mov bx,dx
-	mov matrix[bx],ax						; Запись элемента в матрицу
+	mov matrix[bx],ax						; Р—Р°РїРёСЃСЊ СЌР»РµРјРµРЅС‚Р° РІ РјР°С‚СЂРёС†Сѓ
 	add dx,2
 	pop di
 	jmp findWord
@@ -181,18 +181,18 @@ finishSolveFunction:
 convertStringInMatrix endp
 
 
-CheckIntegerNumber proc						; Проверка на целое число	
+CheckIntegerNumber proc						; РџСЂРѕРІРµСЂРєР° РЅР° С†РµР»РѕРµ С‡РёСЃР»Рѕ	
 	push bx
 	push cx		
 	push dx
  	
 	xor ax,ax
- 	cmp byte ptr[di], '-'					; Проверяем элемент на отрицательность
+ 	cmp byte ptr[di], '-'					; РџСЂРѕРІРµСЂСЏРµРј СЌР»РµРјРµРЅС‚ РЅР° РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕСЃС‚СЊ
 	jne positiveNumber			
 	inc di
 	dec cl
 	mov minus,1
- positiveNumber:							; Конвертирование строки в число
+ positiveNumber:							; РљРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ С‡РёСЃР»Рѕ
 	mov bl,byte ptr[di]
 	inc di
 	cmp bl,'0'
@@ -232,7 +232,7 @@ finishCheckIntegerNumber:
 CheckIntegerNumber endp
 
 
-convertMatrixInString proc							; Процедура преобразования матрицы в строку
+convertMatrixInString proc							; РџСЂРѕС†РµРґСѓСЂР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РјР°С‚СЂРёС†С‹ РІ СЃС‚СЂРѕРєСѓ
 	push cx
 	push di
 	push si
@@ -240,22 +240,22 @@ convertMatrixInString proc							; Процедура преобразования матрицы в строку
 	lea di,matrixAsString
 	lea si,matrix
 	mov cx,numOfRows
-convertRow:											; Преобразование строки матрицы в строку
+convertRow:											; РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РјР°С‚СЂРёС†С‹ РІ СЃС‚СЂРѕРєСѓ
 	push cx
 
 	mov cx,numOfColumns
-convertElement:										; Преобразование каждого элемента в строку
+convertElement:										; РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР°Р¶РґРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РІ СЃС‚СЂРѕРєСѓ
 	mov ax,[si]
 	add si,2
 	call writeElementInString
-	mov byte ptr[di],9								; Табуляция
+	mov byte ptr[di],9								; РўР°Р±СѓР»СЏС†РёСЏ
 	inc di
 	loop convertElement
 
 	pop cx
 	mov byte ptr[di],13
 	inc di
-	mov byte ptr[di],10								; Конец строки в матрице
+	mov byte ptr[di],10								; РљРѕРЅРµС† СЃС‚СЂРѕРєРё РІ РјР°С‚СЂРёС†Рµ
 	inc di
 	loop convertRow
 
@@ -264,7 +264,7 @@ theEndOfMatrix:
 	mov byte ptr[di],'$'
 	mov len,di
 	lea di,matrixAsString
-	sub len,di										; Количество байт в строке для записи матрицы
+	sub len,di										; РљРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚ РІ СЃС‚СЂРѕРєРµ РґР»СЏ Р·Р°РїРёСЃРё РјР°С‚СЂРёС†С‹
 	pop si
 	pop di
 	pop cx
@@ -272,19 +272,19 @@ theEndOfMatrix:
 convertMatrixInString endp
 
 
-writeElementInString proc							; Процедура записи элемента матрицы в файл
+writeElementInString proc							; РџСЂРѕС†РµРґСѓСЂР° Р·Р°РїРёСЃРё СЌР»РµРјРµРЅС‚Р° РјР°С‚СЂРёС†С‹ РІ С„Р°Р№Р»
 	push ax
 	push cx
 	push dx
 	xor cx,cx
 
-	cmp ax,0										; Проверка на отрицательность
+	cmp ax,0										; РџСЂРѕРІРµСЂРєР° РЅР° РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕСЃС‚СЊ
 	jge convertToChar			
-	mov byte ptr[di],'-'							; Заносим в строку минус, если число отрицательное
+	mov byte ptr[di],'-'							; Р—Р°РЅРѕСЃРёРј РІ СЃС‚СЂРѕРєСѓ РјРёРЅСѓСЃ, РµСЃР»Рё С‡РёСЃР»Рѕ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРµ
 	inc di
 	neg ax
 
-convertToChar:										; Конвертирование цифр в символы и запись в стек
+convertToChar:										; РљРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ С†РёС„СЂ РІ СЃРёРјРІРѕР»С‹ Рё Р·Р°РїРёСЃСЊ РІ СЃС‚РµРє
 	inc cx
 	xor dx,dx
 	div ten
@@ -293,7 +293,7 @@ convertToChar:										; Конвертирование цифр в символы и запись в стек
 	test ax,ax
 	jnz convertToChar
 	
-putCharactersInString:								; Занесение символов в строку
+putCharactersInString:								; Р—Р°РЅРµСЃРµРЅРёРµ СЃРёРјРІРѕР»РѕРІ РІ СЃС‚СЂРѕРєСѓ
 	pop dx
 	mov [di],dl
 	inc di						
@@ -306,7 +306,7 @@ putCharactersInString:								; Занесение символов в строку
 writeElementInString endp
 
 
-deleteRow proc										; Удаление строки из матрицы
+deleteRow proc										; РЈРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРєРё РёР· РјР°С‚СЂРёС†С‹
 	push ax
 	push cx
 	push dx
@@ -314,13 +314,13 @@ deleteRow proc										; Удаление строки из матрицы
 	push si
 
 	mov ax,l
-	cmp ax,numOfRows								; Проверка если надо удалить последнюю строку
+	cmp ax,numOfRows								; РџСЂРѕРІРµСЂРєР° РµСЃР»Рё РЅР°РґРѕ СѓРґР°Р»РёС‚СЊ РїРѕСЃР»РµРґРЅСЋСЋ СЃС‚СЂРѕРєСѓ
 	je finishDeleteRow
 
 	mov ax,numOfRows
 	sub ax,l
 	mul numOfColumns
-	mov cx,ax										; Высчитывание количества сдвигов элементов
+	mov cx,ax										; Р’С‹СЃС‡РёС‚С‹РІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃРґРІРёРіРѕРІ СЌР»РµРјРµРЅС‚РѕРІ
 
 	mov ax,l
 	dec ax
@@ -332,9 +332,9 @@ deleteRow proc										; Удаление строки из матрицы
 	add ax,numOfColumns
 	shl ax,1
 	lea di,matrix
-	add di,ax										; Высчитывание с какого элемента надо сдвигать
+	add di,ax										; Р’С‹СЃС‡РёС‚С‹РІР°РЅРёРµ СЃ РєР°РєРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РЅР°РґРѕ СЃРґРІРёРіР°С‚СЊ
 
-moveElement1:										; Сдвиг элементов на новые позиции
+moveElement1:										; РЎРґРІРёРі СЌР»РµРјРµРЅС‚РѕРІ РЅР° РЅРѕРІС‹Рµ РїРѕР·РёС†РёРё
 	mov ax,word ptr[di]
 	mov word ptr[si],ax
 	add di,2
@@ -342,7 +342,7 @@ moveElement1:										; Сдвиг элементов на новые позиции
 	loop moveElement1	
 
 finishDeleteRow:
-	dec numOfRows									; Уменьшение количества строк в матрице
+	dec numOfRows									; РЈРјРµРЅСЊС€РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃС‚СЂРѕРє РІ РјР°С‚СЂРёС†Рµ
 	pop si
 	pop di
 	pop dx
@@ -352,7 +352,7 @@ finishDeleteRow:
 deleteRow endp
 
 
-deleteColumn proc									; Удаление столбца из матрицы
+deleteColumn proc									; РЈРґР°Р»РµРЅРёРµ СЃС‚РѕР»Р±С†Р° РёР· РјР°С‚СЂРёС†С‹
 	push ax
 	push cx
 	push dx
@@ -360,7 +360,7 @@ deleteColumn proc									; Удаление столбца из матрицы
 	push si
 
 	mov ax,l
-	cmp ax,numOfColumns									; Проверка если надо удалить последний столбец
+	cmp ax,numOfColumns									; РџСЂРѕРІРµСЂРєР° РµСЃР»Рё РЅР°РґРѕ СѓРґР°Р»РёС‚СЊ РїРѕСЃР»РµРґРЅРёР№ СЃС‚РѕР»Р±РµС†
 	je finishDeleteColumn
 
 	mov ax,numOfColumns
@@ -368,17 +368,17 @@ deleteColumn proc									; Удаление столбца из матрицы
 	mul numOfRows
 	sub ax,l
 	inc ax
-	mov cx,ax										; Высчитывание количества сдвигов элементов
+	mov cx,ax										; Р’С‹СЃС‡РёС‚С‹РІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃРґРІРёРіРѕРІ СЌР»РµРјРµРЅС‚РѕРІ
 
 	mov ax,l
 	dec ax
 	shl ax,1
 	lea di,matrix
-	add di,ax										; Высчитывание с какого элемента надо сдвигать
+	add di,ax										; Р’С‹СЃС‡РёС‚С‹РІР°РЅРёРµ СЃ РєР°РєРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РЅР°РґРѕ СЃРґРІРёРіР°С‚СЊ
 	mov si,di
 	xor dx,dx
 
-moveElement2:										; Сдвиг элементов на новые позиции
+moveElement2:										; РЎРґРІРёРі СЌР»РµРјРµРЅС‚РѕРІ РЅР° РЅРѕРІС‹Рµ РїРѕР·РёС†РёРё
 	cmp dx,0
 	jne isNotZero
 	add di,2
@@ -393,7 +393,7 @@ isNotZero:
 	loop moveElement2	
 
 finishDeleteColumn:
-	dec numOfColumns									; Уменьшение количества столбцов в матрице
+	dec numOfColumns									; РЈРјРµРЅСЊС€РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃС‚РѕР»Р±С†РѕРІ РІ РјР°С‚СЂРёС†Рµ
 	pop si
 	pop di
 	pop dx
@@ -403,13 +403,13 @@ finishDeleteColumn:
 deleteColumn endp
 
 
-inputIntegerNumber proc								; Процедура чтения числа из консоли
+inputIntegerNumber proc								; РџСЂРѕС†РµРґСѓСЂР° С‡С‚РµРЅРёСЏ С‡РёСЃР»Р° РёР· РєРѕРЅСЃРѕР»Рё
 	push bx
-	push cx											; Сохранение значений из регистров в стек
+	push cx											; РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЂРµРіРёСЃС‚СЂРѕРІ РІ СЃС‚РµРє
 	push dx
 	xor bx,bx
 
-inputCharacter:										; Проверка на нажатие клавиши
+inputCharacter:										; РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё
 	mov ah,01h					
 	inc cx
 	int 21h
@@ -421,13 +421,13 @@ inputCharacter:										; Проверка на нажатие клавиши
 	je theEndOfInput
 	cmp al,32
 	je theEndOfInput
-	jmp addNewNumeral								; Чтение цифр с клавиатуры
+	jmp addNewNumeral								; Р§С‚РµРЅРёРµ С†РёС„СЂ СЃ РєР»Р°РІРёР°С‚СѓСЂС‹
 
-addNewNumeral:										; Перевод строки в число
+addNewNumeral:										; РџРµСЂРµРІРѕРґ СЃС‚СЂРѕРєРё РІ С‡РёСЃР»Рѕ
 	xor ah,ah
 	xchg ax,bx
 	cmp bl,'0'
-	jb inputErrorLabel								; Проверки на корректность ввода
+	jb inputErrorLabel								; РџСЂРѕРІРµСЂРєРё РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РІРІРѕРґР°
 	cmp bl,'9'
 	ja inputErrorLabel					
 	sub bl,'0'							
@@ -438,13 +438,13 @@ addNewNumeral:										; Перевод строки в число
 	xchg ax,bx
 	jmp inputCharacter
 
-pressedEscape:										; обработка нажатия на клавишу Escape
+pressedEscape:										; РѕР±СЂР°Р±РѕС‚РєР° РЅР°Р¶Р°С‚РёСЏ РЅР° РєР»Р°РІРёС€Сѓ Escape
 	call deleteLastSymbol
 	loop pressedEscape
 	xor bx,bx
 	jmp inputCharacter
 
-pressedBackspace:									; обработка нажатия на клавишу Backspace
+pressedBackspace:									; РѕР±СЂР°Р±РѕС‚РєР° РЅР°Р¶Р°С‚РёСЏ РЅР° РєР»Р°РІРёС€Сѓ Backspace
 	mov dl,' '
 	call printSymbol
 	call deleteLastSymbol
@@ -460,20 +460,20 @@ pressedBackspace:									; обработка нажатия на клавишу Backspace
 
 inputErrorLabel:
 	call printEndline
-	call printInputErrorMessage						; Обрабатывание ошибки ввода в программе
+	call printInputErrorMessage						; РћР±СЂР°Р±Р°С‚С‹РІР°РЅРёРµ РѕС€РёР±РєРё РІРІРѕРґР° РІ РїСЂРѕРіСЂР°РјРјРµ
 	xor bx,bx
 	jmp inputCharacter
 
 theEndOfInput:
 	mov ax,bx
 	pop dx
-	pop cx											; Возвращение значений из стека
+	pop cx											; Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЃС‚РµРєР°
 	pop bx
 	ret
 inputIntegerNumber endp
 
 
-deleteLastSymbol proc								; Процедура удаления последнего символа в консоли
+deleteLastSymbol proc								; РџСЂРѕС†РµРґСѓСЂР° СѓРґР°Р»РµРЅРёСЏ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р° РІ РєРѕРЅСЃРѕР»Рё
 	push dx
 	mov dl,8
 	call printSymbol
@@ -486,7 +486,7 @@ deleteLastSymbol proc								; Процедура удаления последнего символа в консоли
 deleteLastSymbol endp
 
 
-printString proc									; Процедура выводящая строку
+printString proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ СЃС‚СЂРѕРєСѓ
 	push ax
 	mov ah,09h
 	int 21h	
@@ -495,7 +495,7 @@ printString proc									; Процедура выводящая строку
 printString endp
 
 
-printSymbol proc									; Процедура выводящая символ
+printSymbol proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ СЃРёРјРІРѕР»
 	push ax
 	mov ah,02h
 	int 21h	
@@ -504,7 +504,7 @@ printSymbol proc									; Процедура выводящая символ
 printSymbol endp
 
 
-printMatrix proc									; Процедура выводящая матрицу
+printMatrix proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ РјР°С‚СЂРёС†Сѓ
 	push dx
 	lea dx,matrixAsString
 	call printString
@@ -514,7 +514,7 @@ printMatrix proc									; Процедура выводящая матрицу
 printMatrix endp
 
 
-printKMessage proc									; Процедура выводящая 'k: '
+printKMessage proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ 'k: '
 	push dx
 	lea dx,kMessage
 	call printString
@@ -523,7 +523,7 @@ printKMessage proc									; Процедура выводящая 'k: '
 printKMessage endp
 	
 
-printLMessage proc									; Процедура выводящая 'l: '
+printLMessage proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ 'l: '
 	push dx
 	lea dx,lMessage
 	call printString
@@ -532,7 +532,7 @@ printLMessage proc									; Процедура выводящая 'l: '
 printLMessage endp
 
 
-printValueOfElementsInFileErrorMessage proc			; Процедура выводящая ошибку значения элемента массива в файле
+printValueOfElementsInFileErrorMessage proc			; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ РѕС€РёР±РєСѓ Р·РЅР°С‡РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° РІ С„Р°Р№Р»Рµ
 	push dx
 	lea dx,valueOfElementsInFileErrorMessage
 	call printString
@@ -541,7 +541,7 @@ printValueOfElementsInFileErrorMessage proc			; Процедура выводящая ошибку значе
 printValueOfElementsInFileErrorMessage endp
 
 
-printInputErrorMessage proc							; Процедура выводящая ошибку ввода
+printInputErrorMessage proc							; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ РѕС€РёР±РєСѓ РІРІРѕРґР°
 	push dx
 	lea dx,inputErrorMessage
 	call printString
@@ -550,7 +550,7 @@ printInputErrorMessage proc							; Процедура выводящая ошибку ввода
 printInputErrorMessage endp
 
 
-printBorderErrorMessage proc						; Процедура выводящая ошибку выхода за границы массива
+printBorderErrorMessage proc						; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ РѕС€РёР±РєСѓ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹ РјР°СЃСЃРёРІР°
 	push dx
 	lea dx,borderErrorMessage
 	call printString
@@ -559,7 +559,7 @@ printBorderErrorMessage proc						; Процедура выводящая ошибку выхода за границы
 printBorderErrorMessage endp
 
 
-printEndline proc									; Процедура переноса каретки на другую строку
+printEndline proc									; РџСЂРѕС†РµРґСѓСЂР° РїРµСЂРµРЅРѕСЃР° РєР°СЂРµС‚РєРё РЅР° РґСЂСѓРіСѓСЋ СЃС‚СЂРѕРєСѓ
 	push dx
 	lea dx,endline
 	call printString
