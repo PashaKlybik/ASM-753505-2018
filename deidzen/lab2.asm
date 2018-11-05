@@ -57,7 +57,7 @@ input_char:
     cmp al, 27
     je if_escape
     cmp al, 13
-    je end
+    je end_read_num
     jmp add_digit
     
 add_digit: 
@@ -115,7 +115,7 @@ large_error:
     xor bx, bx
     jmp input_char
 
-end:
+end_read_num:
     mov ax, bx
     pop dx
     pop cx
