@@ -7,7 +7,7 @@
      b dw 0
      c dw 0 
      max db 200
-     len db ?                     ;длина введенной строки
+     len db ?   ;РґР»РёРЅР° РІРІРµРґРµРЅРЅРѕР№ СЃС‚СЂРѕРєРё
      iputstring db 200 dup('$')
      stringvowelLen db 12
      stringvowel db "AEIOUYaeiouy$"
@@ -125,7 +125,7 @@ jz FINISH
         searchvowel:
             PUSH CX
             PUSH AX 
-            ;поиск очередного символа в строке гласных
+            ;РїРѕРёСЃРє СЃРёРјРІРѕР»Р° РІ СЃС‚СЂРѕРєРµ РіР»Р°СЃРЅС‹С…
             MOV AL, iputstring[SI]
             LEA DI, stringvowel
             MOVZX CX, stringvowelLen
@@ -188,7 +188,7 @@ jz FINISH
     mov ah, 09h 
     int 21h 
     CALL stringnew 
-     ;ввод строки
+     ;ГўГўГ®Г¤ Г±ГІГ°Г®ГЄГЁ
     LEA DX, max
     MOV AH, 0aH
     INT 21h
