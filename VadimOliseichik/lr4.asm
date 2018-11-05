@@ -58,8 +58,8 @@
         menshezzZ:
         JMP FINISH
         LABLE1:
-cmp dl,'I'
-jz FINISH
+        cmp dl,'I'
+        jz FINISH
         MOV DL,' '
         MOV iputstring[SI],DL 
         FINISH: 
@@ -74,8 +74,54 @@ jz FINISH
         POP BX 
         POP CX 
         POP SI
-    RET
+        RET
     Garbagecollection ENDP
+
+    GarbageT PROC 
+        PUSH AX 
+        PUSH DX
+        PUSH BX 
+        PUSH CX 
+        PUSH SI 
+        MOV AX, c
+        SUB AX,THRI 
+        MOV CX, AX
+        MOV SI,0
+        garbageTTR:
+        MOV DL, iputstring[SI]
+        CMP DL,' '
+        JNZ FINISHT 
+        MOV DL, iputstring[SI+1]
+        CMP DL,' '
+        JNZ FINISHT 
+        MOV DL, iputstring[SI+2]
+        CMP DL,' '
+        JNZ FINISHT
+        MOV INDEX,SI  
+        JMP KON
+        FINISHT: 
+        INC SI
+        loop garbageTTR  
+        JMP H
+        KON:
+        MOV AX, c
+        SUB AX,INDEX
+        MOV CX, AX
+        MOV SI, INDEX
+        GFR:
+        MOV DL, iputstring[SI]
+        MOV DL,' '
+        MOV iputstring[SI],DL
+        INC SI
+        LOOP GFR
+        H:
+        POP AX 
+        POP DX
+        POP BX 
+        POP CX 
+        POP SI
+        RET 
+    GarbageT ENDP
 
     Search PROC 
         PUSH AX
@@ -107,7 +153,7 @@ jz FINISH
         INT 21h
         POP DX
         POP AX
-    RET
+        RET
     stringnew ENDP
 
     DeletionOfWordsBeginningWithAVowel PROC
@@ -176,7 +222,7 @@ jz FINISH
         POP DX
         POP CX
         POP BX
-    RET
+        RET
     DeletionOfWordsBeginningWithAVowel ENDP
 
  main:
@@ -188,13 +234,14 @@ jz FINISH
     mov ah, 09h 
     int 21h 
     CALL stringnew 
-     ;ââîä ñòðîêè
+    ;ввожу строчку
     LEA DX, max
     MOV AH, 0aH
     INT 21h
     CALL stringnew 
     CALL DeletionOfWordsBeginningWithAVowel
     CALL Garbagecollection
+    CALL GarbageT
     CALL stringnew 
     lea dx, Message2 
     mov ah, 09h 
