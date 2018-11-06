@@ -16,115 +16,7 @@
      Message1 db "Starting line:$"
      Message2 db "End line:$"
  .code
-
-    Garbagecollection PROC 
-        PUSH AX 
-        PUSH DX
-        PUSH BX 
-        PUSH CX 
-        PUSH SI 
-        MOV CX, c
-        MOV SI,0
-        garbage:
-        MOV DL, iputstring[SI]
-        CMP DL,'a'
-        JC zamena
-        CMP DL,'z'
-        JZ finish
-        CMP DL,'z' 
-        JC menshezz
-        JMP zamena
-        menshezz:
-        JMP FINISH
-        ZAMENA:
-        zamena:
-        CMP DL,'A'
-        JC ZAMENAA
-        CMP DL,'Z'
-        JZ FINISH
-        CMP DL,'Z' 
-        JC FINISH
-        ZAMENAA:
-        CMP DL,"'" 
-        JZ LABLE 
-        JMP LABLE1
-        LABLE:
-        MOV DL, iputstring[SI-1] 
-        CMP DL,'a'
-        JC LABLE1
-        CMP DL,'z'
-        JZ finish
-        CMP DL,'z' 
-        JC menshezzZ
-        JMP LABLE1
-        menshezzZ:
-        JMP FINISH
-        LABLE1:
-        cmp dl,'I'
-        jz FINISH
-        MOV DL,' '
-        MOV iputstring[SI],DL 
-        FINISH: 
-        finish:
-        INC SI
-        loop garbage 
-        MOV DL, iputstring[SI]
-        MOV DL,' '
-        MOV iputstring[SI],DL
-        POP AX 
-        POP DX
-        POP BX 
-        POP CX 
-        POP SI
-    RET
-    Garbagecollection ENDP
-
-    GarbageT PROC 
-        PUSH AX 
-        PUSH DX
-        PUSH BX 
-        PUSH CX 
-        PUSH SI 
-        MOV AX, c
-        SUB AX,THRI 
-        MOV CX, AX
-        MOV SI,0
-        garbageTTR:
-        MOV DL, iputstring[SI]
-        CMP DL,' '
-        JNZ FINISHT 
-        MOV DL, iputstring[SI+1]
-        CMP DL,' '
-        JNZ FINISHT 
-        MOV DL, iputstring[SI+2]
-        CMP DL,' '
-        JNZ FINISHT
-        MOV INDEX,SI  
-        JMP KON
-        FINISHT: 
-        INC SI
-        loop garbageTTR  
-        JMP H
-        KON:
-        MOV AX, c
-        SUB AX,INDEX
-        MOV CX, AX
-        MOV SI, INDEX
-        GFR:
-        MOV DL, iputstring[SI]
-        MOV DL,' '
-        MOV iputstring[SI],DL
-        INC SI
-        LOOP GFR
-        H:
-        POP AX 
-        POP DX
-        POP BX 
-        POP CX 
-        POP SI
-        RET 
-    GarbageT ENDP
-
+ 
     Search PROC 
         PUSH AX
         PUSH DX
@@ -242,11 +134,7 @@
     INT 21h
     CALL stringnew 
     CALL DeletionOfWordsBeginningWithAVowel
-    ;CALL Garbagecollection
-    ;CALL GarbageT
     CALL DeletionOfWordsBeginningWithAVowel
-    ;CALL Garbagecollection
-    ;CALL GarbageT
     CALL stringnew 
     lea dx, Message2 
     mov ah, 09h 
