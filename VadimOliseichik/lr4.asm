@@ -1,13 +1,15 @@
 .model small
  .386
  .stack 256
- .data
+ .data 
+     THRI dw 3 
+     INDEX dw 0
      n dw 0
      a dw 0 
      b dw 0
      c dw 0 
      max db 200
-     len db ?   ;длина введенной строки
+     len db ?                     ;длина введенной строки
      iputstring db 200 dup('$')
      stringvowelLen db 12
      stringvowel db "AEIOUYaeiouy$"
@@ -74,7 +76,7 @@
         POP BX 
         POP CX 
         POP SI
-        RET
+    RET
     Garbagecollection ENDP
 
     GarbageT PROC 
@@ -153,7 +155,7 @@
         INT 21h
         POP DX
         POP AX
-        RET
+    RET
     stringnew ENDP
 
     DeletionOfWordsBeginningWithAVowel PROC
@@ -164,14 +166,14 @@
         MOVZX CX, len 
         MOV c, CX
         XOR SI, SI    
-        CALL Garbagecollection
-        MOVZX CX, len 
-        MOV c, CX
-        XOR SI, SI    
+        ;CALL Garbagecollection
+        ;MOVZX CX, len 
+        ;MOV c, CX
+        ;XOR SI, SI    
         searchvowel:
             PUSH CX
             PUSH AX 
-            ;поиск символа в строке гласных
+            ;поиск очередного символа в строке гласных
             MOV AL, iputstring[SI]
             LEA DI, stringvowel
             MOVZX CX, stringvowelLen
@@ -222,7 +224,7 @@
         POP DX
         POP CX
         POP BX
-        RET
+    RET
     DeletionOfWordsBeginningWithAVowel ENDP
 
  main:
@@ -234,14 +236,17 @@
     mov ah, 09h 
     int 21h 
     CALL stringnew 
-    ;ввожу строчку
+     ;ввод строки
     LEA DX, max
     MOV AH, 0aH
     INT 21h
     CALL stringnew 
     CALL DeletionOfWordsBeginningWithAVowel
-    CALL Garbagecollection
-    CALL GarbageT
+    ;CALL Garbagecollection
+    ;CALL GarbageT
+    CALL DeletionOfWordsBeginningWithAVowel
+    ;CALL Garbagecollection
+    ;CALL GarbageT
     CALL stringnew 
     lea dx, Message2 
     mov ah, 09h 
