@@ -23,7 +23,7 @@ WriteMessage endp
 setsign:
     inc sign
     inc border
-	inc lenth
+    inc lenth
     jmp read
 
 ReadProc proc
@@ -110,7 +110,7 @@ ReadProc proc
     je revsign
     jmp read
 
-	WrongChar:
+    WrongChar:
     mov dl, 8
     mov ah, 02h
     int 21h
@@ -215,44 +215,48 @@ start:
     cmp divisor, -1
     je error
 	
-	nextstep4:
-		cwd
-		idiv divisor
-		cmp dx, border
-		jnc changerem
-	nextstep5:
-		lea dx, resultMessage
-		call WriteMessage
-		call WriteProc
-		mov ax, dx
-		lea dx, remainderMessage
-		call WriteMessage
-		call WriteProc
-		jmp toend
+    nextstep4:
+    cwd
+    idiv divisor
+    cmp dx, border
+    jnc changerem
+	
+    nextstep5:
+    lea dx, resultMessage
+    call WriteMessage
+    call WriteProc
+    mov ax, dx
+    lea dx, remainderMessage
+    call WriteMessage
+    call WriteProc
+    jmp toend
 
-	changerem:
-		mov bx, divisor
-		cmp bx, border
-		jc decquot
-		sub dx,bx
-		inc ax
-		jmp nextstep5
-	decquot:
-		add dx, bx
-		dec ax
-		jmp nextstep5
-    
-	error:
-		mov cx, border
-		cmp dividend, cx
-		jc nextstep4
-	caseerror:
-		lea dx, errorMesssage
-		mov ah, 09h
-		int 21h
-	toend:
-		mov ah, 01h
-		int 21h
-		mov ax, 4c00h
-		int 21h
+    changerem:
+    mov bx, divisor
+    cmp bx, border
+    jc decquot
+    sub dx,bx
+    inc ax
+    jmp nextstep5
+	
+    decquot:
+    add dx, bx
+    dec ax
+    jmp nextstep5
+  
+    error:
+    mov cx, border
+    cmp dividend, cx
+    jc nextstep4
+	
+    caseerror:
+    lea dx, errorMesssage
+    mov ah, 09h
+    int 21h
+	
+    toend:
+    mov ah, 01h
+    int 21h
+    mov ax, 4c00h
+    int 21h
 end start
