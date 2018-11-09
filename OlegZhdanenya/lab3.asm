@@ -222,8 +222,10 @@ start:
     jnc changerem
 	
     nextstep5:
+    push dx
     lea dx, resultMessage
     call WriteMessage
+    pop dx
     call WriteProc
     mov ax, dx
     lea dx, remainderMessage
