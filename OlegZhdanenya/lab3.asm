@@ -34,116 +34,122 @@ ReadProc proc
     xor dx, dx
     mov ax, 0
     mov sign, al
-FirstInput:
-    mov ah, 01h
-    int 21h
-    cmp al, '-'
-    je setsign
-    cmp al, 13
-    jne nextstep1
-    jmp exit
-nextstep1:
-    cmp al, 8
-    je backspace
-    cmp al, '0'
-    jnc nextstep3
-    jmp ErrChar
-nextstep3:
-    cmp al, '9'+1
-    jnc ErrChar
-    sub al, '0'
-    xor ah, ah
-    mov bx, ax
-    inc len
-    jmp Input
-Input:
-    mov ah, 01h
-    int 21h
-    cmp al, 13
-    jne nextstep2
-    jmp exit
-nextstep2:
-    cmp al, 8
-    je backspace
-    cmp al, '0'
-    jc ErrChar
-    cmp al, '9'+1
-    jnc ErrChar
-    sub al, '0'
-    xor ch, ch
-    mov cl, al
-    mov ax, bx
-    xor dx, dx
-    mul ten
-    cmp dx, 1
-    jnc ErrChar
-    cmp ax, border
-    jnc ErrChar
-    add ax, cx
-    cmp ax, border
-    jnc ErrChar
-    mov bx, ax
-    inc len
-    jmp Input
 
-backspace:
-    cmp len, 0
-    je revsign
-    mov dl, ' '
-    mov ah, 02h
-    int 21h
-    mov dl, 8
-    mov ah, 02h
-    int 21h
-    mov ax, bx
-    xor dx, dx
-    div ten
-    mov bx, ax
-    dec len
-    cmp len, 0
-    je revsign
-    jmp Input
-
-ErrChar:
-    mov dl, 8
-    mov ah, 02h
-    int 21h
-    mov dl, ' '
-    mov ah, 02h
-    int 21h
-    mov dl, 8
-    mov ah, 02h
-    int 21h
-    jmp Input
-
-revsign:
-    pop border
-    push border
-    mov ax, 0
-    mov sign, al
-    mov dl, ' '
-    mov ah, 02h
-    int 21h
-    mov dl, 8
-    mov ah, 02h
-    int 21h
-    jmp FirstInput
-
-reverse:
-    neg bx
-    jmp next
+    FirstInput:
+        mov ah, 01h
+        int 21h
+        cmp al, '-'
+        je setsign
+        cmp al, 13
+        jne nextstep1
+        jmp exit
     
-exit:
-    cmp sign, 1
-    jnc reverse
-next:
-    mov ax, 0
-    mov sign, al
-    mov ax, bx
-    pop border
-    pop dx
-    pop cx
-    pop bx
+    nextstep1:
+        cmp al, 8
+        je backspace
+        cmp al, '0'
+        jnc nextstep3
+        jmp ErrChar
+    
+    nextstep3:
+        cmp al, '9'+1
+        jnc ErrChar
+        sub al, '0'
+        xor ah, ah
+        mov bx, ax
+        inc len
+        jmp Input
+    
+    read:
+        mov ah, 01h
+        int 21h
+        cmp al, 13
+        jne nextstep2
+        jmp exit
+    
+    nextstep2:
+        cmp al, 8
+        je backspace
+        cmp al, '0'
+        jc ErrChar
+        cmp al, '9'+1
+        jnc ErrChar
+        sub al, '0'
+        xor ch, ch
+        mov cl, al
+        mov ax, bx
+        xor dx, dx
+        mul ten
+        cmp dx, 1
+        jnc WrongChar
+        cmp ax, border
+        jnc ErrChar
+        add ax, cx
+        cmp ax, border
+        jnc WrongChar
+        mov bx, ax
+        inc len
+        jmp read
+
+    backspace:
+        cmp len, 0
+        je revsign
+        mov dl, ' '
+        mov ah, 02h
+        int 21h
+        mov dl, 8
+        mov ah, 02h
+        int 21h
+        mov ax, bx
+        xor dx, dx
+        div ten
+        mov bx, ax
+        dec len
+        cmp len, 0
+        je revsign
+        jmp Input
+
+    WrongChar:
+        mov dl, 8
+        mov ah, 02h
+        int 21h
+        mov dl, ' '
+        mov ah, 02h
+        int 21h
+        mov dl, 8
+        mov ah, 02h
+        int 21h
+        jmp Input
+
+    revsign:
+        pop border
+        push border
+        mov ax, 0
+        mov sign, al
+        mov dl, ' '
+        mov ah, 02h
+        int 21h
+        mov dl, 8
+        mov ah, 02h
+        int 21h
+        jmp FirstInput
+
+    reverse:
+        neg bx
+        jmp next
+    
+    exit:
+        cmp sign, 1
+        jnc reverse
+    
+    next:
+        mov ax, 0
+        mov sign, al
+        mov ax, bx
+        pop border
+        pop dx
+        pop cx
+        pop bx
     ret
 ReadProc endp
 
@@ -154,21 +160,22 @@ WriteProc proc
     xor bx, bx
     cmp ax, border
     jnc showsign
-DivCycle:
-    xor dx, dx
-    div ten
-    push dx
-    inc bx
-    mov cx, ax
-    inc cx
-    loop DivCycle
-    mov cx, bx
-Output:
-    pop dx
-    add dx, '0'
-    mov ah, 02h
-    int 21h
-    loop Output
+    
+    dividing:   ; pushing digits of number in stack
+        xor dx, dx
+        div ten
+        push dx
+        inc cx
+        cmp ax, 0
+    jne dividing   
+    
+    print:
+        pop dx
+        add dx, '0'
+        mov ah, 02h
+        int 21h
+    loop print
+    
     mov dl, 10
     mov ah, 02h
     int 21h
@@ -176,27 +183,29 @@ Output:
     pop cx
     pop bx
     ret
-showsign:
-    push ax
-    mov dl, '-'
-    mov ah, 02h
-    int 21h
-    pop ax
-    neg ax
-    jmp DivCycle
+    
+    showsign:
+        push ax
+        mov dl, '-'
+        mov ah, 02h
+        int 21h
+        pop ax
+        neg ax
+        jmp dividing
 WriteProc endp
 
 start:
     mov ax, @data
     mov ds, ax
 
-    mov ax, dividend
     call ReadProc
     mov dividend, ax
     call WriteProc
+    
     call ReadProc
     mov divisor, ax
     call WriteProc
+    
     xor dx, dx
     mov ax, dividend
     cmp ax, border
