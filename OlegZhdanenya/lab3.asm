@@ -127,7 +127,6 @@ ReadProc proc
     push border
     mov ax, 0
     mov sign, al
-    mov dl, ' '
     jmp FirstInput
 
     reverse:
