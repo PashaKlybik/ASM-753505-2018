@@ -128,11 +128,6 @@ ReadProc proc
     mov ax, 0
     mov sign, al
     mov dl, ' '
-    mov ah, 02h
-    int 21h
-    mov dl, 8
-    mov ah, 02h
-    int 21h
     jmp FirstInput
 
     reverse:
