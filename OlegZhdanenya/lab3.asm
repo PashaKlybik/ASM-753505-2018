@@ -1,7 +1,7 @@
 .model small
 .stack 256
 .data
-    len db 0
+    lenth db 0
     sign db 0
     border dw 32768
     dividend dw ?
@@ -23,7 +23,8 @@ WriteMessage endp
 setsign:
     inc sign
     inc border
-    jmp Input
+	inc lenth
+    jmp read
 
 ReadProc proc
     push bx
@@ -36,120 +37,120 @@ ReadProc proc
     mov sign, al
 
     FirstInput:
-        mov ah, 01h
-        int 21h
-        cmp al, '-'
-        je setsign
-        cmp al, 13
-        jne nextstep1
-        jmp exit
+    mov ah, 01h
+    int 21h
+    cmp al, '-'
+    je setsign
+    cmp al, 13
+    jne nextstep1
+    jmp exit
     
     nextstep1:
-        cmp al, 8
-        je backspace
-        cmp al, '0'
-        jnc nextstep3
-        jmp ErrChar
+    cmp al, 8
+    je backspace
+    cmp al, '0'
+    jnc nextstep3
+    jmp WrongChar
     
     nextstep3:
-        cmp al, '9'+1
-        jnc ErrChar
-        sub al, '0'
-        xor ah, ah
-        mov bx, ax
-        inc len
-        jmp Input
+    cmp al, '9'+1
+    jnc WrongChar
+    sub al, '0'
+    xor ah, ah
+    mov bx, ax
+    inc lenth
+    jmp read
     
     read:
-        mov ah, 01h
-        int 21h
-        cmp al, 13
-        jne nextstep2
-        jmp exit
+    mov ah, 01h
+    int 21h
+    cmp al, 13
+    jne nextstep2
+    jmp exit
     
     nextstep2:
-        cmp al, 8
-        je backspace
-        cmp al, '0'
-        jc ErrChar
-        cmp al, '9'+1
-        jnc ErrChar
-        sub al, '0'
-        xor ch, ch
-        mov cl, al
-        mov ax, bx
-        xor dx, dx
-        mul ten
-        cmp dx, 1
-        jnc WrongChar
-        cmp ax, border
-        jnc ErrChar
-        add ax, cx
-        cmp ax, border
-        jnc WrongChar
-        mov bx, ax
-        inc len
-        jmp read
+    cmp al, 8
+    je backspace
+    cmp al, '0'
+    jc WrongChar
+    cmp al, '9'+1
+    jnc WrongChar
+    sub al, '0'
+    xor ch, ch
+    mov cl, al
+    mov ax, bx
+    xor dx, dx
+    mul ten
+    cmp dx, 1
+    jnc WrongChar
+    cmp ax, border
+    jnc WrongChar
+    add ax, cx
+    cmp ax, border
+    jnc WrongChar
+    mov bx, ax
+    inc lenth
+    jmp read
 
     backspace:
-        cmp len, 0
-        je revsign
-        mov dl, ' '
-        mov ah, 02h
-        int 21h
-        mov dl, 8
-        mov ah, 02h
-        int 21h
-        mov ax, bx
-        xor dx, dx
-        div ten
-        mov bx, ax
-        dec len
-        cmp len, 0
-        je revsign
-        jmp Input
+    cmp lenth, 0
+    je FirstInput
+    mov dl, ' '
+    mov ah, 02h
+    int 21h
+    mov dl, 8
+    mov ah, 02h
+    int 21h
+    mov ax, bx
+    xor dx, dx
+    div ten
+    mov bx, ax
+    dec lenth
+    cmp lenth, 0
+    je revsign
+    jmp read
 
-    WrongChar:
-        mov dl, 8
-        mov ah, 02h
-        int 21h
-        mov dl, ' '
-        mov ah, 02h
-        int 21h
-        mov dl, 8
-        mov ah, 02h
-        int 21h
-        jmp Input
+	WrongChar:
+    mov dl, 8
+    mov ah, 02h
+    int 21h
+    mov dl, ' '
+    mov ah, 02h
+    int 21h
+    mov dl, 8
+    mov ah, 02h
+    int 21h
+    jmp read
 
     revsign:
-        pop border
-        push border
-        mov ax, 0
-        mov sign, al
-        mov dl, ' '
-        mov ah, 02h
-        int 21h
-        mov dl, 8
-        mov ah, 02h
-        int 21h
-        jmp FirstInput
+    pop border
+    push border
+    mov ax, 0
+    mov sign, al
+    mov dl, ' '
+    mov ah, 02h
+    int 21h
+    mov dl, 8
+    mov ah, 02h
+    int 21h
+    jmp FirstInput
 
     reverse:
-        neg bx
-        jmp next
+    neg bx
+    jmp next
     
     exit:
-        cmp sign, 1
-        jnc reverse
+    cmp sign, 1
+    jnc reverse
     
     next:
-        mov ax, 0
-        mov sign, al
-        mov ax, bx
-        pop border
-        pop dx
-        pop cx
-        pop bx
+    mov ax, 0
+    mov sign, al
+    mov ax, bx
+    pop border
+    pop dx
+    pop cx
+    pop bx
     ret
 ReadProc endp
 
@@ -185,13 +186,13 @@ WriteProc proc
     ret
     
     showsign:
-        push ax
-        mov dl, '-'
-        mov ah, 02h
-        int 21h
-        pop ax
-        neg ax
-        jmp dividing
+    push ax
+    mov dl, '-'
+    mov ah, 02h
+    int 21h
+    pop ax
+    neg ax
+    jmp dividing
 WriteProc endp
 
 start:
@@ -213,42 +214,45 @@ start:
     je caseerror
     cmp divisor, -1
     je error
-nextstep4:
-    cwd
-    idiv divisor
-    cmp dx, border
-    jnc changerem
-nextstep5:
-    call WriteProc
-    mov ax, dx
-    lea dx, remainderMessage
-    call WriteMessage
-    call WriteProc
-    jmp toend
+	
+	nextstep4:
+		cwd
+		idiv divisor
+		cmp dx, border
+		jnc changerem
+	nextstep5:
+		lea dx, resultMessage
+		call WriteMessage
+		call WriteProc
+		mov ax, dx
+		lea dx, remainderMessage
+		call WriteMessage
+		call WriteProc
+		jmp toend
 
-changerem:
-    mov bx, divisor
-    cmp bx, border
-    jc decquot
-    sub dx,bx
-    inc ax
-    jmp nextstep5
-decquot:
-    add dx, bx
-    dec ax
-    jmp nextstep5
+	changerem:
+		mov bx, divisor
+		cmp bx, border
+		jc decquot
+		sub dx,bx
+		inc ax
+		jmp nextstep5
+	decquot:
+		add dx, bx
+		dec ax
+		jmp nextstep5
     
-error:
-    mov cx, border
-    cmp dividend, cx
-    jc nextstep4
-caseerror:
-    lea dx, errorMesssage
-    mov ah, 09h
-    int 21h
-toend:
-    mov ah, 01h
-    int 21h
-    mov ax, 4c00h
-    int 21h
+	error:
+		mov cx, border
+		cmp dividend, cx
+		jc nextstep4
+	caseerror:
+		lea dx, errorMesssage
+		mov ah, 09h
+		int 21h
+	toend:
+		mov ah, 01h
+		int 21h
+		mov ax, 4c00h
+		int 21h
 end start
