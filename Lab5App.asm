@@ -277,19 +277,17 @@ colsCheck:
     upperNotGreater:
         jmp endTask
     firstRow:
-        cmp cx,cols
-        je endTask
         dec si
         dec si
         cmp ax,array[bx][si]
         jl leftGreater
-        jmp endTaskCheck
+        jmp endTask
     leftGreater:
         mov ax,array[bx][si]
     endTask:
     pop bx
-    pop si
-    mov finalArray[bx][si],ax    
+    pop si    
+    mov finalArray[bx][si],ax
     inc si
     inc si
     loop colsCheck
@@ -352,6 +350,7 @@ algorithmCycleCols:
     loop algorithmCycleRows
 
 
+    write crlf
     xor bx,bx
     mov cx,rows
 outputBMatrixRows:    
