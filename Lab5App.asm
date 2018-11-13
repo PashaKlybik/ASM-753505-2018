@@ -315,26 +315,26 @@ algorithmCycleCols:
     cmp cx,cols
     je firstColumnOrRow
     cmp di,0
-    jne defaultCheck
+    jne notFirstColumnAndRow
     firstColumnOrRow:
     pop bx
     pop si
     jmp endTaskAdditional
-    defaultCheck:
+    notFirstColumnAndRow:
         sub si,2
         cmp ax,array[bx][si]
-        jl check1
-        jmp taskCheck1
-    check1:
+        jl greaterOnLeft
+        jmp notGreaterOnLeft
+    greaterOnLeft:
         mov ax,array[bx][si]
-    taskCheck1:
+    notGreaterOnLeft:
         add si,2
         sub bx,cols
         sub bx,cols
         cmp ax,array[bx][si]
-        jl check2
+        jl greaterUp
         jmp endTaskCheck
-        check2:
+        greaterUp:
             mov ax,array[bx][si]
         endTaskCheck:
     pop bx
