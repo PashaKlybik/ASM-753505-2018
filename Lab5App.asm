@@ -1,17 +1,17 @@
 .model small
 .stack 256h
 .data
-rows        dw ?
-cols        dw ?
-array        dw 10*10 dup (?)
-finalArray    dw 10*10 dup (0)
-checkVar    dw ?
-crlf        db 13,10,'$'
-msgPress    db 13,10,'Press any key...$'
-msgRows        db 'Input count of rows (<=10): $'
-msgCols        db 'Input count of columns (<=10): $'
-msgEl        db 13,10,'Input elements: ',13,10,'$'
-errorMessage     db 'ERROR!','$'
+rows            dw ?
+cols            dw ?
+array           dw 10*10 dup (?)
+finalArray      dw 10*10 dup (0)
+checkVar        dw ?
+crlf            db 13,10,'$'
+msgPress        db 13,10,'Press any key...$'
+msgRows         db 'Input count of rows (<=10): $'
+msgCols         db 'Input count of columns (<=10): $'
+msgEl           db 13,10,'Input elements: ',13,10,'$'
+errorMessage    db 'ERROR!','$'
 
 .code
 write macro  str
