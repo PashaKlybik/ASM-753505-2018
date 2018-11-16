@@ -16,6 +16,7 @@ main:
     int 21h
     
 enterString proc ; Выход: cx - строка
+    push 4
   cycle:
     mov ah, 01h
     int 21h
@@ -60,6 +61,9 @@ enterString proc ; Выход: cx - строка
     je cycle
     jne mistake
   right:
+    pop bx
+    cmp bx, 4
+    jne mistake
     push di
     lea di, correct
     call printString
