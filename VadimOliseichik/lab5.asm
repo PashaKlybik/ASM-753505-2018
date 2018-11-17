@@ -517,8 +517,8 @@
   ENDP DET
 
   main:
-      MOV AX, @DATA ; íàñòðîèì DS
-      MOV DS, AX; íà ðåàëüíûé ñåãìåíò
+      MOV AX, @DATA 
+      MOV DS, AX
       MOV es, AX
 	
       CALL FOPEN
