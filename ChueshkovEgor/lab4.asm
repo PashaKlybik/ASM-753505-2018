@@ -5,52 +5,52 @@
     string db 250, 250 dup('$')
 .code
 main:
-	mov ax, @data
-	mov ds, ax
-	mov es, ax    
+    mov ax, @data
+    mov ds, ax
+    mov es, ax    
 
-	lea di, string
-	mov dx, di
-	mov ah, 0ah
-	int 21h
-	call nextstr
-	inc dx
-	call delete
-	mov ah, 09h
-	int 21h
-	call nextstr
-	        
-	mov ax, 4c00h
-	int 21h
+    lea di, string
+    mov dx, di
+    mov ah, 0ah
+    int 21h
+    call nextstr
+    inc dx
+    call delete
+    mov ah, 09h
+    int 21h
+    call nextstr
+            
+    mov ax, 4c00h
+    int 21h
 
 delete proc
-	push cx
-	push bx
-	push ax
-	xor bx, bx
-	mov si, dx
-	mov di, dx
+    push cx
+    push bx
+    push ax
+    xor bx, bx
+    mov si, dx
+    mov di, dx
 checkSimbol:
-	mov al, [si]
-	mov cx, bx
-	repne scasb
-	je alike
-	mov di, dx
-	add di, bx
-	mov [di], al
-	inc bx
+    mov al, [si]
+    mov cx, bx
+    repne scasb
+    je alike
+    mov di, dx
+    add di, bx
+    mov [di], al
+    inc bx
 alike:
-	inc si
-	cmp byte ptr [si], '$'
-	je finish
-	mov di, dx
-	jmp checkSimbol
+    inc si
+    cmp byte ptr [si], '$'
+    je finish
+    mov di, dx
+    jmp checkSimbol
 finish:
-	mov byte ptr [di], '$'
-	pop ax
-	pop bx
-	pop cx
-	ret
+    mov byte ptr [di], '$'
+    pop ax
+    pop bx
+    pop cx
+    ret
 delete endp
 
 nextstr proc
