@@ -454,35 +454,6 @@
      RET
   ENDP STRINGNEW
 
-  PROC MATRSTR 
-     ADD SI, 6
-     PUSH CX
-     PUSH SI
-     XOR BP, BP
-     CMP AX, 0
-     JG LABMET
-     NEG AX
-     INC BP
-     LABMET:
-     XOR DX,DX
-     MOV CX,10
-     DIV CX
-     MOV byte ptr [SI],'0'
-     ADD [SI], DL
-     DEC SI
-     CMP AX, 0
-     JG LABMET
-     CMP BP, 0
-     JE METKA
-     MOV byte ptr [SI],'-'
-     XOR BP,BP
-     METKA:
-     POP SI
-     INC SI
-     POP CX
-     RET
-  ENDP MATRSTR
-
   PROC TAKEELEMENT
 	 XOR AX,AX
 	 lodsb	;берем cимвол
