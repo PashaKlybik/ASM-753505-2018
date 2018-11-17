@@ -19,8 +19,8 @@
        stringerrer db "ERROR$"
        buf db  100 dup (?)
        Matrix dw 100 dup (?)
-       rows dw ?              ;Строки 
-       cols dw ?	              ;Столбцы
+       rows dw ?                      ;РЎС‚СЂРѕРєРё  
+       cols dw ?	              ;РЎС‚РѕР»Р±С†С‹
        handle dw ?
   .code
 
@@ -32,115 +32,115 @@
        XOR AX,AX
        MOV SI,0 
        MOV AX,Matrix[SI]
-       MOV a,AX ; В а элемент mas[0] 
+       MOV a,AX  
        MOV AX,8 
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL a 
-       MOV a,AX;В а произведение mas[0]*mas[m1+1] 
+       MOV a,AX
        MOV AX, 16
        MOV SI,0
        ADD SI,ax
        MOV AX, Matrix[SI]
        IMUL a 
-       MOV a,AX;В а произведение mas[0]*mas[m1+1]*mas[2*m1+2]
+       MOV a,AX
        MOV AX, 12  
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
-       MOV b,AX; В элемент b mas[2*m1]
+       MOV b,AX
        MOV SI,0
        ADD SI,2 
        MOV AX, Matrix[SI] 
        IMUL b 
-       MOV b,AX; В b произведение mas[2*m1]*mas[1] 
+       MOV b,AX 
        MOV AX,10 
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL b 
-       MOV b,AX; В b произведение mas[2*m1]*mas[1]*mas[m1+2] 
+       MOV b,AX
        MOV AX, 6 
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
-       MOV c,AX; В c элемент mas[m1] 
+       MOV c,AX
        MOV AX,4
        MOV SI,0 
        ADD SI,AX
        MOV AX, Matrix[SI] 
        IMUL c 
-       MOV c,AX; В c произведение mas[m1]*mas[2]
+       MOV c,AX
        MOV AX, 14 
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL c 
-       MOV c,AX; В c произведение mas[m1]*mas[2]*mas[2*m1+1] 
+       MOV c,AX
        MOV AX, a 
        ADD AX,b 
        ADD AX,c 
-       MOV d,AX;В d результат первого треугольника 
+       MOV d,AX 
        MOV AX,4 
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
-       MOV a,AX;В a элемент mas[2*m1] 
+       MOV a,AX
        MOV AX,8 
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
        IMUL a 
-       MOV a,AX;В a произведение mas[2*m1]*mas[m1+1] 
+       MOV a,AX
        MOV AX,12
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL a 
-       MOV a,AX;В а произведение mas[2*m1]*mas[m1+1]*mas[2] 
+       MOV a,AX 
        MOV AX,6
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
-       MOV b,AX;В b элемент mas[2*m1+1] 
+       MOV b,AX
        MOV AX,2
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
        IMUL b 
-       MOV b,AX;В b произведение mas[2*m1+1]*mas[m1+2] 
+       MOV b,AX
        MOV AX,16
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL b 
-       MOV b,AX;В b произведение mas[2*m1+1]*mas[m1+2]*mas[0]
+       MOV b,AX
        MOV AX,14
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
-       MOV c,AX; В c элемент mas[m1] 
+       MOV c,AX
        MOV AX,10
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI]
        IMUL c
-       MOV c,AX; В c произведение mas[m1]*mas[1] 
+       MOV c,AX
        MOV AX,0
        MOV SI,0
        ADD SI,AX
        MOV AX, Matrix[SI] 
        IMUL c
-       MOV c,AX; В c произведение mas[m1]*mas[1]*mas[2*m1+2]
+       MOV c,AX
        MOV AX, a 
        ADD AX,b 
        ADD AX,c 
-       MOV b,AX; В b результат второго треугольника 
+       MOV b,AX
        MOV AX,d 
-       MOV a,AX; В a результат первого треугольника 
+       MOV a,AX
        MOV AX,a 
        SUB AX,b 
-       MOV a,AX; В a определитель матрицы 3х3 
+       MOV a,AX
        MOV numeraldet,AX
        CALL CONCLUSIONNUMBER 
        POP CX 
@@ -182,7 +182,6 @@
        MOV a,AX
        MOV AX,a 
        SUB AX,b 
-       ;в ах определитель матрицы 2х2 
        MOV a,AX
        MOV AX,a 
        MOV numeraldet,AX
@@ -203,7 +202,7 @@
        MOV AX,0 
        MOV SI,0 
        ADD SI,AX
-       MOV AX, Matrix[SI] ;в ах определитель матрицы 2х2 
+       MOV AX, Matrix[SI] 
        MOV numeraldet,AX
        CALL CONCLUSIONNUMBER 
        POP CX
@@ -368,17 +367,17 @@
        PUSH CX
        PUSH DX
        XOR DX,DX
-       MOV AH,3Dh            ;Функция DOS 3Dh (открытие файла)
-       XOR AL,AL               ;Режим открытия - только чтение
+       MOV AH,3Dh            ;Р¤СѓРЅРєС†РёСЏ DOS 3Dh (РѕС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°)
+       XOR AL,AL               ;Р РµР¶РёРј РѕС‚РєСЂС‹С‚РёСЏ (С‚РѕР»СЊРєРѕ С‡С‚РµРЅРёРµ)
        LEA DX,fromfile
-       XOR CX,CX               ;Нет атрибутов - обычный файл
+       XOR CX,CX               ;РќРµС‚ Р°С‚СЂРёР±СѓС‚РѕРІ (РѕР±С‹С‡РЅС‹Р№ С„Р°Р№Р»)
        INT 21h
        MOV handle, AX	
        XOR DX, DX
        MOV BX,AX
-       MOV AH,3Fh           ;Функция DOS 3Fh (чтение из файла)
+       MOV AH,3Fh           ;Р¤СѓРЅРєС†РёСЏ DOS 3Fh (С‡С‚РµРЅРёРµ РёР· С„Р°Р№Р»Р°)
        LEA DX,buf
-       MOV CX, 95   ;Максимальное кол-во читаемых байтов
+       MOV CX, 95   ;РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ С‡РёС‚Р°РµРјС‹С… Р±Р°Р№С‚РѕРІ
        INT 21h	
        XOR BX,BX
        LEA SI,buf
@@ -414,11 +413,11 @@
        JG CONTINUEE
        CMP AL, '0'
        JB CONTINUEE
-       SUB AX,'0'	;получаем цифровое значение
-       SHL DX,1	;умножаем сумму на 10
+       SUB AX,'0'	
+       SHL DX,1	        
        ADD AX, DX
        SHL DX, 2
-       ADD DX, AX	;прибавляем текущее значение
+       ADD DX, AX	
        JMP RETURNN
        CONTINUEE:
        CMP AL,' '
@@ -486,8 +485,8 @@
 
   PROC TAKEELEMENT
 	 XOR AX,AX
-	 lodsb	;берем cимвол
-	 SUB AL,'0'	;получаем цифровое значение
+	 lodsb	;Р±РµСЂРµРј cРёРјРІРѕР»
+	 SUB AL,'0'	;РїРѕР»СѓС‡Р°РµРј С†РёС„СЂРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
 	 RET
   ENDP TAKEELEMENT
 
@@ -518,8 +517,8 @@
   ENDP DET
 
   main:
-      MOV AX, @DATA ; настроим DS
-      MOV DS, AX; на реальный сегмент
+      MOV AX, @DATA ; Г­Г Г±ГІГ°Г®ГЁГ¬ DS
+      MOV DS, AX; Г­Г  Г°ГҐГ Г«ГјГ­Г»Г© Г±ГҐГЈГ¬ГҐГ­ГІ
       MOV es, AX
 	
       CALL FOPEN
