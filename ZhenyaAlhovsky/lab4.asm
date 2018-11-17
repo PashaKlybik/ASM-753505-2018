@@ -89,7 +89,6 @@
         push ax
         push di
         push dx
-        mov currentSourceLength, 0 ; if you want to use it several times
         lea dx, sourceLength
         mov ah, 0Ah
         int 21h
