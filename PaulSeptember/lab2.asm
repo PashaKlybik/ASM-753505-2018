@@ -144,6 +144,7 @@ start:
 	call printString
 	call endl
 	call input
+	call output
 
 	mov bx,ax
 	jmp getDivisor
@@ -160,7 +161,7 @@ start:
 	call input
 	cmp ax,0
 	je errorDivisor
-
+	call output
 	
 	xchg ax,bx
 	xor dx,dx
