@@ -2,8 +2,8 @@
 .stack 256
 .data
     ten dw 10
-    dividendMess db "Dividend: $"
-    divisorMess db 10, 13, "Divisor: $"
+    dividendMess db "Dividend: ", 10, 13, '$'
+    divisorMess db 10, 13, "Divisor: ", 10, 13, '$'
     errorMess db 10, 13, "Error", 10, 13, '$'
     resultMess db 10, 13, "Result: $"
     remainderMess db 10, 13, "Remainder: $" 
@@ -26,7 +26,7 @@ main:
     call input
     call outputSign
     cmp ax, 0
-    jz divisorZero        ; проверяем чтобы делитель не был 0 
+    jz divisorZero        ; ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г·ГІГ®ГЎГ» Г¤ГҐГ«ГЁГІГҐГ«Гј Г­ГҐ ГЎГ»Г« 0 
 
     cmp ax, -1
     jnz division
@@ -39,7 +39,7 @@ main:
     int 21h
     jmp exit
 
-division:         ;делим и проверяем какой получился остаток
+division:         ;Г¤ГҐГ«ГЁГ¬ ГЁ ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ ГЄГ ГЄГ®Г© ГЇГ®Г«ГіГ·ГЁГ«Г±Гї Г®Г±ГІГ ГІГ®ГЄ
 	mov cx, ax
 	pop ax
 	cwd
@@ -82,7 +82,7 @@ exit:
     mov ax, 4c00h
     int 21h
 
-output proc      ; процедура вывода на консоль
+output proc      ; ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г  ГўГ»ГўГ®Г¤Г  Г­Г  ГЄГ®Г­Г±Г®Г«Гј
 	push ax
 	push bx
 	push cx
@@ -90,7 +90,7 @@ output proc      ; процедура вывода на консоль
 	xor cx, cx
 	mov bx, 10
 
-inStack:          ;закидываем в стек ост от деления на 10
+inStack:          ;Г§Г ГЄГЁГ¤Г»ГўГ ГҐГ¬ Гў Г±ГІГҐГЄ Г®Г±ГІ Г®ГІ Г¤ГҐГ«ГҐГ­ГЁГї Г­Г  10
 	xor dx, dx
 	div bx
 	push dx
@@ -98,7 +98,7 @@ inStack:          ;закидываем в стек ост от деления на 10
 	cmp ax, 0
 	jnz inStack
 
-outStack:         ;достаем из стека
+outStack:         ;Г¤Г®Г±ГІГ ГҐГ¬ ГЁГ§ Г±ГІГҐГЄГ 
 	pop dx
 	add dl, '0'
 	mov ah, 02h
@@ -111,7 +111,7 @@ outStack:         ;достаем из стека
 	ret
 output endp
 
-outputSign proc    ; процедура вывода если есть -
+outputSign proc    ; ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г  ГўГ»ГўГ®Г¤Г  ГҐГ±Г«ГЁ ГҐГ±ГІГј -
 	push ax
 	push dx
 	
@@ -130,13 +130,13 @@ print:
 	ret
 outputSign endp	
 
-input proc        ; ввод и преобразование символа в число
+input proc        ; ГўГўГ®Г¤ ГЁ ГЇГ°ГҐГ®ГЎГ°Г Г§Г®ГўГ Г­ГЁГҐ Г±ГЁГ¬ГўГ®Г«Г  Гў Г·ГЁГ±Г«Г®
 	push bx
 	push cx
 	push dx
 	push si
 	push di
-startInput:       ; смотрим цифра или - первое
+startInput:       ; Г±Г¬Г®ГІГ°ГЁГ¬ Г¶ГЁГґГ°Г  ГЁГ«ГЁ - ГЇГҐГ°ГўГ®ГҐ
 	xor di, di
 	xor bx, bx
 	xor si, si
@@ -150,7 +150,7 @@ startInput:       ; смотрим цифра или - первое
 cycl:
 	mov ah, 01h
 	int 21h
-button:             ;ввод(), удаление через backspase и esc
+button:             ;ГўГўГ®Г¤(), ГіГ¤Г Г«ГҐГ­ГЁГҐ Г·ГҐГ°ГҐГ§ backspase ГЁ esc
 	inc di
 	cmp al, 13
 	jz enter
@@ -180,7 +180,7 @@ cyclFinish:
 	mov bx, ax
 	jmp cycl
 
-backspace:               ;обработка backspase 
+backspace:               ;Г®ГЎГ°Г ГЎГ®ГІГЄГ  backspase 
 	call delete
 	dec di
 	mov ax, bx
@@ -195,7 +195,7 @@ backspace:               ;обработка backspase
 	cmp dl, 0
 	jz startInput
 	jmp cycl
-escape:                   ;обработка esc
+escape:                   ;Г®ГЎГ°Г ГЎГ®ГІГЄГ  esc
 	xor bx, bx
 	xor si, si
 	mov cx, di
