@@ -3,20 +3,20 @@ LOCALS
 .386
 .stack 256
 .data
-dimension db ?
-array dw 9 dup (?)
-elementSize = 2
-handle dw 1
-enterDimensionMessage db "Please enter a dimension of the array: $"
-determinant db 100 dup (?)
-numberOfDeterminantDigits dw ?
-determinantMessage db "Determinant = $"
-matrixMessage db "Matrix:$"
-inputFileName db 'input.txt', 0
-outputFileName db 'output.txt', 0
-fileErrorMessage db 'Error with file', 13, 10, '$'
-number dw ?
-digit db ?
+    dimension db ?
+    array dw 9 dup (?)
+    elementSize = 2
+    handle dw 1
+    enterDimensionMessage db "Please enter a dimension of the array: $"
+    determinant db 100 dup (?)
+    numberOfDeterminantDigits dw ?
+    determinantMessage db "Determinant = $"
+    matrixMessage db "Matrix:$"
+    inputFileName db 'input.txt', 0
+    outputFileName db 'output.txt', 0
+    fileErrorMessage db 'Error with file', 13, 10, '$'
+    number dw ?
+    digit db ?
 .code
 
 ;переход на новую строку
