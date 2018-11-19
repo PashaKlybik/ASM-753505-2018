@@ -2,8 +2,8 @@
 .stack 256
 .data
     ten dw 10
-    dividendMess db "Dividend: $"
-    divisorMess db 10, 13, "Divisor: $"
+    dividendMess db "Dividend: ", 10, 13, '$'
+    divisorMess db 10, 13, "Divisor: ", 10, 13, '$'
     errorMess db 10, 13, "Error", 10, 13, '$'
     resultMess db 10, 13, "Result: $"
     remainderMess db 10, 13, "Remainder: $" 
@@ -26,7 +26,7 @@ main:
     call input
     call output
     cmp ax, 0
-    jz divisorZero        ; проверяем чтобы делитель не был 0
+    jz divisorZero        ; ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г·ГІГ®ГЎГ» Г¤ГҐГ«ГЁГІГҐГ«Гј Г­ГҐ ГЎГ»Г« 0
 
     mov cx, ax
     pop ax
@@ -58,7 +58,7 @@ exit:
     mov ax, 4c00h
     int 21h
 
-output proc      ; процедура вывода на консоль
+output proc      ; ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г  ГўГ»ГўГ®Г¤Г  Г­Г  ГЄГ®Г­Г±Г®Г«Гј
 	push ax
 	push bx
 	push cx
@@ -66,7 +66,7 @@ output proc      ; процедура вывода на консоль
 	xor cx, cx
 	mov bx, 10
 
-inStack:          ;закидываем в стек ост от деления на 10
+inStack:          ;Г§Г ГЄГЁГ¤Г»ГўГ ГҐГ¬ Гў Г±ГІГҐГЄ Г®Г±ГІ Г®ГІ Г¤ГҐГ«ГҐГ­ГЁГї Г­Г  10
 	xor dx, dx
 	div bx
 	push dx
@@ -74,7 +74,7 @@ inStack:          ;закидываем в стек ост от деления на 10
 	cmp ax, 0
 	jnz inStack
 
-outStack:         ;достаем из стека
+outStack:         ;Г¤Г®Г±ГІГ ГҐГ¬ ГЁГ§ Г±ГІГҐГЄГ 
 	pop dx
 	add dl, '0'
 	mov ah, 02h
@@ -87,14 +87,14 @@ outStack:         ;достаем из стека
 	ret
 output endp	
 
-input proc          ; ввод и преобразование символа в число 
+input proc          ; ГўГўГ®Г¤ ГЁ ГЇГ°ГҐГ®ГЎГ°Г Г§Г®ГўГ Г­ГЁГҐ Г±ГЁГ¬ГўГ®Г«Г  Гў Г·ГЁГ±Г«Г® 
 	push bx
 	push cx
 	push dx
 	push si
 	xor bx, bx
 	xor si, si
-button:             ;ввод(enter), удаление через backspase и esc
+button:             ;ГўГўГ®Г¤(enter), ГіГ¤Г Г«ГҐГ­ГЁГҐ Г·ГҐГ°ГҐГ§ backspase ГЁ esc
 	mov ah, 01h
 	int 21h
 	cmp al, 13
@@ -118,14 +118,14 @@ button:             ;ввод(enter), удаление через backspase и esc
 	mov bx, ax
 	inc si
 	jmp button
-backspace:                 ;обработка backspase 
+backspace:                 ;Г®ГЎГ°Г ГЎГ®ГІГЄГ  backspase 
 	call delete
 	mov ax, bx
 	xor dx, dx
 	div ten
 	mov bx, ax
 	jmp button
-escape:                    ;обработка esc
+escape:                    ;Г®ГЎГ°Г ГЎГ®ГІГЄГ  esc
 	mov cx, si
 	xor si, si
 	xor bx, bx
