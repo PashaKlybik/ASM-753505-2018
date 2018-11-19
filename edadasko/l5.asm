@@ -101,8 +101,8 @@ inputArrayFromFile PROC
         MOV dimension, AL
 
         MOV SI, 0 ;столбцы
-	MOV BX, 0 ;строки
-	MOVSX CX, [dimension]
+        MOV BX, 0 ;строки
+        MOVSX CX, [dimension]
 
         @@externalCycle:
             PUSH CX
@@ -121,10 +121,10 @@ inputArrayFromFile PROC
         loop @@externalCycle
 
         MOV AH,3eH                               
-	MOV BX,[handle]
+        MOV BX,[handle]
         INT 21h
-	JNC @@fileIsClose
-	CALL fileError
+        JNC @@fileIsClose
+        CALL fileError
 
     @@fileIsClose:
     POPA
@@ -227,9 +227,9 @@ outputArray PROC
             loop @@iternalCycle
                 POP CX
                 MOVSX DX, [dimension] ;BX += размерность_массива*размер_элемента
-		IMUL DX, elementSize
+                IMUL DX, elementSize
                 ADD BX, DX
-		CALL newline
+                CALL newline
         loop @@externalCycle
     POPA
 RET
@@ -340,15 +340,15 @@ outputInFile PROC
         INT 21h
 
         POP AX
-	CALL convertDeterminantToString
-	LEA DX, determinant
-	MOV AH,40H
-	MOV cx, numberOfDeterminantDigits
-	INT 21h
+        CALL convertDeterminantToString
+        LEA DX, determinant
+        MOV AH,40H
+        MOV CX, numberOfDeterminantDigits
+        INT 21h
 
         JNC @@output
-	CALL fileError
-	@@output:
+        CALL fileError
+        @@output:
             MOV AH,3eH
             MOV BX,[handle]
             INT 21h
