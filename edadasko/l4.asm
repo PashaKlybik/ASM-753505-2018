@@ -8,7 +8,7 @@
     string db 100 dup('$')
 
     ;строка гласных
-    vowelsLen db 31
+    vowelsLen db 13
     vowels db "AEIOUYaeiouy$"
 .code
 
@@ -54,7 +54,7 @@ counterOfWordsThatBeginsWithVowel PROC
         CALL isSymbolVowel	    
 	
         nextSymbol:
-   	    INC SI
+            INC SI
     loop checkBeginOfWord
 
     POP SI
@@ -119,7 +119,6 @@ output PROC
     POP AX
 RET
 output ENDP
-
 
 main:
     MOV ax, @data
