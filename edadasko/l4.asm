@@ -9,7 +9,7 @@
 
     ;строка гласных
     vowelsLen db 31
-    vowels db "AEIOUaeiouаоиеёэыуюяАОИЕЁЭЫУЮЯ$"
+    vowels db "AEIOUYaeiouy$"
 .code
 
 newline PROC
@@ -40,36 +40,22 @@ counterOfWordsThatBeginsWithVowel PROC
     ;индексатор для введенной строки
     XOR SI, SI
 
-    checkVowels:
-        PUSH CX
-        PUSH AX
+    ;проверка первого символа
+    CALL isSymbolVowel
+    INC SI
 
-        ;поиск очередного символа в строке гласных
-        MOV AL, string[SI]
-        LEA DI, vowels
-        MOVZX CX, vowelsLen
-        REPNE SCASB
-        JNE nextSymbol
-
-        ;проверка, является ли символ началом слова
-        checkBeginning:
-        CMP SI, 0
-        JZ itIsBeginningOfWord
-			
+    ;поиск символа, являющегося началом слова
+    checkBeginOfWord:
         MOV DL, string[SI - 1] 
         CMP DL, ' '
         JNE nextSymbol
-
-        itIsBeginningOfWord:
-            POP AX
-            INC AX
-            PUSH AX
-		
+    
+        ;если символ - начало слова, проверка, является ли он гласной
+        CALL isSymbolVowel	    
+	
         nextSymbol:
-            INC SI	
-            POP AX
-            POP CX
-    loop checkVowels
+   	    INC SI
+    loop checkBeginOfWord
 
     POP SI
     POP DX
@@ -77,6 +63,25 @@ counterOfWordsThatBeginsWithVowel PROC
     POP BX
 RET
 counterOfWordsThatBeginsWithVowel ENDP
+
+isSymbolVowel PROC
+    PUSH CX
+    PUSH AX
+
+    MOV AL, string[SI]
+    LEA DI, vowels
+    MOVZX CX, vowelsLen
+    REPNE SCASB
+    JNE exitFromChecking
+    POP AX ;если символ найден - счетчик++
+    INC AX
+    PUSH AX
+
+    exitFromChecking:
+        POP AX
+        POP CX
+RET
+isSymbolVowel ENDP
 
 ;процедура вывода числа из 2 лабы
 output PROC
