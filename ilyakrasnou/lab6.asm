@@ -76,14 +76,14 @@ isVowel:                                ; выводим подстроку бе
     mov byte ptr [si], bl
     jmp short nextChar
 
-    vowels db "aeiouyAEIOUY$"
+vowels db "aeiouyAEIOUY$"
 
 int21hHandler endp
 
 reset21h: retf                       ; дальний возврат из процедуры
 reset2Dh: retf
 
-int2DhHandler proc far            ; 2Dh 
+int2DhHandler proc far               ; 2Dh 
         
     jmp short actualInt2DhHandler       ; пропустить ISP
 
@@ -93,9 +93,9 @@ oldInt2Dh  dd ?
 jmp short reset2Dh
            db 7 dup (0)
 
-actualInt2DhHandler:                     ; начало обработчика        
+actualInt2DhHandler:                      ; начало обработчика        
         db 80h, 0FCh                      ; начало команды CMP AH, число
-  muxID db ?                        ; идентификатор программы,
+  muxID db ?                              ; идентификатор программы,
         je correctID                      ; если вызываеться с другим ID - переходим к старому обработчику
         jmp dword ptr cs:oldInt2Dh
 
@@ -147,12 +147,12 @@ it02FuncOf2Dh:                                ; выгрузка програм�
     mov ax, 252Dh
     lds dx, dword ptr cs:oldInt2Dh
     int 21h
-                                      ; выгрузка резидента из памяти 
+                                        ; выгрузка резидента из памяти 
     mov ah,51h                          ; Функция DOS 51h (получить сегментный адрес PSP )
     int 21h                               
                                       
-    mov word ptr cs:[16h],bx         ; поместить его в поле
-                                     ; "сегментный адрес предка" в нашем PSP
+    mov word ptr cs:[16h],bx           ; поместить его в поле
+                                       ; "сегментный адрес предка" в нашем PSP
     pop dx                             ; восстановить адрес возврата из стека
     pop bx
     mov word ptr cs:[0Ch],dx         ; и поместить его в поле
@@ -174,7 +174,6 @@ amisSign  db "Krasnov "
           db "NoVowels"                
           db "Print string without vowels",0 
                                     
-
 ; конец резидентной части
 ; начало процедуры инициализации
 
@@ -249,8 +248,8 @@ incorrectParams:
 
 notFree:                                 
     mov es, dx                          ; ES:DI = адрес AMIS-сигнатуры 
-                                    ; вызвавшей программы
-    mov si, offset amisSign           ; DS:SI = адрес нашей сигнатуры
+                                        ; вызвавшей программы
+    mov si, offset amisSign             ; DS:SI = адрес нашей сигнатуры
     mov cx, 16                          
     repe cmpsb
     jcxz alreadyLoaded          
@@ -265,7 +264,7 @@ freeMuxIsFound:
     je noMoreMux                      
     mov ax, 352Dh                     
     int 21h                              ; получить адрес обработчика INT 2Dh
-    mov word ptr oldInt2Dh, bx        ; и поместить его в oldInt2Dh
+    mov word ptr oldInt2Dh, bx           ; и поместить его в oldInt2Dh
     mov word ptr oldInt2Dh+2, es
     mov ax,3521h                    
     int 21h                            
