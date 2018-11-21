@@ -1,155 +1,152 @@
-.model small
-.stack 256
+model small			; модель памяти
+.stack 100h         ; установка размера стека
 .data
 
-    intToOut dw ?
-    endline db 13,10,'$'
-    result db 'Result:',13,10,'$'
-    symbError db 'Invalid input',13,10,'$'
-    interDiv db 'Enter dividend int:',13,10,'$'
-    divOn db 'Enter divider int:',13,10,'$'
-    zeroDiv db 'Division by zero',13,10,'$'
-    ten dw 10
+devident dw 0
+devider dw 0
+temporary dw 0
+enterdevident db "Enter devident: ", '$'
+enterdevider db "Enter devider: ", '$'
+repeat db 13, 10,"Repeat please!", 13, 10, '$'
+wholeres db "Result:", 13, 10, "integer = ", '$'
+fractional db ", fractional = $"
+errorzero db "Division by zero!", 13, 10, '$'
+n db 10,"$"
+u dw 10
+ost dw ?
+cel dw ?
 
 .code
- Input proc ;input of integer
-    push ax
-    push bx
-    push cx
-    push dx
-    xor ax, ax
-    xor cx, cx
-    mov bx, 5
 
-    consoleInput:
-        mov ah, 01h
-        int 21h
-        xor ah, ah
-        cmp al, '0'
-        jnae chech
-        cmp al, '9'
-        ja chech
-        sub al, '0'
-        xchg ax, cx
-        mul ten
-        jc chech
-        add ax, cx
-        xchg ax, cx
-        dec bx
-        test bx, bx
-        jnz consoleInput
-        call NewLine
-        jmp toend
+InputInt proc	;ввод в АX 
 
-    chech:
-        cmp al, 13; if equals to button "Enter"
-        je toend
-        call NewLine
-        call Error
-        jmp exception
-    toend:
-        mov intToOut, cx
-    exception:
-        pop dx
-        pop cx
-        pop bx
-        pop ax
-        ret
+	entersymb:
+	MOV AH, 01h
+	INT 21h
+	xor ah, ah
+	CMP AX, 13 ;проверка на энтр
+	JZ end1
+	CMP AX, 48 ;проверка на 0-9
+	JC error
+	CMP AX, 57
+	JZ contin
+	JNC error
 
-Input endp
+	contin:
+		SUB AL, 48
+		MOV AH, 0
+		MOV BX, AX
+		MOV AX, temporary
+		MUL u
+		JC error
+		ADD AX, BX
+		JC error
+		MOV temporary, AX
+		JMP entersymb
 
-Error proc ;message for error    
-    push dx
-    push ax
-    mov dx, offset symbError
-    mov ah, 09h
-    int 21h
-    pop ax
-    pop dx
-    ret
-Error endp
+	error:
+		LEA DX, repeat
+		MOV AH, 09h
+		INT 21h
+		MOV AX, 0
+		MOV temporary, AX
+		JMP entersymb
 
-NewLine proc ;go to new line
-    push dx
-    push ax
-    mov dx, offset endline
-    mov ah, 09h
-    int 21h
-    pop ax
-    pop dx
-    ret
-NewLine endp
+	end1:
 
- ShowInt proc ;output of integer
-    push ax
-    push bx
-    push cx
-    push dx
-    xor cx, cx
-    mov bx, 10
+	ret
+InputInt endp
 
-    divLoop:
-        xor dx, dx
-        div bx
-        add dl, '0'
-        push dx
-        inc cx
-        test ax, ax
-        jnz divLoop
+OutputInt proc
+	MOV CX, 0
 
-    showLoop:
-        pop dx
-        mov ah, 02h
-        int 21h
-        loop showLoop
+	next:
+		MOV DX, 0
+		DIV u
+		PUSH DX
+		MOV DX, 0
+		INC CX
+		CMP AX, 0
+		JNZ next
 
-    call NewLine
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    ret
-ShowInt endp
+	cycle:
+		POP DX
+		MOV DH, 0
+		ADD DL, 48
+		MOV AH, 02h
+		INT 21h
+		LOOP cycle
 
- divByZero: ;if division by zero
-    mov dx, offset zeroDiv
-    mov ah, 09h
-    int 21h
-    jmp finish
+	ret
+OutputInt endp
 
- main:
-    mov ax, @data
-    mov ds, ax
+stasyan proc
+	push ax
+	push dx
 
-    mov dx, offset interDiv
-    mov ah, 09h
-    int 21h
-    call Input
+	lea dx, n
+	mov ah, 09h
+	int 21h
 
-    mov ax, intToOut
-    call ShowInt
+	pop dx
+	pop ax
 
-    push ax
-    mov dx, offset divOn
-    mov ah, 09h
-    int 21h
-    call Input
+	ret
+stasyan endp
 
-    mov ax, intToOut
-    mov bx, ax
-    call ShowInt
-	 
-    mov dx, offset result
-    mov ah, 09h
-    int 21h 
-    pop ax
-    test bx, bx					; checkin' if divider is zero
-    jz divByZero
-    xor dx, dx
-    div bx
-    call ShowInt
 
-    finish:
-        mov ax, 4c00h    
-        int 21h
-end main
+start: ;------------------------------------------start of prog
+MOV AX, @data
+MOV DS, AX
+
+LEA DX, enterdevident
+MOV AH, 09h
+INT 21h
+call InputInt
+push temporary
+pop devident
+mov temporary, 0
+
+LEA DX, enterdevider
+MOV AH, 09h
+INT 21h
+call InputInt
+push temporary
+pop devider
+mov temporary, 0
+
+cmp devider, 0
+jz altendofprog
+
+mov ax, devident
+cwd
+div devider
+
+mov cel, ax ;ax=целое
+mov ost, dx ;dx=остаток
+
+LEA DX, wholeres
+MOV AH, 09h
+INT 21h
+mov ax, cel
+call outputint
+
+LEA DX, fractional
+MOV AH, 09h
+INT 21h
+mov ax, ost
+call outputint
+
+call stasyan
+
+MOV AH, 4Ch
+INT 21h
+
+altendofprog:
+LEA DX, errorzero
+MOV AH, 09h
+INT 21h
+
+MOV AH, 4Ch
+INT 21h
+end start 
