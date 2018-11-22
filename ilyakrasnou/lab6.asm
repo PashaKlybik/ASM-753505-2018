@@ -28,38 +28,74 @@ actualInt21hHandler:               ; начало обработчика INT 21h
     je newHandler
 oldHandler:
     pushf
-    call dword ptr cs:[oldInt21h]
+    call dword ptr cs:oldInt21h
     iret
+
+bufLen = 10
+
+reset21h: retf                       ; дальний возврат из процедуры
+
 newHandler:
     pushf
     push dx
     push cx
     push si
     push di
-    push bx
-    
-    cli                            ; запрещаем аппаратные прерывания, чтобы никто не додумался с помощью них обрабатывать паралельно с нами строку
+    push es
+
+    cli                            ; запрещаем аппаратные прерываания пока мы тут играемся с сегментами
+    cld
+    push cs
+    pop es
+    mov cx, bufLen
     mov si, dx
-searchVowels:
-    mov cl, byte ptr [si]
+    mov di, offset buffer
+copyString:                        ; копируем выводимую строку в буфер (если полностью не влазит в буфер, то по частям)
+    cmp byte ptr ds:[si], '$'        
+    je endOfString
+    cmp cx, 0
+    je bufferIsFull
+    movsb
+    dec cx
+    jmp short copyString
+endOfString:                       ; забиваем $
+    movsb
+    dec si
+bufferIsFull:                      ; обрабатываем и выводим строку в буфере
+    mov dx, offset buffer
+    push si
+    push ds
+    push cs
+    pop ds
+    mov si, dx
+charFromBuffer:
+    mov cl, byte ptr cs:[si]
     cmp cl, '$'
-    je restString
-    lea di, vowels
+    je restBufferString
+    mov di, offset vowels
     cmpWithVowel:
-        cmp byte ptr [di], '$'         ; сравниваем с гласными
+        cmp byte ptr cs:[di], '$'         ; сравниваем с гласными
         je nextChar
-        cmp cl, byte ptr [di]
+        cmp cl, byte ptr cs:[di]
         je isVowel
         inc di
         jmp short cmpWithVowel
 nextChar:
     inc si
-    jmp short searchVowels
-restString:
+    jmp short charFromBuffer
+restBufferString:
     pushf
     call dword ptr cs:oldInt21h
+    pop ds
+    pop si
+    cmp byte ptr ds:[si], '$'
+    je exit09h
+    mov cx, bufLen
+    mov di, offset buffer
+    jmp short copyString
+exit09h:
     sti
-    pop bx
+    pop es
     pop di
     pop si
     pop cx
@@ -67,21 +103,19 @@ restString:
     popf
     iret
 isVowel:                                ; выводим подстроку без гласной
-    mov bl, cl
-    mov byte ptr [si], '$'
+    mov byte ptr cs:[si], '$'
     pushf
     call dword ptr cs:oldInt21h
     mov dx, si                          ; устанавливаем начало следующей подстроки на следующий символ после гласной
     inc dx
-    mov byte ptr [si], bl
     jmp short nextChar
 
 vowels db "aeiouyAEIOUY$"
+buffer db bufLen dup (?), '$'
 
 int21hHandler endp
 
-reset21h: retf                       ; дальний возврат из процедуры
-reset2Dh: retf
+reset2Dh: retf                       ; дальний возврат из процедуры
 
 int2DhHandler proc far               ; 2Dh 
         
