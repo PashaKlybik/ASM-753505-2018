@@ -153,6 +153,7 @@ WriteProc proc
     push cx
     push dx
     xor bx, bx
+    xor cx,cx ;так как не обнулял cx в нем было всякая хрень и при цикле вывода(print) он выполнялся больше чем нужно
     cmp ax, border
     jnc showsign
     
