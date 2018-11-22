@@ -5,6 +5,7 @@ model small			; модель памяти
 devident dw 0
 devider dw 0
 temporary dw 0
+unusial dw -32768
 
 currentpos dw ?
 isnegative dw ?
@@ -20,7 +21,7 @@ cel dw ?
 
 .code
 
-InputInt proc	;ввод в АX 
+InputInt proc
 	mov currentpos, 0
 	mov isnegative, 0
 
@@ -94,6 +95,11 @@ InputInt proc	;ввод в АX
 		jz makeneg
 
 	end2:
+		mov cx, temporary
+		cmp cx,unusial
+		jz error
+		
+
 
 	ret
 InputInt endp
@@ -179,7 +185,6 @@ start:
 	idiv devider
 
 	mov cel, ax ;ax=целое
-	mov ost, dx ;dx=остаток
 
 	LEA DX, wholeres
 	MOV AH, 09h
