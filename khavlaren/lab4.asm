@@ -84,8 +84,7 @@ main:
     
     ; Processing.
     LEA SI, line
-    XOR CH, CH
-    MOV CL, len					; Счётчик длины строки (текущий индекс).
+    MOV CX, AX					; Счётчик длины строки. (В AX сейчас находится len)
     XOR BX, BX					; Длина текущего слова.
     CLD
 StringCycle:
