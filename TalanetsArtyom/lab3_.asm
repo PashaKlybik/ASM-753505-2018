@@ -18,18 +18,13 @@ END_LINE PROC
 RET
 END_LINE ENDP
 
-COMPARING_NUMBER PROC
-	
-RET
-COMPARING_NUMBER ENDP
-
 INPUT PROC 
 	PUSH BX
-	PUSH AX			;число при выходе из процедуры
-    PUSH CX 		;храним число во время исполнения
+	PUSH AX			;Г·ГЁГ±Г«Г® ГЇГ°ГЁ ГўГ»ГµГ®Г¤ГҐ ГЁГ§ ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г»
+    PUSH CX 		;ГµГ°Г Г­ГЁГ¬ Г·ГЁГ±Г«Г® ГўГ® ГўГ°ГҐГ¬Гї ГЁГ±ГЇГ®Г«Г­ГҐГ­ГЁГї
     PUSH DX  
-    PUSH SI    		;si = 1 <=> cx=0, но в консоль не очищена
-    PUSH DI			;di = 1 <=> число отрицательное
+    PUSH SI    		;si = 1 <=> cx=0, Г­Г® Гў ГЄГ®Г­Г±Г®Г«Гј Г­ГҐ Г®Г·ГЁГ№ГҐГ­Г 
+    PUSH DI			;di = 1 <=> Г·ГЁГ±Г«Г® Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г®ГҐ
     MOV SI, 1
     XOR DI, DI
     XOR CX, CX
@@ -46,39 +41,39 @@ input_loop:
     MOV SI, 1	
     MOV AH,01h
 	INT 21H
-    CMP AL, 13			;проверка на enter
+    CMP AL, 13			;ГЇГ°Г®ГўГҐГ°ГЄГ  Г­Г  enter
     JE _press_enter
-    CMP AL, 8			;проверка на backspace
+    CMP AL, 8			;ГЇГ°Г®ГўГҐГ°ГЄГ  Г­Г  backspace
     JE press_backspace 	
-    CMP AL, 27			;проверка на escape
+    CMP AL, 27			;ГЇГ°Г®ГўГҐГ°ГЄГ  Г­Г  escape
     JE press_escape 
-    CMP AL, '-'			;проверка на минус
+    CMP AL, '-'			;ГЇГ°Г®ГўГҐГ°ГЄГ  Г­Г  Г¬ГЁГ­ГіГ±
     JE press_minus   
-    CMP AL, '0'			;Если код символа меньше кода '0', то 
-    JL delete_symbol	;удаляем символ
-    CMP AL,'9'          ;Если код символа больше кода '9', то
-    JG delete_symbol	;удаляем символ
+    CMP AL, '0'			;Г…Г±Г«ГЁ ГЄГ®Г¤ Г±ГЁГ¬ГўГ®Г«Г  Г¬ГҐГ­ГјГёГҐ ГЄГ®Г¤Г  '0', ГІГ® 
+    JL delete_symbol	;ГіГ¤Г Г«ГїГҐГ¬ Г±ГЁГ¬ГўГ®Г«
+    CMP AL,'9'          ;Г…Г±Г«ГЁ ГЄГ®Г¤ Г±ГЁГ¬ГўГ®Г«Г  ГЎГ®Г«ГјГёГҐ ГЄГ®Г¤Г  '9', ГІГ®
+    JG delete_symbol	;ГіГ¤Г Г«ГїГҐГ¬ Г±ГЁГ¬ГўГ®Г«
     SUB AL, '0'
-	CBW 				;расширяем al на ax       
+	CBW 				;Г°Г Г±ГёГЁГ°ГїГҐГ¬ al Г­Г  ax       
     MOV BX, AX
    
 	MOV AX, CX
     MUL ten
-	JC delete_symbol      ;если перенос - ошибка
-    JO delete_symbol      ;Если переполнение - ошибка
+	JC delete_symbol      ;ГҐГ±Г«ГЁ ГЇГҐГ°ГҐГ­Г®Г± - Г®ГёГЁГЎГЄГ 
+    JO delete_symbol      ;Г…Г±Г«ГЁ ГЇГҐГ°ГҐГЇГ®Г«Г­ГҐГ­ГЁГҐ - Г®ГёГЁГЎГЄГ 
 	ADD AX, BX
-	JC delete_symbol      ;Если перенос - ошибка
-    JO delete_symbol      ;Если переполнение - ошибка
+	JC delete_symbol      ;Г…Г±Г«ГЁ ГЇГҐГ°ГҐГ­Г®Г± - Г®ГёГЁГЎГЄГ 
+    JO delete_symbol      ;Г…Г±Г«ГЁ ГЇГҐГ°ГҐГЇГ®Г«Г­ГҐГ­ГЁГҐ - Г®ГёГЁГЎГЄГ 
     CMP AX, 32767
-    JG delete_symbol      ;Если перенос - ошибка
+    JG delete_symbol      ;Г…Г±Г«ГЁ ГЇГҐГ°ГҐГ­Г®Г± - Г®ГёГЁГЎГЄГ 
  
 	;MOV AX, 10
     ;MUL CX
     ;CMP DX, 0
-	;JG delete_symbol	;если переполнение
+	;JG delete_symbol	;ГҐГ±Г«ГЁ ГЇГҐГ°ГҐГЇГ®Г«Г­ГҐГ­ГЁГҐ
 	;JG input_loop
 	;ADD AX, BX
-    ;JB delete_symbol	;если переполнение
+    ;JB delete_symbol	;ГҐГ±Г«ГЁ ГЇГҐГ°ГҐГЇГ®Г«Г­ГҐГ­ГЁГҐ
     ;JB input_loop	
 	MOV CX, AX
 	_input_loop:
@@ -99,22 +94,22 @@ press_minus:
 	_press_enter:
 	JMP press_enter
 press_backspace:
-	;смотри знак
+	;Г±Г¬Г®ГІГ°ГЁ Г§Г­Г ГЄ
     CMP CX, 0
     JNE lbl88
     MOV DI, 0
     lbl88:
-    ;делим cx на 10
+    ;Г¤ГҐГ«ГЁГ¬ cx Г­Г  10
     MOV AX,CX
     MOV BX,10
     XOR DX,DX
     DIV BX
     MOV CX,AX
-    ;ударяем символ
+    ;ГіГ¤Г Г°ГїГҐГ¬ Г±ГЁГ¬ГўГ®Г«
 	MOV AH,02h
-    MOV DL,' '		;перезаписываем последний символ на пробел
+    MOV DL,' '		;ГЇГҐГ°ГҐГ§Г ГЇГЁГ±Г»ГўГ ГҐГ¬ ГЇГ®Г±Г«ГҐГ¤Г­ГЁГ© Г±ГЁГ¬ГўГ®Г« Г­Г  ГЇГ°Г®ГЎГҐГ«
     INT 21h
-    MOV DL,8		;двигаем коретку влево
+    MOV DL,8		;Г¤ГўГЁГЈГ ГҐГ¬ ГЄГ®Г°ГҐГІГЄГі ГўГ«ГҐГўГ®
     INT 21h
     JMP input_loop    
 delete_symbol:
@@ -151,12 +146,12 @@ INPUT ENDP
 DELETESYMB PROC
        PUSH AX
        PUSH DX     
-       MOV DL, 8		;двигаем коретку влево
+       MOV DL, 8		;Г¤ГўГЁГЈГ ГҐГ¬ ГЄГ®Г°ГҐГІГЄГі ГўГ«ГҐГўГ®
        MOV AH, 02h
        INT 21H
-       MOV DL,' '	;перезаписываем последний символ на пробел
+       MOV DL,' '	;ГЇГҐГ°ГҐГ§Г ГЇГЁГ±Г»ГўГ ГҐГ¬ ГЇГ®Г±Г«ГҐГ¤Г­ГЁГ© Г±ГЁГ¬ГўГ®Г« Г­Г  ГЇГ°Г®ГЎГҐГ«
        INT 21H
-       MOV DL,8		;двигаем коретку влево
+       MOV DL,8		;Г¤ГўГЁГЈГ ГҐГ¬ ГЄГ®Г°ГҐГІГЄГі ГўГ«ГҐГўГ®
        INT 21H
        POP DX
        POP AX
@@ -168,7 +163,7 @@ OUTPUT PROC
 	PUSH BX
 	PUSH CX
 	PUSH DX		
-	PUSH DI 			;di = 1 <=> число отрицательное
+	PUSH DI 			;di = 1 <=> Г·ГЁГ±Г«Г® Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г®ГҐ
 	
 	XOR CX, CX
 	XOR DI, DI
@@ -181,10 +176,10 @@ OUTPUT PROC
 push_digit_to_stack:
     XOR DX,DX
     DIV ten
-    PUSH DX						;добавили в стек очередную цифру числа
+    PUSH DX						;Г¤Г®ГЎГ ГўГЁГ«ГЁ Гў Г±ГІГҐГЄ Г®Г·ГҐГ°ГҐГ¤Г­ГіГѕ Г¶ГЁГґГ°Гі Г·ГЁГ±Г«Г 
     INC CX
-    TEST AX, AX					;(логическое И)
-    JNZ push_digit_to_stack 	;если ax - не ноль, то добавляем следующую цифру
+    TEST AX, AX					;(Г«Г®ГЈГЁГ·ГҐГ±ГЄГ®ГҐ Г€)
+    JNZ push_digit_to_stack 	;ГҐГ±Г«ГЁ ax - Г­ГҐ Г­Г®Г«Гј, ГІГ® Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ Г±Г«ГҐГ¤ГіГѕГ№ГіГѕ Г¶ГЁГґГ°Гі
        
     MOV AH, 02h
     CMP DI, 1
@@ -192,8 +187,8 @@ push_digit_to_stack:
     MOV DX, '-'
     INT 21h
 print:
-	POP DX			;в dx - цифра, которую необходимо вывести
-    ADD DL, '0'		;символ, выводимы на дисплей
+	POP DX			;Гў dx - Г¶ГЁГґГ°Г , ГЄГ®ГІГ®Г°ГіГѕ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г® ГўГ»ГўГҐГ±ГІГЁ
+    ADD DL, '0'		;Г±ГЁГ¬ГўГ®Г«, ГўГ»ГўГ®Г¤ГЁГ¬Г» Г­Г  Г¤ГЁГ±ГЇГ«ГҐГ©
     int 21h
     LOOP print   
     CALL END_LINE
@@ -220,14 +215,14 @@ no_error:
 RET
 CHECK_DIV_BY_ZERO ENDP
     
-SIGNED_DIVISION PROC;деление со знаком, 
-					;вход: AX - делимое, BX - делитель
-					;выход: AX - частное
+SIGNED_DIVISION PROC;Г¤ГҐГ«ГҐГ­ГЁГҐ Г±Г® Г§Г­Г ГЄГ®Г¬, 
+					;ГўГµГ®Г¤: AX - Г¤ГҐГ«ГЁГ¬Г®ГҐ, BX - Г¤ГҐГ«ГЁГІГҐГ«Гј
+					;ГўГ»ГµГ®Г¤: AX - Г·Г Г±ГІГ­Г®ГҐ
 	PUSH DX	
-	XOR DX, DX		;dx = 0 <=> делимое положительное
-	OR AX, AX		;проверяем знак делимого
-	JNS division	;если делимое положительное, оставляем  dx = 0
-	SUB DX, 1		;если делимое отрицательно, то dx=1..1 
+	XOR DX, DX		;dx = 0 <=> Г¤ГҐГ«ГЁГ¬Г®ГҐ ГЇГ®Г«Г®Г¦ГЁГІГҐГ«ГјГ­Г®ГҐ
+	OR AX, AX		;ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г§Г­Г ГЄ Г¤ГҐГ«ГЁГ¬Г®ГЈГ®
+	JNS division	;ГҐГ±Г«ГЁ Г¤ГҐГ«ГЁГ¬Г®ГҐ ГЇГ®Г«Г®Г¦ГЁГІГҐГ«ГјГ­Г®ГҐ, Г®Г±ГІГ ГўГ«ГїГҐГ¬  dx = 0
+	SUB DX, 1		;ГҐГ±Г«ГЁ Г¤ГҐГ«ГЁГ¬Г®ГҐ Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г®, ГІГ® dx=1..1 
 division:		
 	CALL CHECK_DIV_BY_ZERO
 	IDIV BX	
