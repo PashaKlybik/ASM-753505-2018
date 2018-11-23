@@ -14,7 +14,6 @@
     outputFile db "output.txt", 0
     inputFile db "input.txt", 0
     newline db 13, 10, '$'
-         dw 1
     
     outBuffer db 8 dup (' '), '$'
     maxBufferSize dw 1000
