@@ -128,17 +128,16 @@ check_negative:
     cmp byte ptr minus, 1
     jne compare_with_maximum
     cmp ax, 32768
-    ja invalid_no_endline
+    ja large_error_no_endline
     neg ax
     jmp end_read_num
 compare_with_maximum:
     cmp ax, 32767
-    ja invalid_no_endline
+    ja large_error_no_endline
     jmp end_read_num
 
 invalid:
     call print_endline
-invalid_no_endline:
     push dx
     lea dx, letter_error
     call print_string
@@ -150,6 +149,7 @@ invalid_no_endline:
     
 large_error:
     call print_endline
+large_error_no_endline:
     push dx
     lea dx, large_str
     call print_string
