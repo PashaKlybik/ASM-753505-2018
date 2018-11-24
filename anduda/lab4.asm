@@ -8,7 +8,7 @@
 	string   db   80 dup (0) 
 	 
 	
-	sAlphabet db "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 13, 10, '$'
+	sAlphabet db "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890", 13, 10, '$'
 	sEnter      db   "Enter string: $" 
 	sResult      db   13, 10, "Result      : $" 
 	sAny      db   13, 10, "Press any key", 13, 10, "$" 
@@ -39,7 +39,7 @@ isLetter   proc      ;проверка на букву
    push ax
    push cx
    lea di, sAlphabet
-   mov cx, 52
+   mov cx, 62
    repne scasb
    jne notLetter
 letter:
