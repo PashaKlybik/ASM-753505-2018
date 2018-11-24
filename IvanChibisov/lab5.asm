@@ -29,7 +29,7 @@
   sizeResult dw 0
 .code
 
- InResult proc
+ InResult proc                         ; занесение массива в строку результат
   pusha
   xor dx,dx
   lea di, result
@@ -138,11 +138,11 @@
   RET
  InResult endp
 
- MatrixSHL proc
+ MatrixSHL proc                                         ; Циклический сдвих строки матрицы на 1 влево
   pusha
     push ax
      mov ax, ThisColum                      
-     mov bx, colum               
+     mov bx, colum                                      ; смещения для массива в bx
      mul bx
      mov bx,2
      mul bx
@@ -178,7 +178,7 @@
      dec si
      dec si
      add bx,si
-     mov dx, matrix[bx]
+     mov dx, matrix[bx]                       ; помещаем элемент из буффера в его соседа слева, а соседа слева в буффер
      mov BufferArrayElem, dx
      mov matrix[bx], ax
      sub bx,si
@@ -186,7 +186,7 @@
      pop ax
     loop cicleColum
      
-    IsNullColum:
+    IsNullColum:                             ; Если первая строка, то ее элемент нужно в последнюю поместить
      push ax
      push dx
      mov ax, colum
@@ -207,7 +207,7 @@
   ret
  MatrixSHL endp
 
- transformation proc
+ transformation proc                          ; функция определяющая, солько раз нужно сдвинуть строку влево
    pusha
      mov cx, row
     cicleRow:
@@ -230,7 +230,7 @@
    ret
  transformation endp
  
- InMatrix proc
+ InMatrix proc                                                ; Перевод чисел из буффера в матрицу числовую, т.е. считывание из буффера
    pusha
    MOV AX,0
   MOV sig, AX
@@ -282,7 +282,7 @@
   MOV b,AX
   JMP Read
 
- Space:
+ Space:                                     ; Если встретили пробел то заносим число в массив
   mov ax,b
   mov cx,sig
   cmp cx,1
@@ -318,7 +318,7 @@
   ret
  InMatrix endp
 
- out_str MACRO str
+ out_str MACRO str                     ;макросс вывода строки
    push ax
    push dx
    mov ah, 09h
@@ -328,26 +328,26 @@
    pop ax
  endm
 
- file_close_input proc
+ file_close_input proc                  ; функция закрытия файла ввода
    pusha
    mov ah,3Eh
-   mov bx,handle_input
+   mov bx,handle_input                  ; передаем хэндл файла
    int 21h
    jnc next3
-   out_str error_message
+   out_str error_message                ; вывод сообщения об ошибке, если есть она
    jmp exit
   next3:
    popa
    RET
  file_close_input endp
 
- file_close_output proc
+ file_close_output proc                  ; функция закрытия файла вывода
    pusha
    mov ah,3Eh
-   mov bx,handle_output
+   mov bx,handle_output                  ; передаем хэндл файла
    int 21h
    jnc nextClose
-   out_str error_message
+   out_str error_message                 ; вывод сообщения об ошибке, если есть она
    jmp exit
   nextClose:
    popa
@@ -362,67 +362,67 @@ main:
   
    xor ax,ax
    lea di, result
-   mov ah,3Dh
-   xor al,al            
-   lea dx, input
+   mov ah,3Dh                                                ; функция открытия файла
+   xor al,al                                                 ; режим открытия: только чтение
+   lea dx, input                                             ; название файла для открытия
    xor cx,cx            
    int 21h
    jnc continue1 
-   out_str error_message
+   out_str error_message                                     ; сообщение об ошибке
    jmp exit
   continue1:
-    mov handle_input, ax
-    mov bx,ax            
-    mov ah,3Fh
-    lea dx,buffer
-    mov cx, 300
+    mov handle_input, ax                                     ; запоминаем хэндл
+    mov bx,ax                                                ; дескриптор файла для считывания
+    mov ah,3Fh                                               ; функция чтение из файла
+    lea dx,buffer                                            ; то, куда считываем
+    mov cx, 300                                              ; макс число считываемых байт
     int 21h
     jnc continue2
     out_str error_message
     call file_close_input
     
   continue2:
-    lea bx, buffer
-    add bx,ax
-    mov [bx],'$'
-    lea si, buffer
+    lea bx, buffer                         ; помецаем в конец буффера $
+    add bx,ax                              ; в ax число считаных байт
+    mov [bx],'$'                           ; добавляем к началу буффера число считаных байт и в конец $
+    lea si, buffer                         ; настройка регистра si на buffer
     xor ax,ax
-    lodsb
+    lodsb                                  ; считаем из буффера N - число строк матрицы
     sub al,'0'
     mov byte ptr [row],al
     inc si
-    lodsb
+    lodsb                                  ; считаем из буффера M - число столбцов матрицы
     inc si
     inc si
     sub al,'0'
     mov byte ptr [colum],al
-    call InMatrix
-    call transformation 
-    call InResult
-    mov ah, 09h
+    call InMatrix                          ; вносим числа из буффера в матрицу
+    call transformation                    ; трансформируем матрицу
+    call InResult                          ; заносим матрицу в строку результат
+    mov ah, 09h                            ; вывод результата на консоль
     lea dx, result
     int 21h
     xor ax,ax
     xor bx,bx
     xor dx,dx
-    mov ah, 3Ch
-    lea dx, output
-    xor cx,cx
+    mov ah, 3Ch                           ; функция создания файла
+    lea dx, output                        ; название создаваемого файла
+    xor cx,cx                             ; cx=0 следовательно обычный файл
     int 21h
     jnc continue3 
-   out_str error_message
+   out_str error_message                  ; сообщение об ошибке, если такая есть
    jmp exit
   continue3:
-   mov handle_output,ax
-   mov bx,ax
-   mov ah,40h
-   lea dx,result
-   mov cx, sizeResult
+   mov handle_output,ax                   ; запоминаем хэндл
+   mov bx,ax                              ; в bx дескриптор файла для записи
+   mov ah,40h                             ; функция записи в файл
+   lea dx,result                          ; в dx строка, которую записываем, т.е. наш результат
+   mov cx, sizeResult                     ; в cx количество выводимых символов
    int 21h
    jnc continue4
-   out_str error_message
+   out_str error_message                  ; сообщение об ошибке, если такая есть
   continue4:
-   call file_close_output
+   call file_close_output                 ; закрытие файла вывода
  exit:
     mov ax, 4c00h
     int 21h
