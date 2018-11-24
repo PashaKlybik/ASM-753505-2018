@@ -15,9 +15,8 @@ LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 
 
 /*  Make the class name into a global variable  */
-TCHAR szClassName[ ] = _T("CodeBlocksWindowsApp");
-TCHAR textToShow[] = "Some text here!";
-TCHAR path[] = "d://C++//lr7//kappa.bmp";
+TCHAR szClassName[] = "CodeBlocksWindowsApp";
+TCHAR path[] = "kappa.bmp";
 
 bool LoadAndBlitBitmap(LPCSTR, HDC, int, int);
 
@@ -58,7 +57,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     hwnd = CreateWindowEx (
            0,                   /* Extended possibilites for variation */
            szClassName,         /* Classname */
-           _T("Code::Blocks Template Windows App"),       /* Title Text */
+           _T("Lr7 by Meleron"),       /* Title Text */
            WS_OVERLAPPEDWINDOW, /* default window */
            CW_USEDEFAULT,       /* Windows decides the position */
            CW_USEDEFAULT,       /* where the window ends up on the screen */
@@ -97,22 +96,16 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HDC hdc, hdcMem;
+    HDC hdc;
     PAINTSTRUCT ps;
-    RECT rect;
     POINT p;
-    HBITMAP hBitmap = NULL;
-    HBRUSH brush = NULL;
-    HGDIOBJ oldBitmap = NULL;
-    BITMAP bitmap;
     HWND button;
     switch (message)                  /* handle the messages */
     {
         case WM_CREATE:
-            hBitmap = (HBITMAP)LoadImage(NULL, "d://C++//lr7//kappa.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
             button = CreateWindow("button", "Erase",
                                   WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 10, 100, 30,
-                                  hwnd, (HMENU) ID_BTN, GetModuleHandle(NULL), NULL);
+                                  hwnd, (HMENU) ID_BTN, NULL, NULL);
             break;
         case WM_COMMAND:
             switch(LOWORD(wParam)){
@@ -146,13 +139,13 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     return 0;
 }
 
-bool LoadAndBlitBitmap(LPCSTR szFileName, HDC hWinDC, int x, int y)
+bool LoadAndBlitBitmap(LPCSTR path, HDC hWinDC, int x, int y)
 {
     HBITMAP hOldBmp;
 	HBITMAP hBitmap;
 	BITMAP bitmap;
 	HDC hLocalDC;
-	hBitmap = (HBITMAP)LoadImage(NULL, szFileName, IMAGE_BITMAP, 0, 0,
+	hBitmap = (HBITMAP)LoadImage(NULL, path, IMAGE_BITMAP, 0, 0,
 		LR_LOADFROMFILE);
 
 	hLocalDC = CreateCompatibleDC(hWinDC);
@@ -160,7 +153,6 @@ bool LoadAndBlitBitmap(LPCSTR szFileName, HDC hWinDC, int x, int y)
 	BitBlt(hWinDC, x, y, bitmap.bmWidth, bitmap.bmHeight,
 		hLocalDC, 0, 0, SRCCOPY);
 
-	SelectObject(hLocalDC, hOldBmp);
 	DeleteDC(hLocalDC);
 	DeleteObject(hBitmap);
 	return true;
