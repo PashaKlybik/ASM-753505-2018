@@ -15,7 +15,7 @@
 	StringResult db 200 dup (' ')
 	EndLine db 13, 10
 	handle dw ?
-	OutFileName db "MatrixToString.txt"
+	OutFileName db "output.txt"
 
 
 .code
@@ -37,15 +37,18 @@ proc MatrixMultiply
 	lea bx, MatrixResult
 	mov dx, n1	
 
-rowCycle:		mov cx, m2
+rowCycle:	
+	mov cx, m2
 	push dx
 	
-columnCycle:		xor ax, ax
+columnCycle:	
+	xor ax, ax
 	mov [bx], ax
 	push cx
 	mov cx, m1
 	
-multiply:		mov ax, word ptr [di]
+multiply:	
+	mov ax, word ptr [di]
 	mov dx, word ptr [si]
 	imul dx
 	
@@ -58,7 +61,7 @@ multiply:		mov ax, word ptr [di]
 	imul dx
 	add si, ax		; Переход к следующему элементу столбца второй матрицы
 
-loop multioly
+loop multiply
 	
 	add bx, 2			; Переход к следующему элементу строки матрицы-результата
 
@@ -198,7 +201,7 @@ number:
 	inc di
 	inc di
 	xor bp, bp
-	jmp beg
+	jmp begin
 endOfString:
 	ret
 endp StringToMatrix
