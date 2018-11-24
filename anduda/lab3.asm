@@ -247,8 +247,21 @@ proc division
 	not dx
 	positive1:
 	idiv bx
- ret
+	ret
 endp division
+
+proc err1
+	cmp a, -32768
+	jne exitErr1
+	cmp b, -1
+	jne exitErr1
+	mov bp, 5
+	lea dx, zeroMsg
+	mov ah, 9
+	int 21h
+exitErr1:
+	ret
+endp err1
 
 start:
 	mov ax, @data
@@ -256,6 +269,9 @@ start:
 	
 	call inputA
 	call inputB
+	call err1
+	cmp bp, 5
+	je endprog
 	call division
 	call output
 
