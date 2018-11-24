@@ -28,9 +28,9 @@ model small
         ja chech
         sub al, '0'
         xchg ax, cx
-        mul ten
-        jc chech
+        mul ten        
         add ax, cx
+        jc chech
         xchg ax, cx
         dec bx
         test bx, bx
