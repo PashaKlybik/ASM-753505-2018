@@ -1,5 +1,3 @@
-6) Remove from the line all duplicate characters (Keep only the first character from the duplicate).
-
 .model small
 .stack 100h
 .data
@@ -9,98 +7,95 @@ string db 100 dup ('$')
 newLine db 10, 13, '$'
 .code
 printNewLine proc
-    push AX
-    push DX
-    lea DX, newLine
-    mov AH,09h
-    int 21h
-    pop DX
-    pop AX
-    ret
+	push AX
+	push DX
+	lea DX, newLine
+	mov AH,09h
+	int 21h
+	pop DX
+	pop AX
+	ret
 printNewLine endp
 removeDuplicateCharacters proc
-    push AX
-    push SI
-    push CX
-    push DI
+	push AX
+	push SI
+	push CX
+	push DI
 
-    mov AX, 0
-    lea SI, string
-    mov AL, stringSize
-    add SI, AX
-	mov CX, 24h
-    mov [SI], CX
+	mov AH, 0
+	lea SI, string
+	mov AL, stringSize
+	add SI, AX
+	mov AL, 24h
+	mov [SI],  AL
 
-    mov CX, 0
-    lea SI, string 
-    CLD
-    nextSymbol:
-        LODSB
+	mov CX, 0
+	lea SI, string 
+	CLD
+	nextSymbol:
+		LODSB
 
-        cmp AL, 24h
-        je exit
+		cmp AL, 24h
+		je exit
 
-        mov DI, SI
-        scan:
+		mov DI, SI
+		scan:
 
-        mov CX, 0
-        mov CL, stringSize
-        sub CX, DI
-        add CX, 2
+		mov CH, 0
+		mov CL, stringSize
+		sub CX, DI
+		add CX, 2
 
-        cmp CX, 0
-        je nextSymbol
+		cmp CX, 0
+		je nextSymbol
 
-        repne    SCASB
-        je found
+		repne	SCASB
+		je found
 
-        jmp nextSymbol
+		jmp nextSymbol
 
-        found:
+		found:
 
-        push SI
-        push DI
-        mov SI, DI
-        dec DI
-        inc CX
-        rep MOVSB
+		push SI
+		push DI
+		mov SI, DI
+		dec DI
+		inc CX
+		rep MOVSB
 
-        pop DI
-        pop SI
-        dec stringSize
-        dec DI
+		pop DI
+		pop SI
+		dec stringSize
+		dec DI
 
-        jmp scan
+		jmp scan
 
-        dec CX
-    exit:
-    pop DI
-    pop CX
-    pop SI
-    pop AX
-    ret
+	exit:
+	pop DI
+	pop CX
+	pop SI
+	pop AX
+	ret
 removeDuplicateCharacters endp
 main:
-    mov AX, @data
+	mov AX, @data
     mov DS, ax
-    mov     es,ax
+	mov     es,ax
 
-    mov ah, 0Ah
-    lea dx, bufferSize
-    int 21h
+	mov ah, 0Ah
+	lea dx, bufferSize
+	int 21h
 
+	call printNewLine
 
-    call printNewLine
+	call removeDuplicateCharacters
+	lea DX, string
+	mov AH, 09h
+	int 21h	
 
-    call removeDuplicateCharacters
-    lea DX, string
-    mov AH, 09h
-    int 21h    
+	call printNewLine
 
-    call printNewLine
-
-      
-    MOV AX, 4c00h
-    INT 21h
+	MOV AX, 4c00h
+	INT 21h
 
 end main
