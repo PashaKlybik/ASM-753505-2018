@@ -4,70 +4,70 @@
 #include "main.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-TCHAR mainMessage[] = "Мой текст!"; // строка с сообщением
+TCHAR mainMessage[] = "РњРѕР№ С‚РµРєСЃС‚!"; // СЃС‚СЂРѕРєР° СЃ СЃРѕРѕР±С‰РµРЅРёРµРј
 WORD xPos, yPos, GxPos, GyPos;
 int nTimerID;
 LPCSTR image = "picture.bmp";
 int flg = 0, ClickFlg = 0, op1 = 1, op2 = 0, op3 = 0, op4 = 0;
 int t = 0;
-// Управляющая функция:
-int WINAPI WinMain(HINSTANCE hInst, // дескриптор экземпляра приложения
-                   HINSTANCE hPrevInst, // не используем
-                   LPSTR lpCmdLine, // не используем
-                   int nCmdShow) // режим отображения окошка
+// РЈРїСЂР°РІР»СЏСЋС‰Р°СЏ С„СѓРЅРєС†РёСЏ:
+int WINAPI WinMain(HINSTANCE hInst, // РґРµСЃРєСЂРёРїС‚РѕСЂ СЌРєР·РµРјРїР»СЏСЂР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+                   HINSTANCE hPrevInst, // РЅРµ РёСЃРїРѕР»СЊР·СѓРµРј
+                   LPSTR lpCmdLine, // РЅРµ РёСЃРїРѕР»СЊР·СѓРµРј
+                   int nCmdShow) // СЂРµР¶РёРј РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РѕРєРѕС€РєР°
 {
-    TCHAR szClassName[] = "Мой класс"; // строка с именем класса
-    HWND hMainWnd; // создаём дескриптор будущего окошка
-    MSG msg; // создём экземпляр структуры MSG для обработки сообщений
+    TCHAR szClassName[] = "РњРѕР№ РєР»Р°СЃСЃ"; // СЃС‚СЂРѕРєР° СЃ РёРјРµРЅРµРј РєР»Р°СЃСЃР°
+    HWND hMainWnd; // СЃРѕР·РґР°С‘Рј РґРµСЃРєСЂРёРїС‚РѕСЂ Р±СѓРґСѓС‰РµРіРѕ РѕРєРѕС€РєР°
+    MSG msg; // СЃРѕР·РґС‘Рј СЌРєР·РµРјРїР»СЏСЂ СЃС‚СЂСѓРєС‚СѓСЂС‹ MSG РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     static HWND hButton, hButton2, hButton3;
-    WNDCLASSEX wc; // создаём экземпляр, для обращения к членам класса WNDCLASSEX
-    wc.cbSize        = sizeof(wc); // размер структуры (в байтах)
-    wc.style         = CS_HREDRAW | CS_VREDRAW ; // стиль класса окошка
-    wc.lpfnWndProc   = WndProc; // указатель на пользовательскую функцию
-    wc.lpszMenuName  = NULL; // указатель на имя меню (у нас его нет)
-    wc.lpszClassName = szClassName; // указатель на имя класса
-    wc.cbWndExtra    = NULL; // число освобождаемых байтов в конце структуры
-    wc.cbClsExtra    = NULL; // число освобождаемых байтов при создании экземпляра приложения
-    wc.hIcon         = LoadIcon(NULL, IDI_WINLOGO); // декриптор пиктограммы
-    wc.hIconSm       = LoadIcon(NULL, IDI_WINLOGO); // дескриптор маленькой пиктограммы (в трэе)
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW); // дескриптор курсора
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); // дескриптор кисти для закраски фона окна
-    wc.hInstance     = hInst; // указатель на строку, содержащую имя меню, применяемого для класса
+    WNDCLASSEX wc; // СЃРѕР·РґР°С‘Рј СЌРєР·РµРјРїР»СЏСЂ, РґР»СЏ РѕР±СЂР°С‰РµРЅРёСЏ Рє С‡Р»РµРЅР°Рј РєР»Р°СЃСЃР° WNDCLASSEX
+    wc.cbSize        = sizeof(wc); // СЂР°Р·РјРµСЂ СЃС‚СЂСѓРєС‚СѓСЂС‹ (РІ Р±Р°Р№С‚Р°С…)
+    wc.style         = CS_HREDRAW | CS_VREDRAW ; // СЃС‚РёР»СЊ РєР»Р°СЃСЃР° РѕРєРѕС€РєР°
+    wc.lpfnWndProc   = WndProc; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєСѓСЋ С„СѓРЅРєС†РёСЋ
+    wc.lpszMenuName  = NULL; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РёРјСЏ РјРµРЅСЋ (Сѓ РЅР°СЃ РµРіРѕ РЅРµС‚)
+    wc.lpszClassName = szClassName; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РёРјСЏ РєР»Р°СЃСЃР°
+    wc.cbWndExtra    = NULL; // С‡РёСЃР»Рѕ РѕСЃРІРѕР±РѕР¶РґР°РµРјС‹С… Р±Р°Р№С‚РѕРІ РІ РєРѕРЅС†Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
+    wc.cbClsExtra    = NULL; // С‡РёСЃР»Рѕ РѕСЃРІРѕР±РѕР¶РґР°РµРјС‹С… Р±Р°Р№С‚РѕРІ РїСЂРё СЃРѕР·РґР°РЅРёРё СЌРєР·РµРјРїР»СЏСЂР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    wc.hIcon         = LoadIcon(NULL, IDI_WINLOGO); // РґРµРєСЂРёРїС‚РѕСЂ РїРёРєС‚РѕРіСЂР°РјРјС‹
+    wc.hIconSm       = LoadIcon(NULL, IDI_WINLOGO); // РґРµСЃРєСЂРёРїС‚РѕСЂ РјР°Р»РµРЅСЊРєРѕР№ РїРёРєС‚РѕРіСЂР°РјРјС‹ (РІ С‚СЂСЌРµ)
+    wc.hCursor       = LoadCursor(NULL, IDC_ARROW); // РґРµСЃРєСЂРёРїС‚РѕСЂ РєСѓСЂСЃРѕСЂР°
+    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); // РґРµСЃРєСЂРёРїС‚РѕСЂ РєРёСЃС‚Рё РґР»СЏ Р·Р°РєСЂР°СЃРєРё С„РѕРЅР° РѕРєРЅР°
+    wc.hInstance     = hInst; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂРѕРєСѓ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ РёРјСЏ РјРµРЅСЋ, РїСЂРёРјРµРЅСЏРµРјРѕРіРѕ РґР»СЏ РєР»Р°СЃСЃР°
    	wc.lpszMenuName  = "MAINMENU";
    	SetWindowLong(hMainWnd, GWL_STYLE, GetWindowLong(hMainWnd, GWL_STYLE) and not WS_THICKFRAME);
     if(!RegisterClassEx(&wc)){
-        // в случае отсутствия регистрации класса:
-        MessageBox(NULL, "Не получилось зарегистрировать класс!", "Ошибка", MB_OK);
-        return NULL; // возвращаем, следовательно, выходим из WinMain
+        // РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РєР»Р°СЃСЃР°:
+        MessageBox(NULL, "РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РєР»Р°СЃСЃ!", "РћС€РёР±РєР°", MB_OK);
+        return NULL; // РІРѕР·РІСЂР°С‰Р°РµРј, СЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ, РІС‹С…РѕРґРёРј РёР· WinMain
     }
-    // Функция, создающая окошко:
+    // Р¤СѓРЅРєС†РёСЏ, СЃРѕР·РґР°СЋС‰Р°СЏ РѕРєРѕС€РєРѕ:
     hMainWnd = CreateWindow(
-        szClassName, // имя класса
-        "Лабораторная работа №7", // имя окошка (то что сверху)
-        WS_OVERLAPPED, // режимы отображения окошка
-        CW_USEDEFAULT, // позиция окошка по оси х
-        NULL, // позиция окошка по оси у (раз дефолт в х, то писать не нужно)
-        CW_USEDEFAULT, // ширина окошка
-        NULL, // высота окошка (раз дефолт в ширине, то писать не нужно)
-        (HWND)NULL, // дескриптор родительского окна
-        NULL, // дескриптор меню
-        hInst, // дескриптор экземпляра приложения
-        NULL); // ничего не передаём из WndProc
+        szClassName, // РёРјСЏ РєР»Р°СЃСЃР°
+        "Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° в„–7", // РёРјСЏ РѕРєРѕС€РєР° (С‚Рѕ С‡С‚Рѕ СЃРІРµСЂС…Сѓ)
+        WS_OVERLAPPED, // СЂРµР¶РёРјС‹ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РѕРєРѕС€РєР°
+        CW_USEDEFAULT, // РїРѕР·РёС†РёСЏ РѕРєРѕС€РєР° РїРѕ РѕСЃРё С…
+        NULL, // РїРѕР·РёС†РёСЏ РѕРєРѕС€РєР° РїРѕ РѕСЃРё Сѓ (СЂР°Р· РґРµС„РѕР»С‚ РІ С…, С‚Рѕ РїРёСЃР°С‚СЊ РЅРµ РЅСѓР¶РЅРѕ)
+        CW_USEDEFAULT, // С€РёСЂРёРЅР° РѕРєРѕС€РєР°
+        NULL, // РІС‹СЃРѕС‚Р° РѕРєРѕС€РєР° (СЂР°Р· РґРµС„РѕР»С‚ РІ С€РёСЂРёРЅРµ, С‚Рѕ РїРёСЃР°С‚СЊ РЅРµ РЅСѓР¶РЅРѕ)
+        (HWND)NULL, // РґРµСЃРєСЂРёРїС‚РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
+        NULL, // РґРµСЃРєСЂРёРїС‚РѕСЂ РјРµРЅСЋ
+        hInst, // РґРµСЃРєСЂРёРїС‚РѕСЂ СЌРєР·РµРјРїР»СЏСЂР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+        NULL); // РЅРёС‡РµРіРѕ РЅРµ РїРµСЂРµРґР°С‘Рј РёР· WndProc
     hButton = CreateWindow ((LPCSTR)"button", (LPCSTR)"Close", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,  150, 600, 200, 30, hMainWnd, (HMENU)101, hInst, 0);
     hButton2 = CreateWindow ((LPCSTR)"button", (LPCSTR)"Switch", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,  450, 600, 200, 30, hMainWnd, (HMENU)111, hInst, 0);
     hButton3 = CreateWindow ((LPCSTR)"button", (LPCSTR)"Clear", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,  750, 600, 200, 30, hMainWnd, (HMENU)1000, hInst, 0);
 	if(!hMainWnd || !hButton || !hButton2){
-        // в случае некорректного создания окошка (неверные параметры и тп):
-        MessageBox(NULL, "Не получилось создать окно!", "Ошибка", MB_OK);
+        // РІ СЃР»СѓС‡Р°Рµ РЅРµРєРѕСЂСЂРµРєС‚РЅРѕРіРѕ СЃРѕР·РґР°РЅРёСЏ РѕРєРѕС€РєР° (РЅРµРІРµСЂРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ Рё С‚Рї):
+        MessageBox(NULL, "РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РѕРєРЅРѕ!", "РћС€РёР±РєР°", MB_OK);
         return NULL;
     }
-    ShowWindow(hMainWnd, nCmdShow); // отображаем окошко
-    UpdateWindow(hMainWnd); // обновляем окошко
-    while(GetMessage(&msg, NULL, NULL, NULL)){ // извлекаем сообщения из очереди, посылаемые фу-циями, ОС
-        TranslateMessage(&msg); // интерпретируем сообщения
-        DispatchMessage(&msg); // передаём сообщения обратно ОС
+    ShowWindow(hMainWnd, nCmdShow); // РѕС‚РѕР±СЂР°Р¶Р°РµРј РѕРєРѕС€РєРѕ
+    UpdateWindow(hMainWnd); // РѕР±РЅРѕРІР»СЏРµРј РѕРєРѕС€РєРѕ
+    while(GetMessage(&msg, NULL, NULL, NULL)){ // РёР·РІР»РµРєР°РµРј СЃРѕРѕР±С‰РµРЅРёСЏ РёР· РѕС‡РµСЂРµРґРё, РїРѕСЃС‹Р»Р°РµРјС‹Рµ С„Сѓ-С†РёСЏРјРё, РћРЎ
+        TranslateMessage(&msg); // РёРЅС‚РµСЂРїСЂРµС‚РёСЂСѓРµРј СЃРѕРѕР±С‰РµРЅРёСЏ
+        DispatchMessage(&msg); // РїРµСЂРµРґР°С‘Рј СЃРѕРѕР±С‰РµРЅРёСЏ РѕР±СЂР°С‚РЅРѕ РћРЎ
     }
-    return msg.wParam; // возвращаем код выхода из приложения
+    return msg.wParam; // РІРѕР·РІСЂР°С‰Р°РµРј РєРѕРґ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
@@ -123,7 +123,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
       ReleaseDC(hWnd, hDC);
 
         break;
-   /* case WM_PAINT: // если нужно нарисовать, то:
+   /* case WM_PAINT: // РµСЃР»Рё РЅСѓР¶РЅРѕ РЅР°СЂРёСЃРѕРІР°С‚СЊ, С‚Рѕ:
         	hDC = BeginPaint(hWnd, &PaintStruct);
             hBitmap = LoadImage(NULL, "picture.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
             if ( !hBitmap ){
@@ -133,7 +133,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
             GetObject(hBitmap, sizeof(BITMAP), &Bitmap);
             hCompatibleDC = CreateCompatibleDC(hDC);
 
-            hOldBitmap = SelectObject(hCompatibleDC, hBitmap);
+            hOldBitmap = SelectObject(hCompatibleDC, hBitmap); 
             GetClientRect(hWnd, &Rect);
 
             BitBlt(hDC, 0, 0, Rect.right, Rect.bottom, hCompatibleDC,nHPos, nVPos, SRCCOPY);
@@ -258,7 +258,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 			{
 				case CLOSE:
 
-				     switch ((int)MessageBox(NULL, "Вы уверены, что хотите выйти?", "Предупреждение",
+				     switch ((int)MessageBox(NULL, "Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?", "РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ",
                              MB_ICONQUESTION | MB_YESNO))
 				     {
 					     case IDYES: DestroyWindow(hWnd);break;
@@ -271,7 +271,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 					{
 						if(ClickFlg == 0)
 						{
-							MessageBox(NULL, "Не нарисовано изображение!","Ошибка", MB_OK);
+							MessageBox(NULL, "РќРµ РЅР°СЂРёСЃРѕРІР°РЅРѕ РёР·РѕР±СЂР°Р¶РµРЅРёРµ!","РћС€РёР±РєР°", MB_OK);
 							break;
 						}
 						image = "picture1.bmp";
@@ -314,7 +314,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 					flg = 0;
 					InvalidateRect(hWnd, 0, TRUE);
 					UpdateWindow(hWnd);
-					MessageBox(NULL, "Очищено","Сообщение", MB_OK);
+					MessageBox(NULL, "РћС‡РёС‰РµРЅРѕ","РЎРѕРѕР±С‰РµРЅРёРµ", MB_OK);
 					break;
 			}
 			break;
@@ -322,12 +322,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     	PostQuitMessage(NULL);
 		DestroyWindow(hWnd);
 		break;
-    case WM_DESTROY: // если окошко закрылось, то:
-        PostQuitMessage(NULL); // отправляем WinMain() сообщение WM_QUIT
+    case WM_DESTROY: // РµСЃР»Рё РѕРєРѕС€РєРѕ Р·Р°РєСЂС‹Р»РѕСЃСЊ, С‚Рѕ:
+        PostQuitMessage(NULL); // РѕС‚РїСЂР°РІР»СЏРµРј WinMain() СЃРѕРѕР±С‰РµРЅРёРµ WM_QUIT
         break;
     default:
-        return DefWindowProc(hWnd, uMsg, wParam, lParam); // если закрыли окошко
+        return DefWindowProc(hWnd, uMsg, wParam, lParam); // РµСЃР»Рё Р·Р°РєСЂС‹Р»Рё РѕРєРѕС€РєРѕ
     }
-    return NULL; // возвращаем значение
+    return NULL; // РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ
 }
 
