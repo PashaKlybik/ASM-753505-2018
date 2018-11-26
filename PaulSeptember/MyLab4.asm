@@ -3,6 +3,7 @@
 .data
 	buffer db 255,0,256 dup (?)
 	endline db 13,10,'$'
+	spaces db '?! ,.'
 .code
 
 printString proc
@@ -13,6 +14,16 @@ printString proc
     ret
 printString endp
 
+
+printSymbol proc
+    push ax
+    mov ah,02h
+    int 21h 
+    pop ax
+    ret
+printSymbol endp
+
+
 endl proc
     push dx
     lea dx,endline
@@ -21,26 +32,44 @@ endl proc
     ret
 endl endp
 
+
+isSpace proc
+	push di
+	push cx
+	lea di,spaces
+	mov cx,5
+	repne scasb
+	pop cx
+	pop di
+	ret
+isSpace endp
+
+
 find proc 
-	
+	push ax
+	xor ax,ax
 	mov di,offset buffer	
 	add di,2
 	mov si,di
 
 	loopRight:
 		cmp byte ptr[si],'$'
-		je exit
-		cmp byte ptr[si],' '
+		je exit	
+		mov al,byte ptr[si]
+		call isSpace		
 		je endOfWord
+
 		inc si
 	jmp loopRight
 
 	endOfWord:
 		push si
 		push di
-
+		cmp si,di
+		je printSpace
 		dec si
 		wordCheck:
+			;jmp nePalindrom   KOSTYL!!!
 			sub si,di
 			cmp si,1
 			jb palindrom
@@ -58,10 +87,13 @@ find proc
 			pop si
 			mov cx,si
 			sub cx,di
-			cmp byte ptr[di],' '
-			je again
+
+			mov al,byte ptr[di]
+			;call isSpace
+			;je again
+
 			call printWord
-			inc si
+			;inc si
 			mov di,si
 		jmp loopRight
 			
@@ -69,12 +101,23 @@ find proc
 			pop di
 			pop si
 		again:	
-			inc si
+			;inc si
 			mov di,si
 		jmp loopRight
+
+		printSpace:
+			pop di
+			pop si
+			mov dl,byte ptr[di]
+			call printSymbol
+			inc si
+			inc di
+		jmp loopRight
 	exit:
+	pop ax
 	ret
 find endp
+
 
 stringInput proc 
     push ax
@@ -97,16 +140,17 @@ stringInput proc
     ret
 stringInput endp
 
+
 printWord proc
         push ax
         push cx
         push dx
 	push si
         sub si, cx
-        inc cx
+        ;inc cx
         mov ah, 02h
         output_loop:
-            mov dx, [si]
+            mov dl, byte ptr [si]
             int 21h
             inc si
         loop output_loop 
@@ -117,6 +161,7 @@ printWord proc
         ret
 printWord endp
 
+
 start:
 	mov ax,@data
 	mov ds,ax
@@ -124,6 +169,7 @@ start:
 	call stringInput
 	call endl
 	call find
+	;call endl
 	mov ax,4c00h
 	int 21h
 end start
