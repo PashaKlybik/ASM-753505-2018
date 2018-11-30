@@ -11,7 +11,7 @@ array dw 50*50 dup(0)
 array2 dw 50*50 dup(0)
 array3 dw 50*50 dup(0)
 msgErr db 13, 10, "Repeat please!$"
-msgOv db 13, 10, "Overfloat in process$"
+
 msgRo db 13, 10, "Input count of rows: $"
 msgCo db 13, 10, "Input count of colums: $"
 msgEl db 13, 10, "Input elements: ", 13, 10, "$"
@@ -29,26 +29,70 @@ isnegative dw ?
 
 .code	
 
+InputUsInt proc	;РІРІРѕРґ РІ РђX 
+	
+	mov temporary, 0
+	entersymbus:
+		MOV AH, 01h
+		INT 21h
+		xor ah, ah
+		CMP AX, 13 ;РїСЂРѕРІРµСЂРєР° РЅР° СЌРЅС‚СЂ
+		JZ end1us
+		CMP AX, 48 ;РїСЂРѕРІРµСЂРєР° РЅР° 0-9
+		JC errorus
+		CMP AX, 57
+		JZ continus
+		JNC errorus
+
+	continus:
+		SUB AL, 48
+		MOV AH, 0
+		MOV BX, AX
+		MOV AX, temporary
+		MUL u
+		JC errorus
+		ADD AX, BX
+		JC errorus
+		MOV temporary, AX
+		JMP entersymbus
+
+	errorus:
+		LEA DX, repeat
+		MOV AH, 09h
+		INT 21h
+		MOV AX, 0
+		MOV temporary, AX
+		JMP entersymbus
+
+	end1us:
+
+	ret
+InputUsInt endp
+
 proc InputElements
-mov ax, rows
-mul cols ;v ax kol elementov
-mov cx, ax
-qwe:
-	call inputint
-	mov ax, temporary
-	mov [si], ax
-	inc si 
-	inc si
+	mov ax, rows
+	mul cols ;v ax kol elementov
+	mov cx, ax
+	qwe:
+		call inputint
+
+		push temporary
+		pop ax
+
+		mov ax, temporary
+		mov [si], ax
+		inc si 
+		inc si
 	loop qwe
 
 	ret
 InputElements endp
 
 InputInt proc
-push ax
-push bx
-push cx
-push dx
+	push ax
+	push bx
+	push cx
+	push dx
 	
 	mov temporary, 0
 	mov currentpos, 0
@@ -68,12 +112,11 @@ push dx
 		jz minus	
 
 	usiallint:
-		CMP AX, 13 ;проверка на энтр
+		CMP AX, 13 ;РїСЂРѕРІРµСЂРєР° РЅР° СЌРЅС‚СЂ
 		JZ end1
-		CMP AX, 48 ;проверка на 0-9
+		CMP AX, 48 ;РїСЂРѕРІРµСЂРєР° РЅР° 0-9
 		JC error
 		CMP AX, 58
-		;Jc usiallint
 		JNC error
 
 	contin:
@@ -138,248 +181,205 @@ InputInt endp
 
 proc OutputMass
 
-
 	MOV BX, rows
 	PUSH BX
 	MOV BX, cols
 	PUSH BX
 
-outstr:
-	MOV AX, [SI]
-	TEST AX, 1000000000000000b
-	JZ next
-	LEA DX, strmin
-	PUSH AX
-	MOV AH, 09h
-	INT 21h
-	POP AX
-	NEG AX
+	outstr:
+		MOV AX, [SI]
+		TEST AX, 1000000000000000b
+		JZ next
+		LEA DX, strmin
+		PUSH AX
+		MOV AH, 09h
+		INT 21h
+		POP AX
+		NEG AX
 
-next:
-	MOV DX, 0
-	IDIV u
-	PUSH DX
-	MOV DX, 0
-	INC CX
-	CMP AX, 0
-	JNZ next
+	next:
+		MOV DX, 0
+		IDIV u
+		PUSH DX
+		MOV DX, 0
+		INC CX
+		CMP AX, 0
+		JNZ next
 
-cycle:
-	POP DX
-	MOV DH, 0
-	ADD DL, 48
-	MOV AH, 02h
-	INT 21h
-	LOOP cycle
+	cycle:
+		POP DX
+		MOV DH, 0
+		ADD DL, 48
+		MOV AH, 02h
+		INT 21h
+		LOOP cycle
 
-	INC SI
-	INC SI
-	POP BX
-	DEC BX
-	CMP BX, 0
-	JZ zero
-	PUSH BX
-	MOV DL, 9
-	MOV AH, 2
+		INC SI
+		INC SI
+		POP BX
+		DEC BX
+		CMP BX, 0
+		JZ zero
+		PUSH BX
+		MOV DL, 9
+		MOV AH, 2
 
-	INT 21h
-	JMP outstr
+		INT 21h
+		JMP outstr
 
-zero:
-	POP BX
-	DEC BX
-	CMP BX, 0
-	JZ zero2
-	PUSH BX
-	MOV BX, cols
-	PUSH BX
-	LEA DX, msgEn
-	MOV AH, 09h
-	INT 21h
-	JMP outstr
+	zero:
+		POP BX
+		DEC BX
+		CMP BX, 0
+		JZ zero2
+		PUSH BX
+		MOV BX, cols
+		PUSH BX
+		LEA DX, msgEn
+		MOV AH, 09h
+		INT 21h
+		JMP outstr
 
-zero2:
+	zero2:
 
-ret
+	ret
 OutputMass endp
 
-
-
 start:
-MOV AX, @data
-MOV DS, AX
+	MOV AX, @data
+	MOV DS, AX
 
-startRo:
-	LEA DX, msgRo
-	MOV AH, 09h
-	INT 21h
-	enterRo:
-	MOV AH, 01h
-	INT 21h
-	MOV AH, 0
-	CMP AX, 13
-	JZ startCo
-	CMP AX, 48
-	JC errorRo
-	CMP AX, 57
-	JZ J9a
-	JNC errorRo
-	J9a:
-	SUB AL, 48
-	MOV AH, 0
-	MOV BX, AX
-	MOV AX, rows
-	MUL u
-	JC errorRo
-	ADD AX, BX
-	JC errorRo
-	MOV rows, AX
-	JMP enterRo
+	lea dx, msgCo
+	mov ah, 09h
+	int 21h
+	call inputusint
+	push temporary
+	pop cols
 
-errorRo:
-	LEA DX, msgErr
-	MOV AH, 09h
-	INT 21h
-	MOV AX, 0
-	MOV rows, AX
-	MOV cols, AX
-	JMP startRo
+	lea dx, msgRo
+	mov ah, 09h
+	int 21h
+	call inputusint
+	push temporary
+	pop rows
 
-startCo:
-	LEA DX, msgCo
-	MOV AH, 09h
-	INT 21h
-	enterCo:
-	MOV AH, 01h
-	INT 21h
-	MOV AH, 0
-	CMP AX, 13
-	JZ endCo
-	CMP AX, 48
-	JC errorCo
-	CMP AX, 57
-	JZ J9b
-	JNC errorCo
-J9b:
-	SUB AL, 48
-	MOV AH, 0
-	MOV BX, AX
-	MOV AX, cols
-	MUL u
-	JC errorCo
-	ADD AX, BX
-	JC errorCo
-	MOV cols, AX
-	JMP enterCo
+	lea dx, msgEl
+	mov ah, 09h
+	int 21h
 
-errorCo:
-	LEA DX, msgErr
-	MOV AH, 09h
-	INT 21h
-	MOV AX, 0
-	MOV cols, AX
-	JMP startCo
+	LEA SI, array
+	call inputelements
 
-endCo:
-	MOV AX, rows
-	MOV BX, cols
-	MUL BX
-	CMP AX, 0
-	JZ errorRo
-	CMP AX, 2501
-	JC EntOk
-	JMP errorRo
+	lea dx, msgEl
+	mov ah, 09h
+	int 21h
 
-EntOk:
+	LEA SI, array2
+	call inputelements
 
+	mov ax, rows
+	mul cols ;v ax kol elementov
+	mov cx, ax
 
+	mov si, offset array
+	mov di, offset array2
 
-lea dx, msgEl
-mov ah, 09h
-int 21h
+	cycle54:
+		mov ax, [si]
+		cmp ax, 32767
+		jc p1
+		jmp n1
 
-LEA SI, array
-call inputelements
-
-
-lea dx, msgEl
-mov ah, 09h
-int 21h
-
-LEA SI, array2
-call inputelements
-
-mov ax, rows
-mul cols ;v ax kol elementov
-mov cx, ax
-;dec cx
-
-mov si, offset array
-mov di, offset array2
-
-cycle54:
+		n1:
+			mov ax, [di]
+			cmp ax, 32767
+			jc n1p2
+			jmp n1n2
 	
-	mov ax, [si]
-	cmp ax, [di]
-	jnc men
+		n1p2:
+			jmp add2
 
-	mov ax, [di]
-	push ax
-	jmp bol
-	
-	men:
-		push ax
-	bol:
-		inc si
-		inc si
+		n1n2:
+			mov ax, [si]
+			cmp ax, [di]
+			jc add2
+			jmp add1
+
+
+		p1:
+			mov ax, [di]
+			cmp ax, 32767
+			jc p1p2
+			jmp p1n2
+		
+		p1p2:
+			mov ax, [si]
+			cmp ax, [di]
+			jc add2
+			jmp add1
+
+		p1n2:
+			jmp add1
+		
+		add1:
+			push [si]
+			jmp asd
+
+		add2:
+			push [di]
+			jmp asd
+		
+		asd:	
+			inc si
+			inc si
+			inc di
+			inc di
+
+	loop cycle54
+
+	mov ax, rows
+	mul cols ;v ax kol elementov
+	mov cx, ax
+	dec cx
+
+	lea di, array3
+	cycle228:
 		inc di
 		inc di
+	loop cycle228;С‡С‚РѕР±С‹ di СѓРєР°Р·С‹РІР°Р» РЅР° Р»Р°СЃС‚ СЌР»РµРјРµРЅС‚ С†РµРїРѕС‡РєРё
 
-loop cycle54
+	mov ax, rows
+	mul cols ;v ax kol elementov
+	mov cx, ax
 
-mov ax, rows
-mul cols ;v ax kol elementov
-mov cx, ax
-dec cx
-
-lea di, array3
-cycle228:
-	inc di
-	inc di
-	loop cycle228;чтобы di указывал на ласт элемент цепочки
-
-mov ax, rows
-mul cols ;v ax kol elementov
-mov cx, ax
-
-cyclen:
-	pop [di]
-	dec di 
-	dec di
+	cyclen:
+		pop [di]
+		dec di 
+		dec di
 	loop cyclen
 
-LEA DX, msgMa
-MOV AH, 09h
-INT 21h
-LEA SI, array
-call OutputMass
+	LEA DX, msgMa
+	MOV AH, 09h
+	INT 21h
+	LEA SI, array
+	call OutputMass
 
-LEA DX, msgMa2
-MOV AH, 09h
-INT 21h
-LEA SI, array2
-call OutputMass
+	LEA DX, msgMa2
+	MOV AH, 09h
+	INT 21h
+	LEA SI, array2
+	call OutputMass
 
-LEA DX, msgSu
-MOV AH, 09h
-INT 21h
-LEA SI, array3
-call OutputMass
+	LEA DX, msgSu
+	MOV AH, 09h
+	INT 21h
+	LEA SI, array3
+	call OutputMass
 
-lea dx, msgNewLine 
-mov ah, 09h
-int 21h
+	lea dx, msgNewLine 
+	mov ah, 09h
+	int 21h
 
-MOV AH, 4Ch
-INT 21h
+	MOV AH, 4Ch
+	INT 21h
 end start
