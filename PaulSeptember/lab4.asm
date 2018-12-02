@@ -69,7 +69,7 @@ find proc
 		je printSpace
 		dec si
 		wordCheck:
-			;jmp nePalindrom   KOSTYL!!!
+			;jmp nePalindrom   ;Just crutch
 			sub si,di
 			cmp si,1
 			jb palindrom
@@ -87,13 +87,8 @@ find proc
 			pop si
 			mov cx,si
 			sub cx,di
-
 			mov al,byte ptr[di]
-			;call isSpace
-			;je again
-
 			call printWord
-			;inc si
 			mov di,si
 		jmp loopRight
 			
@@ -101,7 +96,6 @@ find proc
 			pop di
 			pop si
 		again:	
-			;inc si
 			mov di,si
 		jmp loopRight
 
@@ -147,7 +141,6 @@ printWord proc
         push dx
 	push si
         sub si, cx
-        ;inc cx
         mov ah, 02h
         output_loop:
             mov dl, byte ptr [si]
@@ -169,7 +162,7 @@ start:
 	call stringInput
 	call endl
 	call find
-	;call endl
+
 	mov ax,4c00h
 	int 21h
 end start
