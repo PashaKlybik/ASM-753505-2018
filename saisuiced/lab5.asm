@@ -12,7 +12,7 @@
     mMessage db 'Write M number:', 13, 10, '$'
     aMessage db 'Write A number:', 13, 10, '$'
     matrixMessage db 'Write your matrix elements:', 13, 10, '$'
-    showFirstMatrix db 'Your first matrix:', 13, 10, '$'
+    showFirstMatrix db 'Your matrix:', 13, 10, '$'
     showResult db 'Program result:', 13, 10, '$'
     symbError db 'Invalid input', 13, 10, '$'
     endline db 13, 10, '$'
@@ -163,7 +163,7 @@ mInput proc ; input of M
     jns mok
     call Error
     mok:
-        cmp al, 13
+        cmp al, 0
         jne mAbsEnd
         call Error
         mAbsEnd:
@@ -193,11 +193,10 @@ matrixInput proc ; input of matrix
     mul M
     xor cx, cx
     mov cx, ax
+    xor ax, ax
     superLoop:
         call Input
         mov ax, intToOut
-        cmp ax, 13
-        je er
         mov matrix[si], ax
         inc si
         inc si
@@ -206,8 +205,6 @@ matrixInput proc ; input of matrix
     pop si
     pop ax
     ret
-    er:
-        call Error
 matrixInput endp
 
 matrixOutput proc ; output of matrix
@@ -257,7 +254,7 @@ compareWithA proc; main task
         cmp matrix[si], 0
         je doAnyway
         cmp matrix[si], bx
-        jl stp
+        jle stp
         doAnyway:
             mov matrix[si], 0
             stp:
