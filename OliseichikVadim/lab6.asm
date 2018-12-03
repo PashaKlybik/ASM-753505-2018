@@ -31,18 +31,18 @@ jmp to_ret
 
 isE: 
 cmp al, 12h           ; 12h = 'e' 
-jne to_original_handler ; переход, когда в al не 12h
+jne to_original_int15 ; переход, когда в al не 12h
 mov al, 06h           ; 06h = '5' 
 jmp to_ret 
 
 to_ret: 
-jmp dword ptr cs:handler_vector ; переходит по адресу 
-                          ; cs:handler_vector, где хранится 
+jmp dword ptr cs:int15_vector ; переходит по адресу 
+                          ; cs:int15_vector, где хранится 
                           ; оригинальная функция для обработки 
                           ; прерывания, которое выводит символ 
                           ; из регистра al на экран
-to_original_handler: 
-jmp dword ptr cs:handler_vector 
+to_original_int15: 
+jmp dword ptr cs:int15_vector 
 
 handler_vector dd ?     ; здесь хранится адрес 
                         ; предыдущего обработчика
@@ -50,12 +50,12 @@ resident endp
 
 installation: 
 ; скопировать адрес предыдущего обработчика 
-; в переменную handler_vector
+; в переменную int15_vector
 mov ax, 3515h        ; AH = 35h, AL = номер прерывания
 int 21h              ; функция DOS: считать 
                      ; адрес обработчика прерывания
-mov word ptr handler_vector, bx     ; возвратить смещение в BX  
-mov word ptr handler_vector + 2, es ; и сегментный адрес в ES,
+mov word ptr int15_vector, bx     ; возвратить смещение в BX  
+mov word ptr int15_vector + 2, es ; и сегментный адрес в ES,
                                    ; установить наш обработчик
 mov ax, 2515h        ; AH = 25h, AL = номер прерывания
 mov dx, offset resident ; DS:DX - адрес обработчика
