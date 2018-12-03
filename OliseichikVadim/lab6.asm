@@ -44,7 +44,7 @@ jmp dword ptr cs:int15_vector ; переходит по адресу
 to_original_int15: 
 jmp dword ptr cs:int15_vector 
 
-handler_vector dd ?     ; здесь хранится адрес 
+int15_vector dd ?     ; здесь хранится адрес 
                         ; предыдущего обработчика
 resident endp 
 
