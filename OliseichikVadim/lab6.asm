@@ -1,6 +1,6 @@
 .model tiny
 .code
-org 100h ; начало COM-программы
+org 100h              ; начало COM-программы
 Start: 
 jmp installation 
 
