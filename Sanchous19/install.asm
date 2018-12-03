@@ -12,9 +12,9 @@ org 80h
 org 100h
 
 START:
-    jmp initialize
-    mov ah,4ch
-    int 21h
+    	jmp initialize
+    	mov ah,4ch
+    	int 21h
 	
 	int21hVector dd ?
 	installFlag dw 13579
@@ -26,15 +26,15 @@ START:
 	fileErrorMessage db 'Error with file', 13, 10, '$'
 	endline db 13, 10, '$'
     
-myHandler proc										; Наш обработчик
-    cmp ah, 0Ah
-    je  new0AhFunction
-    jmp dword ptr cs:[int21hVector]
+myHandler proc										; РќР°С€ РѕР±СЂР°Р±РѕС‚С‡РёРє
+    	cmp ah, 0Ah
+    	je  new0AhFunction
+    	jmp dword ptr cs:[int21hVector]
 
-new0AhFunction:										; Новая функция 0Ah
-    push ax
+new0AhFunction:										; РќРѕРІР°СЏ С„СѓРЅРєС†РёСЏ 0Ah
+    	push ax
 	push bx
-	push cx											; Сохранение значений из регистров в стек
+	push cx									; РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЂРµРіРёСЃС‚СЂРѕРІ РІ СЃС‚РµРє
 	push dx
 	push di
 	push si
@@ -48,13 +48,13 @@ new0AhFunction:										; Новая функция 0Ah
 	lea di,inputWord
 	xor bx,bx
 	xor cx,cx
-	call readVocabularyFromFile						; Чтения словаря из файла
+	call readVocabularyFromFile						; Р§С‚РµРЅРёСЏ СЃР»РѕРІР°СЂСЏ РёР· С„Р°Р№Р»Р°
 	lea dx,vocabulary
 	mov ah,09h
 	int 21h
 	call printEndline
 
-inputCharacter:										; Проверка на нажатие клавиши
+inputCharacter:										; РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё
 	mov ah,01h
 	int 21h
 	cmp al,13
@@ -66,7 +66,7 @@ inputCharacter:										; Проверка на нажатие клавиши
 	inc cx
 	jmp inputCharacter
 
-pressedSpace:										; обработка нажатия на клавишу Space
+pressedSpace:										; РѕР±СЂР°Р±РѕС‚РєР° РЅР°Р¶Р°С‚РёСЏ РЅР° РєР»Р°РІРёС€Сѓ Space
 	call findWordInVocabulary
 	xor cx,cx
 	lea di,inputWord
@@ -75,17 +75,17 @@ pressedSpace:										; обработка нажатия на клавишу Space
 theEndOfInput:
 	pop es
 	pop ds
-    pop si
+    	pop si
 	pop di
 	pop dx
-	pop cx											; Возвращение значений из стека
+	pop cx											; Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РёР· СЃС‚РµРєР°
 	pop bx
 	pop ax
-    iret
+    	iret
 myHandler endp
 
 
-findWordInVocabulary proc							; Процедура нахождения слова в словаре
+findWordInVocabulary proc							; РџСЂРѕС†РµРґСѓСЂР° РЅР°С…РѕР¶РґРµРЅРёСЏ СЃР»РѕРІР° РІ СЃР»РѕРІР°СЂРµ
 	push ax
 	push bx
 	push cx
@@ -98,32 +98,32 @@ findWordInVocabulary proc							; Процедура нахождения слова в словаре
 compareWords:
 	push cx
 	lea si,inputWord
-	repe cmpsb										; Проверяем слова на равенство
+	repe cmpsb										; РџСЂРѕРІРµСЂСЏРµРј СЃР»РѕРІР° РЅР° СЂР°РІРµРЅСЃС‚РІРѕ
 	je changeWord
 	mov al,10
 	mov cx,50
-	repne scasb										; Ищем начало нового слова 
+	repne scasb										; РС‰РµРј РЅР°С‡Р°Р»Рѕ РЅРѕРІРѕРіРѕ СЃР»РѕРІР° 
 	mov ax,di
 	lea bx,vocabulary
 	sub ax,bx
 	pop cx
-	cmp ax,len										; Проверяем достигли ли мы конца словаря
+	cmp ax,len								; РџСЂРѕРІРµСЂСЏРµРј РґРѕСЃС‚РёРіР»Рё Р»Рё РјС‹ РєРѕРЅС†Р° СЃР»РѕРІР°СЂСЏ
 	je theEndOfFindWord
 	jmp compareWords
 
 changeWord:
 	pop cx
-	call deleteWordFromConsole						; Удаляем слово из консоли
+	call deleteWordFromConsole						; РЈРґР°Р»СЏРµРј СЃР»РѕРІРѕ РёР· РєРѕРЅСЃРѕР»Рё
 printWordInConsole:
 	mov dl,[di]
-	call printSymbol								; Выводим новое слово на консоль
+	call printSymbol								; Р’С‹РІРѕРґРёРј РЅРѕРІРѕРµ СЃР»РѕРІРѕ РЅР° РєРѕРЅСЃРѕР»СЊ
 	inc di
 	cmp byte ptr[di],13
 	jne printWordInConsole
 
 theEndOfWord:
 	mov dl,' '
-	call printSymbol								; Выводим пробел
+	call printSymbol								; Р’С‹РІРѕРґРёРј РїСЂРѕР±РµР»
 
 theEndOfFindWord:
 	pop si
@@ -135,7 +135,7 @@ theEndOfFindWord:
 findWordInVocabulary endp
 
 
-deleteWordFromConsole proc							; Процедура удаления последнего символа в консоли
+deleteWordFromConsole proc							; РџСЂРѕС†РµРґСѓСЂР° СѓРґР°Р»РµРЅРёСЏ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р° РІ РєРѕРЅСЃРѕР»Рё
 	push cx
 delete:
 	call deleteLastSymbol
@@ -145,7 +145,7 @@ delete:
 deleteWordFromConsole endp
 
 
-deleteLastSymbol proc								; Процедура удаления последнего символа в консоли
+deleteLastSymbol proc								; РџСЂРѕС†РµРґСѓСЂР° СѓРґР°Р»РµРЅРёСЏ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р° РІ РєРѕРЅСЃРѕР»Рё
 	push dx
 	mov dl,8
 	call printSymbol
@@ -158,7 +158,7 @@ deleteLastSymbol proc								; Процедура удаления последнего символа в консоли
 deleteLastSymbol endp
 
 
-printSymbol proc									; Процедура выводящая символ
+printSymbol proc									; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ СЃРёРјРІРѕР»
 	push ax
 	mov ah,02h
 	int 21h	
@@ -167,7 +167,7 @@ printSymbol proc									; Процедура выводящая символ
 printSymbol endp
 
 
-readVocabularyFromFile proc						; Процедура чтения словаря из файла
+readVocabularyFromFile proc						; РџСЂРѕС†РµРґСѓСЂР° С‡С‚РµРЅРёСЏ СЃР»РѕРІР°СЂСЏ РёР· С„Р°Р№Р»Р°
 	push ax
 	push bx
 	push cx
@@ -177,7 +177,7 @@ readVocabularyFromFile proc						; Процедура чтения словаря из файла
 	mov ah,3dH
 	lea dx,fileName
 	xor al,al
-	int 21h										; Открытие файла
+	int 21h										; РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	jnc fileIsOpen
 	call errorWithFile
 fileIsOpen:
@@ -186,7 +186,7 @@ fileIsOpen:
 	mov ah,3fH
 	lea dx,vocabulary
 	mov cx,100
-	int 21h										; Чтение файла
+	int 21h										; Р§С‚РµРЅРёРµ С„Р°Р№Р»Р°
 	jnc fileIsRead
 	call errorWithFile
 fileIsRead:
@@ -200,7 +200,7 @@ fileIsRead:
 	add ax,2
 	mov len,ax
 
-	mov ah,3eH									; Закрытие файла
+	mov ah,3eH									; Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 	mov bx,[handle]
 	int 21h
 	jnc fileIsClose
@@ -216,15 +216,15 @@ fileIsClose:
 readVocabularyFromFile endp
 
 
-errorWithFile proc								; Процедура, обрабатывающая ошибки с файлами
+errorWithFile proc								; РџСЂРѕС†РµРґСѓСЂР°, РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰Р°СЏ РѕС€РёР±РєРё СЃ С„Р°Р№Р»Р°РјРё
 	lea dx,fileErrorMessage
 	call printString
 	mov ah,4ch
-    int 21h
+    	int 21h
 errorWithFile endp
 
 
-printString proc								; Процедура выводящая строку
+printString proc								; РџСЂРѕС†РµРґСѓСЂР° РІС‹РІРѕРґСЏС‰Р°СЏ СЃС‚СЂРѕРєСѓ
 	push ax
 	mov ah,09h
 	int 21h	
@@ -233,7 +233,7 @@ printString proc								; Процедура выводящая строку
 printString endp
 
 
-printEndline proc								; Процедура переноса каретки на другую строку
+printEndline proc								; РџСЂРѕС†РµРґСѓСЂР° РїРµСЂРµРЅРѕСЃР° РєР°СЂРµС‚РєРё РЅР° РґСЂСѓРіСѓСЋ СЃС‚СЂРѕРєСѓ
 	push dx
 	lea dx,endline
 	call printString
@@ -245,7 +245,7 @@ printEndline endp
 initialize:
 	mov ah,35h
 	mov al,21h
-	int 21h										; Получаем вектор прерывания 21h
+	int 21h										; РџРѕР»СѓС‡Р°РµРј РІРµРєС‚РѕСЂ РїСЂРµСЂС‹РІР°РЅРёСЏ 21h
 	mov word ptr int21hVector,bx
 	mov word ptr int21hVector+2,es
 
@@ -256,62 +256,62 @@ initialize:
 
 	cmp cmdLine[0],' '
 	jne parametrError
-	cmp cmdLine[1],'-'							; Проверяем параметр 
+	cmp cmdLine[1],'-'							; РџСЂРѕРІРµСЂСЏРµРј РїР°СЂР°РјРµС‚СЂ 
 	jne parametrError
 	cmp cmdLine[2],'d'
 	jne parametrError
 	jmp remove
 
-parametrError:									; Выдать сообщение об ошибке при передаче параметра
+parametrError:									; Р’С‹РґР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РїСЂРё РїРµСЂРµРґР°С‡Рµ РїР°СЂР°РјРµС‚СЂР°
 	mov ah,09h
 	lea dx,parametrErrorMessage
 	int 21h
 	mov ah,4ch
-    int 21h
+    	int 21h
 	
 install:
-	cmp es:installFlag,13579					; Проверяем установлен ли обработчик
+	cmp es:installFlag,13579						; РџСЂРѕРІРµСЂСЏРµРј СѓСЃС‚Р°РЅРѕРІР»РµРЅ Р»Рё РѕР±СЂР°Р±РѕС‚С‡РёРє
 	je alreadyInstalled
 	
-	mov ah,09h									; Устанавливаем обработчик
+	mov ah,09h									; РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РѕР±СЂР°Р±РѕС‚С‡РёРє
 	lea dx,handlerHasBeenInstalledMessage
-	int 21h										; Выдать сообщение, что обработчик установлен
+	int 21h										; Р’С‹РґР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ, С‡С‚Рѕ РѕР±СЂР°Р±РѕС‚С‡РёРє СѓСЃС‚Р°РЅРѕРІР»РµРЅ
 	mov ah,25h
 	mov al,21h
 	mov dx,offset myHandler
 	int 21h	
 	jmp exit
 
-alreadyInstalled:								; Выдать сообщение, что обработчик уже установлен
+alreadyInstalled:								; Р’С‹РґР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ, С‡С‚Рѕ РѕР±СЂР°Р±РѕС‚С‡РёРє СѓР¶Рµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
 	mov ah,09h
 	lea dx,handlerAlreadyInstalledMessage
 	int 21h
 	mov ah,4ch
-    int 21h
+    	int 21h
 
 remove:
-	cmp es:installFlag,13579					; Проверяем установлен ли обработчик
+	cmp es:installFlag,13579						; РџСЂРѕРІРµСЂСЏРµРј СѓСЃС‚Р°РЅРѕРІР»РµРЅ Р»Рё РѕР±СЂР°Р±РѕС‚С‡РёРє
 	jne didNotInstall
 	
 	mov ah,09h
 	lea dx,handlerHasBeenRemovedMessage
-	int 21h										; Выдать сообщение, что обработчик удален
+	int 21h										; Р’С‹РґР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ, С‡С‚Рѕ РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅ
 	mov ah,25h
 	mov al,21h
 	mov ds,word ptr es:int21hVector+2
 	mov dx,word ptr es:int21hVector
-	int 21h										; Удаляем обрабочик прерывания
+	int 21h										; РЈРґР°Р»СЏРµРј РѕР±СЂР°Р±РѕС‡РёРє РїСЂРµСЂС‹РІР°РЅРёСЏ
 	mov ah,4ch
-    int 21h
+    	int 21h
 
-didNotInstall:									; Выдать сообщение, что обработчик не был до этого установлен
+didNotInstall:									; Р’С‹РґР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ, С‡С‚Рѕ РѕР±СЂР°Р±РѕС‚С‡РёРє РЅРµ Р±С‹Р» РґРѕ СЌС‚РѕРіРѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
 	mov ah,09h
 	lea dx,handlerDidNotInstallMessage
 	int 21h
 	mov ah,4ch
-    int 21h
+    	int 21h
 
 exit:
 	mov dx,offset initialize
-    int 27h
+    	int 27h
 END START
