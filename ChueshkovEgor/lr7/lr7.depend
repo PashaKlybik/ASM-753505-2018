@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1542992376 source:d:\c++\lr7\main.cpp
+	<iostream>
+	<tchar.h>
+	<windows.h>
+
+1543905500 source:d:\asm-753505-2018-master\asm-753505-2018-master\meleron\lr7\main.cpp
+	<iostream>
+	<tchar.h>
+	<windows.h>
+
+1543905500 source:d:\3 сем\lab7\main.cpp
+	<iostream>
+	<tchar.h>
+	<windows.h>
+
