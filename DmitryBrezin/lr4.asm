@@ -1,13 +1,14 @@
-.model small
-.386
+.model small 
 .stack 256
-.data
-    max db 100
-        len db ?
-        string db 100 dup('$')
-.code
 
-;функция новой строки
+data segment
+     string db 0ah,100 dup ('$')
+data ends
+ 
+code segment
+assume cs:code,ds:data
+
+
 newline PROC
         push AX
         push DX
@@ -20,8 +21,7 @@ newline PROC
     pop AX
 ret
 newline ENDP
-
-;удаление пробелов
+ ;oaaeaiea i?iaaeia
 delete proc
         push cx
         push bx
@@ -31,7 +31,7 @@ delete proc
     lea di, string
     
 cycle:
-    ;перебираем пока не встретим пробел либо конец строки
+    ;ia?aae?aai iiea ia ano?aoei i?iaae eeai eiiao no?iee
     cmp byte ptr [si], ' '
     je Space
     cmp byte ptr [si], '$'
@@ -39,12 +39,10 @@ cycle:
     
     lodsb
     mov [di], al
-
-    inc di
+     inc di
     jmp cycle
-
-Space:
-    ;проверяем является ли след. символ пробелом , если да , то пропускаем его
+ Space:
+    ;i?iaa?yai yaeyaony ee neaa. neiaie i?iaaeii , anee aa , oi i?iioneaai aai
     cmp byte ptr [si+1], ' '
     je Skip
     
@@ -66,28 +64,65 @@ exit:
 ret
 delete ENDP
 
-
-
-main:
-    mov ax, @data
+start:
+    mov ax, data
     mov ds, ax
-    mov es, ax
-
-    ;ввод строки
-    lea dx, max
-    mov ah, 0aH
-    int 21h
     
-    ;удаление пробелов
-    call newline
-    call delete
-    lea dx, string
-
-    ;вывод
-    mov ah, 09h
+    mov cx,99
+    lea bx,string+1
+        
+n1:
+    mov ah,1
     int 21h
-    call newline
+    cmp al,13     ;
+    je ex
+    cmp al,8
+    je backspace
+    mov [bx],al
+    inc bx
+        
+    
+    loop n1
 
+backspace:
+	push ax
+	push dx
+	
+  	cmp bx, 0
+	je n1
+
+        mov [bx], '$'
+	dec bx
+	
+	mov DL,' ' 
+        mov AH, 02h 
+        int 21h 
+
+        ;СЃРґРІРёРіР°РµРј РєСѓСЂСЃРѕСЂ РЅР°Р·Р°Рґ
+        mov DL,8 
+        mov AH, 02h 
+        int 21h 
+
+	pop dx
+	pop ax
+
+  	jmp n1
+
+ex: 
+    
+    
+
+    CALL newline
+    CALL delete
+    
+    mov ah,9
+    lea dx,string
+    int 21h
+  
+    CALL newline
     mov ax, 4c00h
     int 21h
-end main    
+code ends
+end start
+
+
