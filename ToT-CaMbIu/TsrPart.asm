@@ -17,29 +17,59 @@ intRout proc
     je      @0
     jmp     dword ptr cs:[vOldInt]
 @0:
-    pushf
     push ax
     push bx
-    push cx                                   
+    push cx                                    
     push dx
     push di
     push si
     push ds
     push es
+    pushf
+   
+    push cs
+    push cs
+    cld
+    pop es
+    mov si, dx
+    lea di, str1+2
+    xor cx, cx
+    copy:
+        lodsb
+        cmp al, '$'
+        jz End_loop
+        inc ch
+        stosb
+        jmp copy
+    End_loop:
+        pop ds  
+
+    mov str1_length,ch
+    mov str1[1],ch
     
-    push cs
-    pop  ds
-    push cs
-    pop  es  
+    xor cx,cx
+    mov cl,str1[1]
+    add cl,2
+    mov bx,offset str1
+    add bx,cx
+    mov byte ptr [bx],' '
+    xor cx,cx
+    mov cl,str1[1]
+    add cl,1
+    mov str1[1],cl
     
     xor ax,ax
     xor si,si
     xor di,di
-    xor dx,dx             
-    
-    call addSymbolStr
-    
-    call mainAlgorithm
+    xor dx,dx   
+
+    push ds
+    push es
+    pushf
+    call mainAlgorithm  
+    popf
+    pop es
+    pop ds
 
     mov si, offset finalString
     add si,2
@@ -55,6 +85,7 @@ cycle:
     je exit
     jmp cycle
 exit:
+    popf
     pop es
     pop ds
     pop si
@@ -63,7 +94,6 @@ exit:
     pop cx                                            
     pop bx
     pop ax
-    popf
     iret
 intRout endp
 
@@ -252,23 +282,27 @@ addSymbolStr endp
 endl proc
     push ax
     push dx
+    pushf
     mov ah, 02h
     mov dl, 13
     int 21h
     mov dl, 10
     int 21h
+    popf
     pop dx
     pop ax
     ret
 endl endp 
 
 flag dw 15687
-str1 db 0dh,0ah,"lolkek$"
+;str1 db 0dh,0ah,"lolkek$"
+str1 db 10, ?, 9 dup('$')
 str2 db 0dh,0ah,"progkekch$"
 str3 db 10, ?, 9 dup ('$')
 addSymbol db 10, ?, 9 dup ('$')
 addSymbolNotCycle db 10, ?, 9 dup('$')
 finalString db 10,?,9 dup ('$')
+str1_length db 0
 
 init    proc    
         mov     ax, 3521h
