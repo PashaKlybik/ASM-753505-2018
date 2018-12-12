@@ -1,18 +1,19 @@
 model small
 .stack 256
 .data
-s db  0dh,0ah,"startString$"
+s db  "startgkek$"
+mess1 db 0dh,0ah,"Final String:",0dh,0ah,"$"
 .code
 start:
-	mov ax, @data
-	mov ds, ax
+    mov ax, @data
+    mov ds, ax
 
-	lea dx, s+2
-	mov ah, 09h
-	int 21h
+    lea dx, s
+    mov ah, 09h
+    int 21h
 
-	mov ah, 4ch
-	int 21h
+    mov ah, 4ch
+    int 21h
 
 endl proc
     push ax
