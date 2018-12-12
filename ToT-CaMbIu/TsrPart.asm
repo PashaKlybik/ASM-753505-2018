@@ -305,66 +305,66 @@ finalString db 10,?,9 dup ('$')
 str1_length db 0
 
 init    proc    
-        mov     ax, 3521h
-        int     21h
+        mov ax, 3521h
+        int 21h
 
-        cmp     byte ptr cmd_line[1], 'i'
-        je      install
-        cmp     byte ptr cmd_line[1], 'd'
-        je      uninstall
-        jmp     error
+        cmp byte ptr cmd_line[1], 'i'
+        je install
+        cmp byte ptr cmd_line[1], 'd'
+        je uninstall
+        jmp error
 
 install:
 
-        cmp     es:flag, 19864
-        je      installed
+        cmp es:flag, 19864
+        je installed
 
-        mov     flag, 19864
+        mov flag, 19864
 
-        mov     [vOldInt], bx
-        mov     [vOldInt+2], es
+        mov [vOldInt], bx
+        mov [vOldInt+2], es
  
-        mov     dx, offset intRout
-        mov     ax, 2521h
-        int     21h
+        mov dx, offset intRout
+        mov ax, 2521h
+        int 21h
  
-        mov     dx, offset init
-        int     27h
+        mov dx, offset init
+        int 27h
 
 uninstall:
-        cmp     es:flag, 19864
-        jne     uninstall_error
+        cmp es:flag, 19864
+        jne uninstall_error
 
-        mov     dx, es:vOldInt
-        mov     ds, es:vOldInt+2
-        mov     ax, 2521h
-        int     21h
+        mov dx, es:vOldInt
+        mov ds, es:vOldInt+2
+        mov ax, 2521h
+        int 21h
 
-        mov     ax, 4ch
-        int     21h
+        mov ax, 4ch
+        int 21h
 
 installed:
-        mov     dx, offset installed_str
-        mov     ah, 09h
-        int     21h
+        mov dx, offset installed_str
+        mov ah, 09h
+        int 21h
 
-        mov     ah, 4ch
-        int     21h
+        mov ah, 4ch
+        int 21h
 
 error:
-        mov     dx, offset error_str
-        mov     ah, 09h
-        int     21h
+        mov dx, offset error_str
+        mov ah, 09h
+        int 21h
 
-        mov     ah, 4ch
-        int     21h
+        mov ah, 4ch
+        int 21h
 uninstall_error:
-        mov     dx, offset uninstall_error_str
-        mov     ah, 09h
-        int     21h
+        mov dx, offset uninstall_error_str
+        mov ah, 09h
+        int 21h
 
-        mov     ah, 4ch
-        int     21h        
+        mov ah, 4ch
+        int 21h        
 init    ENDP
 
 installed_str db "Already installed!$"
