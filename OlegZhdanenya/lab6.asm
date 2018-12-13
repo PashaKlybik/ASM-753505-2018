@@ -7,7 +7,7 @@
 .startup
     jmp real_start
 
-    identifier  dw 752Fh     ;identifier ?
+    identifier  dw 752Fh
     scanA       db 1Eh
     scanB       db 30h
     scanC       db 2Eh
@@ -76,8 +76,8 @@ endcheck:
     mov ax, 40h
     mov es, ax
     mov bx, 1Ah
-    mov cx, es:[bx];?
-    mov di, es:[bx+2];?
+    mov cx, es:[bx]
+    mov di, es:[bx+2]
     cmp cx, di
     je write    ;empty buffer
     jg startAfterEnd
