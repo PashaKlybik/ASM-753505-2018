@@ -1,6 +1,0 @@
-# depslib dependency file v1.0
-1542992376 source:d:\c++\lr7\main.cpp
-	<iostream>
-	<tchar.h>
-	<windows.h>
-
