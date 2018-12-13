@@ -295,7 +295,6 @@ endl proc
 endl endp 
 
 flag dw 15687
-;str1 db 0dh,0ah,"lolkek$"
 str1 db 10, ?, 9 dup('$')
 str2 db 0dh,0ah,"progkekch$"
 str3 db 10, ?, 9 dup ('$')
