@@ -1,82 +1,70 @@
-; ��������� � cp866
-.model  small
-.386
-CR  =   0Dh
-LF  =   0Ah
-dos_inp macro   lbl, sz
-_ib_    struc  
-max db  sz      ; ���������� ����� ������
-len db  ?               ; ���� �������� ��������� �����
-bf  db  sz dup(?)   ; ��� ����� ��, ��� �����
-_ib_    ends            
-lbl _ib_ <>
-endm
-.stack  100
-.data
-req db  CR, LF, 'Enter string:$'
-dos_inp buf1, 10
-dos_inp buf2, 20
-vowels  db  '123456789'
-vow_sz  =   $ - vowels
-.code   
-start:  
-    mov ax, @data
-    mov ds, ax
-    mov es, ax
-    call    entr
-    lea dx, buf1
-    call    my_gets
-    call    entr
-    lea dx, buf2
-    call    my_gets
-    call    crlf
-    lea dx, buf1.bf
-    mov ah, 9
-    int 21h
-    call    crlf
-    lea dx, buf2.bf
-    mov ah, 9
-    int 21h
-    mov ax, 4C00h
-    int 21h
- 
-my_gets:pusha
+CSEG segment
+assume cs:CSEG, ds:CSEG, es:CSEG, ss:CSEG    
+org 100h
+Start:
+    jmp Init    
+;residental part
+Int_21h_proc proc            ;our procedure that replaces/controls standard 09h
+    cmp ah,9                 ;Is it 09h?
+    je Is09h
+    jmp dword ptr cs:[Int_21h_vect]     ;if no, to the original int21h
+Is09h:        
+ pushf
+    push ax
+    push cx
+    push dx
+    push si
+    push di
+    push cs
+
+    pop es            ;ds moves into es
+    cld				  ;CLD 	Очистка флага направления ;STD 	Установка флага направления
     mov si, dx
-    lodsw
-    mov di, si
-    movzx   cx, al
-    xor bx ,bx
-@l: xor ax,ax
-    int 16h
-    cmp al, CR
-    jz  done
-    push    cx
-    push    di
-    lea di, vowels
-    mov cx, vow_sz
-    repne   scasb
+    stringProcessing:
+        lodsb
+        cmp al, '$'
+        je stringHasEnded
+        lea di, vowels
+        mov cx, 10
+        repne scasb        ;compare al with es:di
+        je stringProcessing
+        mov dx, [si-1]
+        mov ah, 02h
+        int 21h
+        jmp stringProcessing
+    stringHasEnded:
+    pushf
+    call dword ptr cs:[Int_21h_vect]
+    sti	;Команда STI устанавливает флаг IF. Тем самым эта команда разрешает процессору реагировать на аппаратные прерывания. Для запрещения прерываний служит команда CLI.
     pop di
-    jz  @F
-    stosb
-    inc bx
-    int 29h
-@F: pop cx
-    loop    @l
-done:   mov al, '$'
-    stosb
-    mov [si-1],bl
-    popa
-    ret
-entr:   lea dx, req
-    mov ah, 9
+    pop si
+    pop dx
+    pop cx
+    pop ax
+    popf
+    iret
+Int_21h_vect dd ?
+Int_40h_vect dd ?
+vowels db "aeiouAEIOU"
+int_21h_proc endp
+
+
+;the end of the residental part
+installMessage db "Succesfully installed.",10,13,'$'
+
+Init:
+    mov ah,35h            ;function 35h 
+    mov al,21h            ;saves vector of 21h to es(segment):bx(offset)
     int 21h
-    ret
-; newline
-crlf:
-    mov ax, 0D0Ah
-    int 29h
-    xchg    ah,al
-    int 29h
-;
- 
-    end start
+    mov word ptr Int_21h_vect,bx
+    mov word ptr Int_21h_vect+2,es
+    mov ax,2521h        ;installing our handler on 21h 
+    mov dx,offset Int_21h_proc ;ds:dx = handler
+    int 21h
+    mov ah, 9
+    lea dx, installMessage
+    int 21h 
+    mov dx,offset Init
+    int 27h        ;makes it residental (init = last byte)
+CSEG ends
+end Start
