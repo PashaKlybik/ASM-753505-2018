@@ -169,7 +169,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	HWND ballButton = CreateWindowEx(NULL,
 		L"BUTTON",
-		L"Укарасить шариками",
+		L"Украсить шариками",
 		WS_CHILD,
 		10,
 		50,
@@ -182,7 +182,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	HWND starButton = CreateWindowEx(NULL,
 		L"BUTTON",
-		L"Укарасить звездой",
+		L"Украсить звездой",
 		WS_CHILD,
 		10,
 		90,
