@@ -38,44 +38,44 @@ Int_21h_proc proc
         pop ds
    mov inputStr_length,ch
    mov bx,0
-  lea si, ResidentStr
-  cicleLength:
-   lodsb
-   cmp al, 36
-   jz endLength
-   inc bx
-  jmp cicleLength
- endLength:
-  mov ax,bx
-  mov bl,1
-  div bl
-  mov resident_length, al
-  mov ah, resident_length
-   push bx
-   lea bx, Temp_max_str
-   mov offset_temp_max, bx
-   pop bx 
-        
-    
-    lea si, ResidentStr
-    lea di, InputStr
-    cld
-   cicle_i:
-    push ax
-    push bx
-    mov ah,i
-    mov al, resident_length
-    cmp ah,al
-    pop bx
-    pop ax
-   
-    jl next_cicle_i
-    jmp end_cicle_i
-   next_cicle_i:
-    
-    cicle_j:
-      push ax
-     push bx
+  lea si, ResidentStr                                ; Алгоритм на языке C++
+  cicleLength:                                       ;int main()
+   lodsb                                             ;{
+   cmp al, 36                                        ;   string str1, str2;
+   jz endLength                                      ;   cin >> str1 >> str2;
+   inc bx                                            ;   string max_str;
+  jmp cicleLength                                    ;   int MaxCount = 0; 
+ endLength:                                          ;   for (int i = 0; i < str1.length(); i++)
+  mov ax,bx                                          ;   {   
+  mov bl,1                                           ;       for (int j = 0; j < str2.length(); j++)
+  div bl                                             ;       {    
+  mov resident_length, al                            ;           if (str1[i] == str2[j])
+  mov ah, resident_length                            ;           {
+   push bx                                           ;               int indexBegin1 = i;
+   lea bx, Temp_max_str                              ;               int indexBegin2 = j;
+   mov offset_temp_max, bx                           ;               int tempCount = 0;
+   pop bx                                            ;               string Temp_max_str;
+                                                     ;               while (str1[indexBegin1] == str2[indexBegin2])
+                                                     ;               {
+    lea si, ResidentStr                              ;                   Temp_max_str.operator+=(str1[indexBegin1]);
+    lea di, InputStr                                 ;                   indexBegin1++;
+    cld                                              ;                   indexBegin2++;
+   cicle_i:                                          ;                   tempCount++;
+    push ax                                          ;                   if (indexBegin1 == str1.length() || indexBegin2 == str2.length())
+    push bx                                          ;                   {
+    mov ah,i                                         ;                       break;
+    mov al, resident_length                          ;                   }
+    cmp ah,al                                        ;               }    if (MaxCount < tempCount)
+    pop bx                                           ;               if (MaxCount < tempCount)    {
+    pop ax                                           ;               {        max_str.operator=(Temp_max_str);
+                                                     ;                   max_str.operator=(Temp_max_str);    
+    jl next_cicle_i                                  ;                   MaxCount = tempCount;
+    jmp end_cicle_i                                  ;               }
+   next_cicle_i:                                     ;           }
+                                                     ;       }
+    cicle_j:                                         ;   }
+      push ax                                        ;   cout << max_str;
+     push bx                                         ;}
      mov ah,j
      mov bh, InputStr_length
      cmp ah,bh
