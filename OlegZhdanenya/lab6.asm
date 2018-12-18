@@ -1,6 +1,5 @@
 ; tasm experiment.asm
 ; tlink /t prog.obj (/t - for COM)
-;line 149?
 .model tiny
 .code
 .186 
