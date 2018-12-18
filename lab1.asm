@@ -18,56 +18,56 @@ start:
 mov ax, @data
 mov ds, ax
 
-mov ax,[aa]
-mul [bb]
-mov [a],ax
+mov ax,aa
+mul bb
+mov a,ax
 
-mov ax,[bb]
-mul [cc]
-mov [b],ax
+mov ax,bb
+mul cc
+mov b,ax
 
-mov ax,[cc]
-mul [dd]
-mov [c],ax
+mov ax,cc
+mul dd
+mov c,ax
 
-mov ax,[dd]
-mul [aa]
-mov [d],ax
+mov ax,dd
+mul aa
+mov d,ax
 
-mov ax,[a]
-cmp ax,[b]
+mov ax,a
+cmp ax,b
 jnl sr1
 
-mov ax,[b]
-cmp ax,[c]
+mov ax,b
+cmp ax,c
 jnl sr2
 
-mov ax,[c]
-cmp ax,[d]
+mov ax,c
+cmp ax,d
 jnl exit
 
-mov ax,[d]
+mov ax,d
 jmp exit
 
 sr1:
-cmp ax,[c]
+cmp ax,c
 jnl sr3
-mov ax,[c]
-cmp ax,[d]
+mov ax,c
+cmp ax,d
 jnl exit
-mov ax,[d]
+mov ax,d
 jmp exit
 
 sr2:
-cmp ax,[d]
+cmp ax,d
 jnl exit
-mov ax,[d]
+mov ax,d
 jmp exit
 
 sr3:
-cmp ax,[d]
+cmp ax,d
 jnl exit
-mov ax,[d]
+mov ax,d
 jmp exit
 
 
