@@ -16,7 +16,7 @@
 
 proc inputStr
 
-    lea dx, inputString 
+    lea dx, inputString   ;65536 / 12 = 0!!
     mov ah, 10
     int 21h
 
@@ -34,31 +34,31 @@ endp inputStr
 
 proc toNum
     
-    xor dx,dx 
-	xor cx,cx
-	mov dx,1
+    xor dx, dx 
 
 toReg:
-    xor ax,ax
-    mov bl, [si]    
+    xor ax, ax
+    mov al, [si]    
     inc si           
-    cmp bl, 13  
+    cmp al, 13        
     je exit
     
-    cmp bl,'9'   
+    cmp al,'9'    
     jg notNum
-    cmp bl,'0'  
+    cmp al,'0'      
     jb notNum
     
-    sub bl,'0'  
-	
-    mov ax, cx  
-	imul dx	
-	jc overflow
-	mov dx, 10		
-	add ax, bx	
-	mov cx, ax 	
-	jmp toReg
+    sub ax, '0'    
+    
+    shl dx, 1    
+    add ax, dx
+    jc overflow
+    
+    shl dx, 2
+    add dx, ax    
+    jc overflow
+
+    jmp toReg
 
 notNum:
     mov bp, 2
@@ -68,8 +68,8 @@ overflow:
     mov bp, 1
 
 exit:    
-    mov ax,cx
-    
+    mov ax, dx
+   
     ret
 endp toNum
 
@@ -80,11 +80,11 @@ proc toStr
     push dx
     push bx
 
-    mov bx,10    
-    xor cx,cx    
+    mov bx, 10    
+    xor cx, cx    
 
 digitToStack:    
-    xor dx,dx    
+    xor dx, dx    
     div bx       
     push dx      
     inc cx       
@@ -93,7 +93,7 @@ digitToStack:
 	
 stackToStr:    
     pop ax        
-    add al,'0'    
+    add al, '0'    
     mov [di], al
     inc di        
     loop stackToStr  
@@ -165,12 +165,14 @@ start:
     xor ax, ax
     call inputStr
     call toNum
+	
     mov a, ax
     call checkNum
 
     xor ax, ax
     call inputStr
     call toNum
+		
     mov b, ax
     cmp b, 0
     jne nozero
