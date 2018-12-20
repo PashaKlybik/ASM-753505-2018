@@ -105,7 +105,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-   HWND hClearButton = CreateWindow(_T("BUTTON"), _T("CLEAR"), WS_CHILD | WS_VISIBLE, 600, 720, 130, 50, hWnd, (HMENU)IDM_CLEARBUTTON, hInst, 0);
+   HWND hClearButton = CreateWindow(_T("BUTTON"), _T("CLEAR"), WS_CHILD | WS_VISIBLE, 450, 0, 130, 50, hWnd, (HMENU)IDM_CLEARBUTTON, hInst, 0);
    if (!hWnd)
    {
       return FALSE;
@@ -160,22 +160,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HPEN hBlackPen, hRedPen;
 			hRedPen = CreatePen(PS_SOLID, 1, RGB(254, 32, 31));
 			hBlackPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
-	
+			
+		
 
 			for (int i = 0; i < points.size(); i++)
 			{
 				int x = points[i].first;
 				int y = points[i].second;
-
 				SelectObject(hdc, hBlackPen);
+				HBRUSH hOldBrush, hRedBrush;
+				hRedBrush = CreateSolidBrush(RGB(255, 255, 210));
+				hOldBrush = (HBRUSH)SelectObject(hdc, hRedBrush);
+				hRedBrush = CreateSolidBrush(RGB(255, 255, 210));
+				hOldBrush = (HBRUSH)SelectObject(hdc, hRedBrush);
 				Rectangle(hdc, x - 100, y + 70, x + 100, y - 70);
+				hRedBrush = CreateSolidBrush(RGB(0, 0, 255));
+				hOldBrush = (HBRUSH)SelectObject(hdc, hRedBrush);
 				Rectangle(hdc, x - 30, y + 30, x + 30, y - 30);
-		
-				Rectangle(hdc, x - 30, y + 30, x + 30, y - 30);
+
+
 
 				SelectObject(hdc, hRedPen);
+
+				hRedBrush = CreateSolidBrush(RGB(254, 32, 32));
+				hOldBrush = (HBRUSH)SelectObject(hdc, hRedBrush);
 				POINT triangle[3] = { {x - 100, y - 70}, {x + 100, y - 70}, {x, y - 150} };
 				Polygon(hdc, triangle, 3);
+
+				
 			}
 
 			DeleteObject(hBlackPen);
