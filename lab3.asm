@@ -9,7 +9,6 @@ c dw 0
 d dw 0
 checker dw 0
 not_a_number dw 0
-;MAX_VALUE dw 32768
 is_Negative dw 0
 result_is_negative dw 0
 
@@ -221,9 +220,9 @@ main:
 			
 			mov cx, ax
 			pop ax
-
-			;cmp cx, MAX_VALUE
-			;ja overlim
+			
+			cmp cx, 32768
+			ja overlim
 
 			mov checker, 1 
 
@@ -234,10 +233,10 @@ main:
 			jmp InputBegin
 			
 		overlim:
-			mov cx, 0
-			lea dx, strOF
-			mov ah, 9
-			int 21h
+            		mov cx,0
+            		mov   ah, 9           
+            		mov   dx, offset strOF        
+            		int   21h
 			mov is_Negative, 0
 			mov checker, 0
 			jmp InputBegin
