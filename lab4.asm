@@ -19,7 +19,7 @@ EnterString   proc
 	mov   ah, 9 
 	int   21h
  
-	lea   dx, max      ;ввод строки
+	lea   dx, max      
 	mov   ah, 10
 	int   21h
 
@@ -27,23 +27,23 @@ EnterString   proc
 EnterString   endp 
 
 
-isSpace   proc      ;проход слова до пробела 
+isSpace   proc      
 
 	xor bp, bp
 
 beg1:   
-	cmp [si], byte ptr ' '	;проверяем пробел ли это 
+	cmp [si], byte ptr ' '	
 	je space			
-	inc bp       			;помечаем, что найдена буква очередного слова 
-	dec si	    			;переходим на следующую букву(читаем с конца)
-	dec bx					;bx - длина строки, которая еще не прочитана
-	cmp bx, 0				;проверка на конец строки
+	inc bp       			
+	dec si	    			
+	dec bx				
+	cmp bx, 0			
 	je space
 	jmp beg1
 
 space:
-	inc si					; устанавливаем указатель на первую букву копируемого слова
-	dec bp					; уменьшаем слово на 1 (пробел)
+	inc si		
+	dec bp		
 	ret 
 isSpace   endp
 
@@ -51,24 +51,24 @@ isSpace   endp
 reverse_words proc
 
 	xor   bx, bx      
-	mov   bl, len					;помещаем в bx длину строки исходной       
-	mov   [bx+di], byte ptr '$'		; устанавливаем длину выходящей строки такую как и входящая
+	mov   bl, len	       
+	mov   [bx+di], byte ptr '$'
 	add si, bx
-	dec si		;перемещаем si в конец строки
+	dec si	
 	dec bx
 beg2:
 	call isSpace
-	mov cx, bp		; cx - длина копируемого слова(без последней буквы)
-	inc cx			; полная длина слова
-	rep movsb		; копируем слово из si в di
-	cmp bx, 0		; проверяем на конец строки
+	mov cx, bp
+	inc cx			
+	rep movsb		
+	cmp bx, 0		
 	je fin
-	mov [di], byte ptr ' '	; ставим пробел после слова
+	mov [di], byte ptr ' '	
 	inc di
-	lea si, string			; перемещаемся в начало строки
+	lea si, string		
 	add si, bx				
-	dec si					; перемещаемся на текущую позицию					
-	dec bx					; уменьшаем строку на 1(пробел)
+	dec si								
+	dec bx			
 	dec si					
 	jmp beg2
 
