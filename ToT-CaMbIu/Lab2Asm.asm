@@ -1,3 +1,4 @@
+//Grigoriev Kirill fix directories
 .model small
 .stack 100h
 .data
