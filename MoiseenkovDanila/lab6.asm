@@ -43,7 +43,7 @@ jmp Initialisation
         mov si, dx
 	lea di, InputStr
 	xor cx, cx
-       copy:
+		copy:
 		lodsb
 		cmp al, '$'
 		jz End_loop
@@ -270,6 +270,7 @@ jmp Initialisation
    mov ah,0
    mov MaxCount, ah
   pop ax
+  popf
    pop ax 
    pop bx 
    pop cx 
@@ -281,7 +282,7 @@ jmp Initialisation
 iret
  Int_21h_proc endp
  	Int_21h_vect dd ?
-        ResidentStr db 'Karl u klary read writeln rapapa never lets you go$'
+        ResidentStr db 'i dont now what is it resident program$'
         InputStr db 255 dup('$')
         Max_str db 255 dup('$')
         MaxCount db 0
