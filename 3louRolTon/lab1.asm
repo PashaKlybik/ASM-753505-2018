@@ -15,13 +15,13 @@ start:
 	mov ax, a
 	mul ax
 
-	mov ebx, eax
+	mov bx, ax
 	
 	mov ax, c
 	mov cx, b
 	mul cx
 	
-	cmp ebx, eax
+	cmp bx, ax
 	je result1
 	
 	jmp result3
@@ -32,7 +32,7 @@ result1:
 	mov cx, b
 	div cx
 
-	cmp ebx, eax
+	cmp bx, ax
 	je result2
 	mov ax, c
 	jmp finish
