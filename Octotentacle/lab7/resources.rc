@@ -1,0 +1,7 @@
+#include "resource.h"
+
+MYICON ICON "tree256.ico"
+
+BALL BITMAP "train.bmp"
+
+IDB_YEAR BITMAP "background.bmp"

@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1543561004 source:d:\university\lab7\main.cpp
+	<windows.h>
+	"resource.h"
+
+1542661347 d:\university\lab7\resource.h
+
+1542667042 source:d:\university\lab7\resources.rc
+	"resource.h"
+
+1543561006 source:e:\bsuir\programming(assembly)\dos-box\dosbox\lab7\main.cpp
+	<windows.h>
+	"resource.h"
+
+1542661348 e:\bsuir\programming(assembly)\dos-box\dosbox\lab7\resource.h
+
+1542667044 source:e:\bsuir\programming(assembly)\dos-box\dosbox\lab7\resources.rc
+	"resource.h"
+
+1542667044 source:d:\prog\labo\asm\lab7\resources.rc
+	"resource.h"
+
+1542661348 d:\prog\labo\asm\lab7\resource.h
+
