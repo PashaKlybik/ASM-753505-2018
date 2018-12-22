@@ -34,21 +34,19 @@ result1:
 
 	cmp ebx, eax
 	je result2
-	mov bx, c
+	mov ax, c
 	jmp finish
 
 result2:
 	mov ax, a
 	mov cx, b
 	or ax, cx
-	mov bx, c
 	jmp finish
 
 result3:
 	mov ax, c
 	mul a
 	sub ax, b
-	mov ebx, eax
 	jmp finish
 	
 finish:
