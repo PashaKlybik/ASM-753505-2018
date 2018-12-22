@@ -1,88 +1,90 @@
+
+
 .model small
 .stack 100h
 
 .data 
-a dw 2
-b dw 3
-c dw 4
-d dw 5
+a dw 8
+b dw 4
+c dw 6
+d dw 2
 
 .code
 
 start:
 
-    mov ax,@data                 
-    mov cx,ax                
+    mov ax, @DATA
+    mov ds, ax
     
-    mov ax,a
+    mov ax,a 
     mul c
+    mov bx,ax
+    xor ax,ax
+
+    mov ax,b
+    mul d
+    mov dx,ax
+    xor ax,ax
+
+    add bx,dx
+    xor dx,dx
+
+    mov ax,a
+    mul d
     mov cx,ax
     xor ax,ax
 
     mov ax,b
-    mul d
-    mov dh,ax
-    xor ax,ax
-
-    add cs,dh
-    xor dh,dh
-
-    mov ax,a
-    mul d
-    mov ah,ax
-    xor ax,ax
-
-    mov ax,b
     mul c
-    mov dh,ax
+    mov dx,ax
     xor ax,ax
 
-    add dh,ah
-    xor ah,ah
+    add dx,cx
+    xor cx,cx
 
-    cmp cs,dh
+    cmp bx,dx
     je func1
 
-    xor cs,cs
-    xor dh,dh
+    xor bx,bx
+    xor dx,dx
 
-    mov cs, a
-    mov ah, c
-    cmp cs,ah
+    mov bx,a
+    mov cx,c
+    cmp bx,cx
     jg func2
 
-    mov ax, a
-    mov cs, b
-    mov dh, c
+    mov ax,a
+    mov bx,b
+    mox dx,c
 
-    or cs,dh
-    sub ax,cs
+    or bx,dx
+    sub ax,bx
 
     jmp finish
 
-    func1:
+func1:
     
-    mov ax, a
+    mov ax,a
     mul a
     
     jmp finish
 
-    func2:
+func2:
 
-    xor cs,cs
-    mov cs, d
-    and ah,cs
-    MOV ax,ah
+    xor bx,bx
+    mov bx, d
+    and cx,bx
+    mov ax,cx
     
     jmp finish
 
-    finish:
+finish:
 
-    xor cs,cs
-    xor ah,ah
-    xor dh,dh
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
 
-    mov ax, 4c00h
+    mov ah, 04ch
     int 21h
 
-end start
+    end start
