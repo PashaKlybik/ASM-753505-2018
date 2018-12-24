@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1544207516 source:c:\users\acer\desktop\lab7\lab7\main.cpp
+	<iostream>
+	<tchar.h>
+	<windows.h>
+
