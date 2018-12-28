@@ -1,6 +1,5 @@
 .model tiny
 
-;.stack 256
 
 .data
     
@@ -13,9 +12,6 @@
 org 100h
 
 start:
-    ;mov ax, @data
-    ;mov ds, ax
-    ;mov es, ax
     
     lea dx, max
     mov ah, 10
