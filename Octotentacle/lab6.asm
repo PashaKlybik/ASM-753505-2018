@@ -1,80 +1,113 @@
-.model small
-.stack 1000
-.data
-    old dd 0 
-.code
-.486
-    count db 0 
+CSEG segment
+assume cs:CSEG, ds:CSEG, es:CSEG, ss:CSEG
+org 100h
+Start:
+    jmp installation
  
-new_handle proc far      
-    push ds si es di dx cx bx ax 
-    xor ax, ax 
-    xor dx, dx
-    in  ax, 60h    
-    cmp ax, 38h
-    je switch
-    mov dl, count
-    cmp dl, 1
-    je old_handler
-    cmp al, 12h    
-    mov dl, 'f'
-    je new_handler
-    cmp al, 15h      
-    mov dl, 'z'
-    je new_handler
-    cmp al, 16h    
-    mov dl, 'v'
-    je new_handler
-    cmp al, 17h    
-    mov dl, 'j'
-    je new_handler
-    cmp al, 18h    
-    mov dl, 'p'
-    je new_handler
-    cmp al, 1Eh    
-    mov dl, 'b'
-    je new_handler
-    jmp old_handler
-    switch:
-        mov al, 1
-        add count, al
-        mov al, count
-        cmp al, 2
-        jne exit
-        mov count, 0
-        jmp exit
-    new_handler:
-        mov ah, 02h
-        int 21h
-        jmp exit    
-    old_handler: 
-        pop ax bx cx dx di es si ds           
-        jmp dword ptr cs:old         
-    exit:
-        xor ax, ax
-        mov al, 20h
-        out 20h, al 
-        pop ax bx cx dx di es si ds 
-    iret
-new_handle endp
+resident proc
+    push ax    
+    cmp al, 3Bh
+    jne f2 
+    push cx    
+    mov ah, 5      
+    mov cx, 'h'    
+    int 16h
+    mov ah, 5
+    mov cx, 'e'
+    int 16h
+    mov ah, 5
+    mov cx, 'l'
+    int 16h
+    pop ax
+    mov al, 19h
+    jmp to_ret
+f2:
+    cmp al, 3Ch    
+    jne f3
+    push cx    
+    mov ah, 5      
+    mov cx, 's'    
+    int 16h
+    mov ah, 5
+    mov cx, 'a'
+    int 16h
+    mov ah, 5
+    mov cx, 'v'
+    int 16h
+    pop ax
+    mov al, 12h
+    jmp to_ret
+f3:
+    cmp al, 3Dh    
+    jne f4
+    push cx    
+    mov ah, 5      
+    mov cx, 'o'    
+    int 16h
+    mov ah, 5
+    mov cx, 'p'
+    int 16h
+    mov ah, 5
+    mov cx, 'e'
+    int 16h
+    pop ax
+    mov al, 31h
+    jmp to_ret
+f4:
+    cmp al, 3Eh    
+    jne f5
+    push cx    
+    mov ah, 5      
+    mov cx, 'e'    
+    int 16h
+    mov ah, 5
+    mov cx, 'd'
+    int 16h
+    mov ah, 5
+    mov cx, 'i'
+    int 16h
+    pop ax
+    mov al, 14h
+    jmp to_ret
+f5:
+    cmp al, 3Fh    
+    jne to_original_int15
+    push cx    
+    mov ah, 5      
+    mov cx, 'c'    
+    int 16h
+    mov ah, 5
+    mov cx, 'o'
+    int 16h
+    mov ah, 5
+    mov cx, 'p'
+    int 16h
+    pop ax
+    mov al, 15h
  
-new_end:
+to_ret:
+    pop cx
+    jmp dword ptr cs:int15_vector
+   
+to_original_int15:
+    pop ax
+    jmp dword ptr cs:int15_vector
  
-start:
-    mov ax, @data
-    mov ds, ax  
-    cli
-    pushf 
-    push 0    
-    pop ds
-    mov eax, ds:[09h*4] 
-    mov cs:[old], eax 
-    call new_handle
-    mov ax, cs
-    shl eax, 16
-    mov ax, offset new_handle
-    mov ds:[09h*4], eax 
-    sti 
-    mov dx, (new_end - @code + 10fh) / 16 
-    int 27h 
-end start
+    int15_vector dd ?
+resident endp
+ 
+installation:
+    mov ax, 3515h  
+    int 21h
+ 
+    mov word ptr int15_vector, bx  
+    mov word ptr int15_vector + 2, es  
+ 
+    mov ax, 2515h  
+    mov dx, offset resident
+    int 21h
+ 
+    mov dx, offset installation
+    int 27h
+CSEG ends
+end Start
